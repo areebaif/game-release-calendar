@@ -1,4 +1,5 @@
 import { Card } from "@mantine/core";
+import { db } from "~/utils/db.server";
 
 const AddGame: React.FC = () => {
   // Create a card and a submit form

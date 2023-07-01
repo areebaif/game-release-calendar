@@ -1,4 +1,5 @@
 import { Button, Title } from "@mantine/core";
+import { Link } from "@remix-run/react";
 
 // export const meta: V2_MetaFunction = () => {
 //   return [
@@ -13,27 +14,11 @@ export default function Index() {
       <Title>Welcome to Remix</Title>
       <ul>
         <li>
-          <a
-            target="_blank"
-            href="https://remix.run/tutorials/blog"
-            rel="noreferrer"
-          >
-            15m Quickstart Blog Tutorial
-          </a>
+          <Link to="/admin">Add Game</Link>
         </li>
         <li>
-          <a
-            target="_blank"
-            href="https://remix.run/tutorials/jokes"
-            rel="noreferrer"
-          >
-            Deep Dive Jokes App Tutorial
-          </a>
-        </li>
-        <li>
-          <a target="_blank" href="https://remix.run/docs" rel="noreferrer">
-            Remix Docs
-          </a>
+          {" "}
+          <Link to="/admin/platform/new">Add Platform</Link>
         </li>
       </ul>
     </div>

@@ -13,7 +13,6 @@ declare global {
 if (process.env.NODE_ENV === "production") {
   db = new PrismaClient();
 } else {
-  console.log(" I am here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
   if (!global.__db__) {
     global.__db__ = new PrismaClient();
   }

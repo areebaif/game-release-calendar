@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useLoaderData, Form, useActionData } from "@remix-run/react";
+import { Form, useActionData } from "@remix-run/react";
 import type { ActionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { Card, Title, TextInput, Button } from "@mantine/core";
@@ -10,32 +10,27 @@ import { db, badRequest } from "~/utils";
 import { BadRequest } from "~/utils/types";
 import { BadRequestZod } from "~/utils/zod";
 
-export async function action({ request }: ActionArgs) {
+export const action = async ({ request }: ActionArgs) => {
   const form = await request.formData();
-  //const content = form.get("content");
   const name = form.get("name");
 
   if (typeof name !== "string" || !name.length) {
     return badRequest({
-      fieldErrors: null,
-      fields: null,
+      fieldErrors: "bad request",
+      fields: "name",
       formErrors: "Form not submitted correctly.",
     });
   }
-  const fields = { name };
   const platform = await db.gamePlatform.create({ data: { name } });
   return redirect(`/`);
-}
+};
 
 const AddPlatform: React.FC = () => {
   const [name, setName] = React.useState("");
   const actionData = useActionData<BadRequest>();
-
-  if (actionData) {
-    // TODO: error handling
-    const result = BadRequestZod.safeParse(actionData);
-    !result.success ? console.log(result.error) : undefined;
-  }
+  const result = BadRequestZod.safeParse(actionData);
+  // TODO: error handling, incorrect response from the server
+  !result.success ? console.log(result.error) : undefined;
 
   return (
     <Card
@@ -60,9 +55,17 @@ const AddPlatform: React.FC = () => {
             value={name}
             type="text"
             name="name"
-            error={!name.length ? "Enter a value to submit" : false}
+            error={
+              actionData?.fieldErrors ? "error submitting this value" : false
+            }
             onChange={(event) => setName(event.currentTarget.value)}
           ></TextInput>
+          {/* TODO: error handling: show client error */}
+          {actionData?.formErrors ||
+          actionData?.fields ||
+          actionData?.fieldErrors ? (
+            <div>{actionData.formErrors} </div>
+          ) : undefined}
           <Button type="submit">Submit</Button>
         </Form>
       </Card.Section>

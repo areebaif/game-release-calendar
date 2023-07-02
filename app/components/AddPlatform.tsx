@@ -1,35 +1,33 @@
 import * as React from "react";
 import { Flex, Select, Box, Button } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
-import { GamePlatform, PlatformReleaseList } from "~/utils/types";
+import { GamePlatform, FormPlatformFields, PlatformDropDwonList } from "~/utils/types";
 
-type GamePlatformInputProps = {
-  platforms: GamePlatform[];
-  platformsReleaseList: PlatformReleaseList[];
-  setPlatformsReleaseList: (val: PlatformReleaseList[]) => void;
+
+type AddPlatformProps = {
+  platformDropdownList: PlatformDropDwonList[];
+  setPlatformDropdownList: (data: PlatformDropDwonList[]) => void;
+  formPlatformFields: FormPlatformFields[];
+  setFormPlatformFields: (val: FormPlatformFields[]) => void;
 };
 
-export const GamePlatformInput: React.FC<GamePlatformInputProps> = ({
-  platforms,
-  platformsReleaseList,
-  setPlatformsReleaseList,
+export const AddPlatform: React.FC<AddPlatformProps> = ({
+  platformDropdownList,
+  formPlatformFields,
+  setFormPlatformFields,
+  setPlatformDropdownList,
 }) => {
-  // derivedProps
-  const parsePlatform = platforms.map((item) => ({
-    ...item,
-    value: item.name,
-    label: item.name,
-  }));
   // props
   const [namePlatform, setNamePlatform] = React.useState<string | null>("");
-  const [platformList, setPlatformList] = React.useState(parsePlatform);
+  //const [platformList, setPlatformList] = React.useState(parsePlatform);
   const [releaseDate, setReleaseDate] = React.useState<Date | null>(null);
 
   const onAddToPlatformList = (val: string | null) => {
-    const platform = findPlatform(val, platforms);
-
-    setPlatformsReleaseList([
-      ...platformsReleaseList,
+    const platform = platformDropdownList.filter(
+      (item) => `${item.id}` === val
+    );
+    setFormPlatformFields([
+      ...formPlatformFields,
       {
         platformId: platform[0].id,
         platformName: platform[0].name,
@@ -37,7 +35,10 @@ export const GamePlatformInput: React.FC<GamePlatformInputProps> = ({
       },
     ]);
     setNamePlatform("");
-    setPlatformList(platformList.filter((item) => item.name !== val));
+    setReleaseDate(null);
+    setPlatformDropdownList(
+      platformDropdownList.filter((item) => `${item.id}` !== val)
+    );
   };
 
   return (
@@ -49,7 +50,7 @@ export const GamePlatformInput: React.FC<GamePlatformInputProps> = ({
         withAsterisk
         placeholder="pick one"
         nothingFound="No options"
-        data={platformList}
+        data={platformDropdownList}
       />
       <DateInput
         valueFormat="MMM DD YYYY"
@@ -71,9 +72,4 @@ export const GamePlatformInput: React.FC<GamePlatformInputProps> = ({
       </Box>
     </Flex>
   );
-};
-
-const findPlatform = (val: string | null, data: GamePlatform[]) => {
-  const platform = data.filter((item) => item.name === val);
-  return platform;
 };

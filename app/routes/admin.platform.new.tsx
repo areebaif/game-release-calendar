@@ -1,8 +1,9 @@
 import * as React from "react";
 import { Form, useActionData } from "@remix-run/react";
-import type { ActionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { Card, Title, TextInput, Button } from "@mantine/core";
+// type import
+import type { ActionArgs } from "@remix-run/node";
 
 // local imports
 import { db, badRequest } from "~/utils";
@@ -21,7 +22,7 @@ export const action = async ({ request }: ActionArgs) => {
       formErrors: "Form not submitted correctly.",
     });
   }
-  const platform = await db.gamePlatform.create({ data: { name } });
+  //const platform = await db.gamePlatform.create({ data: { name } });
   return redirect(`/`);
 };
 
@@ -47,7 +48,7 @@ const AddPlatform: React.FC = () => {
         <Title order={3}>Add Platform</Title>
       </Card.Section>
       <Card.Section inheritPadding py="md">
-        <Form method="POST">
+        <form method="POST">
           <TextInput
             withAsterisk
             label="Name"
@@ -67,7 +68,7 @@ const AddPlatform: React.FC = () => {
             <div>{actionData.formErrors} </div>
           ) : undefined}
           <Button type="submit">Submit</Button>
-        </Form>
+        </form>
       </Card.Section>
     </Card>
   );

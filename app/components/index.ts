@@ -1,3 +1,4 @@
-import { GamePlatformInput } from "./GameReleaseInput";
+import { AddPlatform } from "./AddPlatform";
+import { FormPlatformList } from "./FormPlatformList";
 
-export { GamePlatformInput };
+export { AddPlatform, FormPlatformList };

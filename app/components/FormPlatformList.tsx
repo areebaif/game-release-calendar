@@ -56,15 +56,15 @@ export const FormPlatformList: React.FC<FormPlatformListProps> = ({
             </Grid.Col>
           </Grid>
           {formPlatformFields.map((formValues, index) => (
-            <>
+            <React.Fragment key={formValues.platformId}>
               <Divider my="sm" />
-              <Grid key={index}>
+              <Grid>
                 <Grid.Col span={"auto"}>
                   <Input
                     variant="unstyled"
                     value={formValues.platformId}
                     type="text"
-                    name="platformId"
+                    name={`platformId-${index}`}
                     readOnly
                   ></Input>
                 </Grid.Col>
@@ -73,7 +73,7 @@ export const FormPlatformList: React.FC<FormPlatformListProps> = ({
                     variant="unstyled"
                     value={formValues.platformName}
                     type="text"
-                    name="platformName"
+                    name={`platformName-${index}`}
                     readOnly
                   ></Input>
                 </Grid.Col>
@@ -82,7 +82,7 @@ export const FormPlatformList: React.FC<FormPlatformListProps> = ({
                     variant="unstyled"
                     value={formatDate(formValues.releaseDate)}
                     type="text"
-                    name="releaseDate"
+                    name={`releaseDate-${index}`}
                     readOnly
                   ></Input>
                 </Grid.Col>
@@ -97,7 +97,7 @@ export const FormPlatformList: React.FC<FormPlatformListProps> = ({
                   </Button>
                 </Grid.Col>
               </Grid>
-            </>
+            </React.Fragment>
           ))}
         </>
       ) : (

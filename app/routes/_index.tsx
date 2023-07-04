@@ -10,15 +10,15 @@ import { Link } from "@remix-run/react";
 
 export default function Index() {
   return (
-    <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.8" }}>
+    <div>
       <Title>Welcome to Remix</Title>
       <ul>
         <li>
-          <Link to="/admin">Add Game</Link>
+          <Link to="/admin/new">Add Game</Link>
         </li>
         <li>
           {" "}
-          <Link to="/admin/platform/new">Add Platform</Link>
+          <Link to="/admin/platform">Add Platform</Link>
         </li>
       </ul>
     </div>

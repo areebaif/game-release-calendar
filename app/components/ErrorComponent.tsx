@@ -3,7 +3,7 @@ import { Card, Alert } from "@mantine/core";
 import { IconAlertCircle } from "@tabler/icons-react";
 
 type ErrorCardProps = {
-  errorMessage: string;
+  errorMessage: string | undefined;
 };
 
 export const ErrorCard: React.FC<ErrorCardProps> = ({ errorMessage }) => {

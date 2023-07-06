@@ -1,4 +1,4 @@
-import { EnumLike, EnumValues, ZodEnum, z } from "zod";
+import { z } from "zod";
 
 export const GamePlatformZod = z.object({
   id: z.number(),
@@ -22,11 +22,3 @@ export const PlatformDropDwonListZod = z.object({
   updatedAt: z.string().optional(),
 });
 
-export const AddGameFormFieldsZod = z.enum(["platformName", ""]);
-export const AddNewPlatformFieldsZod = z.enum(["name"]);
-
-export const ErrorFormFieldsZod = z.object({
-  isError: z.boolean(),
-  message: z.string(),
-  field: z.union([AddGameFormFieldsZod, AddNewPlatformFieldsZod]),
-});

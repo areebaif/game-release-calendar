@@ -14,11 +14,11 @@ export default function Index() {
       <Title>Welcome to Remix</Title>
       <ul>
         <li>
-          <Link to="/admin/new">Add Game</Link>
+          <Link to="/admin/addGame">Add Game</Link>
         </li>
         <li>
           {" "}
-          <Link to="/admin/platform">Add Platform</Link>
+          <Link to="/admin/addPlatform">Add Platform</Link>
         </li>
       </ul>
     </div>

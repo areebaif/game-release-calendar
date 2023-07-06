@@ -1,5 +1,5 @@
-import { AddPlatform } from "./AddPlatform";
+import { GamePlatformList } from "./GamePlatformList";
 import { FormPlatformList } from "./FormPlatformList";
 import { ErrorCard } from "./ErrorComponent";
 
-export { AddPlatform, FormPlatformList, ErrorCard };
+export { GamePlatformList, FormPlatformList, ErrorCard };

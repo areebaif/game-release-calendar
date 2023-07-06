@@ -8,7 +8,8 @@ import {
   Input,
   Divider,
 } from "@mantine/core";
-import { FormPlatformFields, PlatformDropDwonList } from "~/utils/types";
+import { FormPlatformFields, PlatformDropDwonList } from "~/utils/zod/types";
+import { AddGameFormFields } from "~/utils/zod";
 import { formatDate } from "~/utils";
 
 type FormPlatformListProps = {
@@ -41,9 +42,6 @@ export const FormPlatformList: React.FC<FormPlatformListProps> = ({
           <Divider my="sm" />
           <Grid>
             <Grid.Col span={"auto"}>
-              <Title order={5}>Id</Title>
-            </Grid.Col>
-            <Grid.Col span={"auto"}>
               <Title order={5}>Platform Name</Title>
             </Grid.Col>
             <Grid.Col span={"auto"}>
@@ -57,23 +55,19 @@ export const FormPlatformList: React.FC<FormPlatformListProps> = ({
           </Grid>
           {formPlatformFields.map((formValues, index) => (
             <React.Fragment key={formValues.platformId}>
+              <Input
+                variant="unstyled"
+                value={`${formValues.platformId}$${formValues.platformName}$${formValues.releaseDate}`}
+                type="hidden"
+                name={`${AddGameFormFields.IdNameReleaseDate}`}
+                readOnly
+              ></Input>
               <Divider my="sm" />
               <Grid>
                 <Grid.Col span={"auto"}>
                   <Input
                     variant="unstyled"
-                    value={formValues.platformId}
-                    type="text"
-                    name={`platformId-${index}`}
-                    readOnly
-                  ></Input>
-                </Grid.Col>
-                <Grid.Col span={"auto"}>
-                  <Input
-                    variant="unstyled"
                     value={formValues.platformName}
-                    type="text"
-                    name={`platformName-${index}`}
                     readOnly
                   ></Input>
                 </Grid.Col>
@@ -81,8 +75,6 @@ export const FormPlatformList: React.FC<FormPlatformListProps> = ({
                   <Input
                     variant="unstyled"
                     value={formatDate(formValues.releaseDate)}
-                    type="text"
-                    name={`releaseDate-${index}`}
                     readOnly
                   ></Input>
                 </Grid.Col>

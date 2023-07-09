@@ -4,7 +4,11 @@ import {
   PlatformDropDwonListZod,
 } from "./addGame";
 import { ErrorFormFieldsZod } from "./common";
-import { AddPlatformFormFields, AddGameFormFields } from "./types";
+import {
+  AddPlatformFormFields,
+  AddGameFormFields,
+  s3FormFields,
+} from "./types";
 
 export {
   GamePlatformZod,
@@ -13,4 +17,5 @@ export {
   AddGameFormFields,
   AddPlatformFormFields,
   ErrorFormFieldsZod,
+  s3FormFields,
 };

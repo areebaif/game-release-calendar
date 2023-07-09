@@ -19,7 +19,12 @@ export enum AddGameFormFields {
   gameName = "gameName",
   gameDescription = "gameDescription",
   gamePicBlob = "gamePicBlob",
+  pictureUrl = "pictureUrl",
 }
 export enum AddPlatformFormFields {
   name = "name",
+}
+
+export enum s3FormFields {
+  fileType = "fileType",
 }

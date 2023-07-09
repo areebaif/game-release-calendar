@@ -5,8 +5,10 @@ import {
   useNavigation,
   useSubmit,
   useActionData,
+  useFetcher,
 } from "@remix-run/react";
 import { redirect } from "@remix-run/node";
+
 // type imports
 import type { ActionArgs, TypedResponse } from "@remix-run/node";
 import {
@@ -20,7 +22,7 @@ import {
 import { IconUpload } from "@tabler/icons-react";
 // local imports
 import { GamePlatformList, FormPlatformList, ErrorCard } from "~/components";
-import { db } from "~/utils";
+import { db, uploadPicture, validFileType } from "~/utils";
 // type imports
 import {
   GamePlatform,
@@ -45,9 +47,8 @@ export const action = async ({
 }: ActionArgs): Promise<ErrorFormFields | TypedResponse> => {
   const form = await request.formData();
   // check if any platformId value is invalid
-  const platformId = form.get(`${AddGameFormFields.IdNameReleaseDate}`);
-  const picture = form.get(AddGameFormFields.gamePicBlob);
-  console.log(platformId, "hdododod");
+  const platformId = form.get(`${AddGameFormFields.pictureUrl}`);
+  console.log(platformId, "hdododod!!!!!!!!!!!!!!!!!!!!!!!");
   if (!platformId?.length) {
     return {
       isError: true,
@@ -56,9 +57,10 @@ export const action = async ({
         "error submitting form, please include platform Id to insert in the database",
     };
   }
-  for (const pair of form.entries()) {
-    console.log(pair, "hfhfhfh  ");
-  }
+
+  // for (const pair of form.entries()) {
+  //   console.log(pair, "hfhfhfh  ");
+  // }
 
   return redirect(`/`);
 };
@@ -67,6 +69,7 @@ const AddGame: React.FC = () => {
   // hooks
   const platforms = useLoaderData<GamePlatform[]>();
   const actionData = useActionData<ErrorFormFields>();
+  const fetcher = useFetcher();
   const navigation = useNavigation();
   const submit = useSubmit();
   // derive props
@@ -106,7 +109,7 @@ const AddGame: React.FC = () => {
   if (navigation.state === "submitting" || navigation.state === "loading") {
     return <Loader />;
   }
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: any) => {
     e.preventDefault();
     setError(undefined);
 
@@ -118,15 +121,36 @@ const AddGame: React.FC = () => {
       });
       return;
     }
+    const type = pictureBlob?.type!;
+    // this functioon checks if the file submitted by the user is of valid type, it also returns the extension of the file
+    const validPictureType = validFileType(type);
+    if (!validPictureType.isValid) {
+      setError({
+        isError: true,
+        message: "upload picture with file extension png or jpeg",
+        field: AddGameFormFields.gamePicBlob,
+      });
+      return;
+    }
     const $form = e.currentTarget;
     const formData = new FormData($form);
+
+    // const s3FormData = new FormData();
+    // s3FormData.append("fileType", type);
+    const result = await uploadPicture(type);
+    console.log(
+      result,
+      "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    );
+    const fileUrl = result.fileName;
+    // add the fileUrl to the formData
+    formData.append(AddGameFormFields.pictureUrl, fileUrl);
     submit(formData, {
       method: "post",
       action: "/admin/addGame",
       encType: "multipart/form-data",
     });
   };
-  console.log(pictureBlob, "sdhdshdh");
   const gamePlatformInputProps = {
     platformDropdownList,
     setPlatformDropdownList,
@@ -191,6 +215,11 @@ const AddGame: React.FC = () => {
               value={pictureBlob}
               onChange={setPictureBlob}
             />
+            {error && error.field === AddGameFormFields.gamePicBlob ? (
+              <ErrorCard errorMessage={error.message} />
+            ) : (
+              <></>
+            )}
             <Button type="submit">Submit</Button>
           </Form>
         </Card.Section>

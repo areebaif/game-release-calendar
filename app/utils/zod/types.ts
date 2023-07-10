@@ -5,11 +5,13 @@ import {
   formPlatformFieldsZod,
 } from "./addGame";
 import { ErrorFormFieldsZod } from "./common";
+import { ImageUploadApiZod } from "./imageUploadApi";
 
 export type GamePlatform = z.infer<typeof GamePlatformZod>;
 export type FormPlatformFields = z.infer<typeof formPlatformFieldsZod>;
 export type PlatformDropDwonList = z.infer<typeof PlatformDropDwonListZod>;
 export type ErrorFormFields = z.infer<typeof ErrorFormFieldsZod>;
+export type ImageUploadApi = z.infer<typeof ImageUploadApiZod>;
 
 export enum AddGameFormFields {
   platformName = "platformName",

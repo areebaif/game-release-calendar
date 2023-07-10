@@ -1,17 +1,15 @@
-export const validFileType = (val: string | null) => {
+export const validFileType = (val: string | undefined) => {
   // test valid file extension
 
   if (!val?.length) {
-    return { isValid: false, fileExtension: null };
+    return { isValid: false };
   }
-  const regex = /\/(png|jpeg)/;
+  const regex = /image\/(png|jpeg)/;
   const isValid = regex.test(val);
   // return the file type if valid
-  const stringArray = val.split("/");
-  const fileExtension = stringArray[1];
+
   return {
     isValid: isValid,
-    fileExtension,
   };
 };
 

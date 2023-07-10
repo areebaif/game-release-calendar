@@ -4,6 +4,7 @@ import {
   PlatformDropDwonListZod,
 } from "./addGame";
 import { ErrorFormFieldsZod } from "./common";
+import { ImageUploadApiZod } from "./imageUploadApi";
 import {
   AddPlatformFormFields,
   AddGameFormFields,
@@ -18,4 +19,5 @@ export {
   AddPlatformFormFields,
   ErrorFormFieldsZod,
   s3FormFields,
+  ImageUploadApiZod,
 };

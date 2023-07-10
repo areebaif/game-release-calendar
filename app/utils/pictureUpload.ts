@@ -1,9 +1,11 @@
+import { PutObjectCommand } from "@aws-sdk/client-s3";
+import type { PutObjectCommandInput } from "@aws-sdk/client-s3";
 import { validFileType } from "./fileType";
-import { s3FormFields } from "./zod";
-export const uploadPicture = async (fileType: string) => {
-  // TODO: send type as params
-  // revalidate again at backend
+import { s3FormFields, ImageUploadApiZod } from "./zod";
+import { ImageUploadApi } from "./zod/types";
+import { s3Client } from "./awsS3";
 
+export const uploadPicture = async (fileType: string) => {
   const testFileType = validFileType(fileType);
   if (!testFileType.isValid) {
     throw new Error("bad request: file type not valid");
@@ -18,6 +20,31 @@ export const uploadPicture = async (fileType: string) => {
   if (!response.ok) {
     throw new Error("Network response was not ok");
   }
-  const res: { fileName: string; signedUrl: string } = await response.json();
+  const res: ImageUploadApi = await response.json();
+  const parseResponse = ImageUploadApiZod.safeParse(res);
+  if (!parseResponse.success) {
+    console.log(parseResponse.error);
+    throw new Error("internal server error: type incompatibility");
+  }
+  return res;
+};
+
+export const uploadToS3 = async (
+  pictureBlob: File,
+  contentType: string,
+  preSignedURL: string
+) => {
+  console.log(
+    pictureBlob,
+    contentType,
+    preSignedURL,
+    "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  );
+  const response = await fetch(preSignedURL, {
+    method: "PUT",
+    headers: { contentType: contentType },
+    body: pictureBlob,
+  });
+  const res = response.json();
   return res;
 };

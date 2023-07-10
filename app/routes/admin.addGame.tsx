@@ -34,6 +34,8 @@ import {
   AddGameFormFields,
   ErrorFormFieldsZod,
 } from "~/utils/zod";
+import { ImageUploadApiZod } from "~/utils/zod/imageUploadApi";
+import { uploadToS3 } from "~/utils/pictureUpload";
 
 export const loader = async () => {
   const platforms = await db.gamePlatform.findMany({
@@ -134,15 +136,26 @@ const AddGame: React.FC = () => {
     }
     const $form = e.currentTarget;
     const formData = new FormData($form);
-
     // const s3FormData = new FormData();
     // s3FormData.append("fileType", type);
+    // get the url
     const result = await uploadPicture(type);
-    console.log(
-      result,
-      "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-    );
-    const fileUrl = result.fileName;
+    const parseResult = ImageUploadApiZod.safeParse(result);
+    if (!parseResult.success) {
+      console.log(error);
+      setError({
+        isError: true,
+        message:
+          "something went wrong with the picture upload, please try again",
+        field: AddGameFormFields.gamePicBlob,
+      });
+      return;
+    }
+    // attempt image upload to s3 now
+    const upload = await uploadToS3(pictureBlob!, type, result.signedUrl);
+    console.log(" I do not expect to be hit right now");
+
+    const fileUrl = result?.fileName!;
     // add the fileUrl to the formData
     formData.append(AddGameFormFields.pictureUrl, fileUrl);
     submit(formData, {
@@ -151,6 +164,7 @@ const AddGame: React.FC = () => {
       encType: "multipart/form-data",
     });
   };
+
   const gamePlatformInputProps = {
     platformDropdownList,
     setPlatformDropdownList,

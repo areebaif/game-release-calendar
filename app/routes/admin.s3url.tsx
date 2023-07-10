@@ -40,16 +40,16 @@ export const action = async ({ request }: ActionArgs) => {
       "bad request: invalid picture format. Supply image of type png, or jpeg"
     );
   }
-
-  const fileName = `game/${uuidv4()}.${validFileExt.fileExtension}`;
+  const stringArray = fileExt.split("/");
+  const parsedFileExt = stringArray[1];
+  const fileName = `game/${uuidv4()}.${parsedFileExt}`;
   const s3Params = {
     Bucket: process.env.BUCKET_NAME,
     Key: fileName,
-    ContentType: validFileExt.fileExtension!,
+    ContentType: fileExt,
     // ACL: 'bucket-owner-full-control'
   };
   const command = new PutObjectCommand(s3Params);
   const signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 60 });
-  console.log(signedUrl, fileName);
   return { fileName, signedUrl };
 };

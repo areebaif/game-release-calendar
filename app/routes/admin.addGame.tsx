@@ -153,7 +153,7 @@ const AddGame: React.FC = () => {
     }
     // attempt image upload to s3 now
     const upload = await uploadToS3(pictureBlob!, type, result.signedUrl);
-    console.log(" I do not expect to be hit right now");
+    console.log(" I do not expect to be hit right now", upload);
 
     const fileUrl = result?.fileName!;
     // add the fileUrl to the formData

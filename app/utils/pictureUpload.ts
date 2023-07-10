@@ -34,17 +34,11 @@ export const uploadToS3 = async (
   contentType: string,
   preSignedURL: string
 ) => {
-  console.log(
-    pictureBlob,
-    contentType,
-    preSignedURL,
-    "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-  );
   const response = await fetch(preSignedURL, {
     method: "PUT",
     headers: { contentType: contentType },
     body: pictureBlob,
   });
-  const res = response.json();
-  return res;
+  if (!response.ok) throw new Error(" failed to upload image to se");
+  return response.ok;
 };

@@ -33,12 +33,13 @@ model GameMetaData {
   id Int @id @default(autoincrement())
   releaseDate  DateTime
   gameId Int
-  game Game  @relation(fields: [gameId], references: [id], onDelete: Cascade)
   gamePlatformId Int
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  game Game  @relation(fields: [gameId], references: [id], onDelete: Cascade)
   GamePlatform GamePlatform @relation(fields: [gamePlatformId], references: [id], onDelete: Cascade)
   @@index([gameId])
   @@index([gamePlatformId])
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+
 }
 

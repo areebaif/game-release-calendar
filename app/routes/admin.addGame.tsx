@@ -5,10 +5,8 @@ import {
   useNavigation,
   useSubmit,
   useActionData,
-  useFetcher,
 } from "@remix-run/react";
-import { redirect } from "@remix-run/node";
-
+import { redirect, json } from "@remix-run/node";
 // type imports
 import type { ActionArgs, TypedResponse } from "@remix-run/node";
 import {
@@ -22,20 +20,19 @@ import {
 import { IconUpload } from "@tabler/icons-react";
 // local imports
 import { GamePlatformList, FormPlatformList, ErrorCard } from "~/components";
-import { db, uploadPicture, validFileType } from "~/utils";
+import { db, validFileType } from "~/utils";
 // type imports
 import {
   GamePlatform,
   FormPlatformFields,
-  ErrorFormFields,
-} from "~/utils/zod/types";
+  AddGameDbFormFIeld,
+  ErrorAddGameFormFields,
+} from "~/utils/types";
 import {
   GamePlatformZod,
   AddGameFormFields,
-  ErrorFormFieldsZod,
-} from "~/utils/zod";
-import { ImageUploadApiZod } from "~/utils/zod/imageUploadApi";
-import { uploadToS3 } from "~/utils/pictureUpload";
+  ErrorAddGameFormFieldsZod,
+} from "~/utils";
 
 export const loader = async () => {
   const platforms = await db.gamePlatform.findMany({
@@ -46,32 +43,95 @@ export const loader = async () => {
 
 export const action = async ({
   request,
-}: ActionArgs): Promise<ErrorFormFields | TypedResponse> => {
+}: ActionArgs): Promise<ErrorAddGameFormFields | TypedResponse> => {
   const form = await request.formData();
-  // check if any platformId value is invalid
-  const platformId = form.get(`${AddGameFormFields.pictureUrl}`);
-  console.log(platformId, "hdododod!!!!!!!!!!!!!!!!!!!!!!!");
-  if (!platformId?.length) {
-    return {
-      isError: true,
-      field: AddGameFormFields.platformId,
-      message:
-        "error submitting form, please include platform Id to insert in the database",
-    };
-  }
 
-  // for (const pair of form.entries()) {
-  //   console.log(pair, "hfhfhfh  ");
-  // }
+  const addToDb: AddGameDbFormFIeld = {
+    platform: [],
+    GameName: "",
+    description: "",
+    imageUrl: "",
+  };
+
+  const errors: ErrorAddGameFormFields = {};
+
+  for (const pair of form.entries()) {
+    switch (true) {
+      case pair[0] === AddGameFormFields.platformIdNameReleaseDate:
+        const value = pair[1];
+        if (typeof value !== "string")
+          errors.platformName = "type mismatch please enter value as string";
+
+        const parseFormValue = value as string;
+
+        const splitFormValue = parseFormValue.split("$");
+
+        const [platformId, platformName, releaseDate] = splitFormValue;
+
+        const regexExp = /^\d+$/;
+
+        const validPlatformIdNumber = regexExp.test(platformId);
+
+        if (!validPlatformIdNumber)
+          errors.platformId = "invalid platformId provided by client";
+
+        if (!platformName.length)
+          errors.platformName = "please provide a value for platform name";
+
+        if (!releaseDate.length)
+          errors.releaseDate = "please provide value for platform release date";
+
+        const platForm = {
+          platformId: Number(platformId),
+          platformName: platformName,
+          releaseDate: releaseDate,
+        };
+        addToDb.platform.push(platForm);
+        break;
+      case pair[0] === AddGameFormFields.gameName:
+        // type checking
+        const gameNameVal = pair[1];
+
+        if (typeof gameNameVal !== "string" || gameNameVal.length === 0)
+          errors.gameName =
+            "please submit game name as string and this fields cannot be empty";
+
+        const gameName = gameNameVal as string;
+
+        addToDb.GameName = gameName;
+        break;
+      case pair[0] === AddGameFormFields.gameDescription:
+        // type checking
+        const descriptionVal = pair[1] as string;
+        addToDb.description = descriptionVal;
+        break;
+      case pair[0] === AddGameFormFields.imageUrl:
+        const imageUrlVal = pair[1] as string;
+        addToDb.imageUrl = imageUrlVal;
+        break;
+      default:
+        throw new Error(
+          "You have submitted a form field that is not supported by the backend"
+        );
+    }
+  }
+  console.log(addToDb, "dhjdhdhdhdhdhd");
+  const hasError = Object.values(errors).some((errorMessage) =>
+    errorMessage?.length ? true : false
+  );
+  if (hasError) return json({ errors: errors });
+
+  // start adding values to the db
+  // create game and link metadata at same time
 
   return redirect(`/`);
 };
 
 const AddGame: React.FC = () => {
   // hooks
+  // TODO: error handling of thrown errors using catch boundaries
   const platforms = useLoaderData<GamePlatform[]>();
-  const actionData = useActionData<ErrorFormFields>();
-  const fetcher = useFetcher();
+  const actionData = useActionData<{ errors: ErrorAddGameFormFields }>();
   const navigation = useNavigation();
   const submit = useSubmit();
   // derive props
@@ -85,13 +145,16 @@ const AddGame: React.FC = () => {
   const [formPlatformFields, setFormPlatformFields] = React.useState<
     FormPlatformFields[]
   >([]);
+  //props
   const [gameName, setGameName] = React.useState("");
   const [gameDescription, setGameDescription] = React.useState("");
   const [pictureBlob, setPictureBlob] = React.useState<File | null>(null);
-  const [error, setError] = React.useState<ErrorFormFields>();
+  const [error, setError] = React.useState<ErrorAddGameFormFields>();
   // Type checks: check if the server is sending correct values
   const parsePlatform = GamePlatformZod.safeParse(platforms[0]);
-  const serverPostError = ErrorFormFieldsZod.safeParse(actionData);
+  const serverPostError = ErrorAddGameFormFieldsZod.safeParse(
+    actionData?.errors
+  );
 
   if (!parsePlatform.success || !serverPostError.success) {
     // log error in console
@@ -112,57 +175,56 @@ const AddGame: React.FC = () => {
     return <Loader />;
   }
   const onSubmit = async (e: any) => {
-    e.preventDefault();
-    setError(undefined);
+    try {
+      e.preventDefault();
+      setError(undefined);
+      if (!formPlatformFields.length) {
+        setError({
+          ...error,
+          [AddGameFormFields.platformName]:
+            "platform name and release date cannot be empty",
+        });
+        return;
+      }
+      if (!gameName.length) {
+        setError({
+          ...error,
+          [AddGameFormFields.gameName]: "Game name cannot be empty",
+        });
+        return;
+      }
+      const type = pictureBlob?.type!;
+      // this functioon checks if the file submitted by the user is of valid type, it also returns the extension of the file
+      const validPictureType = validFileType(type);
+      if (!validPictureType.isValid) {
+        setError({
+          ...error,
+          [AddGameFormFields.gamePicBlob]:
+            "please upload correct image type of jpeg or png",
+        });
+        return;
+      }
+      const $form = e.currentTarget;
+      const formData = new FormData($form);
 
-    if (!formPlatformFields.length) {
-      setError({
-        isError: true,
-        message: "platform name and release date cannot be empty",
-        field: AddGameFormFields.platformName,
+      // TODO: uncomment this, uploads file to s3
+      // add function to upload image
+
+      //const fileUrl = uploadImage?.fileName!;
+      // add the fileUrl to the formData
+      formData.append(AddGameFormFields.imageUrl, "testUrl");
+      submit(formData, {
+        method: "post",
+        action: "/admin/addGame",
       });
-      return;
-    }
-    const type = pictureBlob?.type!;
-    // this functioon checks if the file submitted by the user is of valid type, it also returns the extension of the file
-    const validPictureType = validFileType(type);
-    if (!validPictureType.isValid) {
-      setError({
-        isError: true,
-        message: "upload picture with file extension png or jpeg",
-        field: AddGameFormFields.gamePicBlob,
-      });
-      return;
-    }
-    const $form = e.currentTarget;
-    const formData = new FormData($form);
-    // const s3FormData = new FormData();
-    // s3FormData.append("fileType", type);
-    // get the url
-    const result = await uploadPicture(type);
-    const parseResult = ImageUploadApiZod.safeParse(result);
-    if (!parseResult.success) {
+    } catch (err) {
       console.log(error);
       setError({
-        isError: true,
-        message:
-          "something went wrong with the picture upload, please try again",
-        field: AddGameFormFields.gamePicBlob,
+        ...error,
+        [AddGameFormFields.gamePicBlob]:
+          "internal server error: something went wrong with image upload",
       });
-      return;
     }
-    // attempt image upload to s3 now
-    const upload = await uploadToS3(pictureBlob!, type, result.signedUrl);
-    console.log(" I do not expect to be hit right now", upload);
-
-    const fileUrl = result?.fileName!;
-    // add the fileUrl to the formData
-    formData.append(AddGameFormFields.pictureUrl, fileUrl);
-    submit(formData, {
-      method: "post",
-      action: "/admin/addGame",
-      encType: "multipart/form-data",
-    });
   };
 
   const gamePlatformInputProps = {
@@ -211,6 +273,17 @@ const AddGame: React.FC = () => {
               name={AddGameFormFields.gameName}
               onChange={(event) => setGameName(event.currentTarget.value)}
             ></TextInput>
+            {actionData?.errors?.gameName || error?.gameName ? (
+              <ErrorCard
+                errorMessage={
+                  actionData?.errors?.gameName
+                    ? actionData?.errors?.gameName
+                    : error?.gameName
+                }
+              />
+            ) : (
+              <></>
+            )}
             <Textarea
               label="Description"
               placeholder="type here"
@@ -221,7 +294,8 @@ const AddGame: React.FC = () => {
               }
             ></Textarea>
             <FileInput
-              name={AddGameFormFields.gamePicBlob}
+              // we will not submit this field to the backend, we will submit the fileURL we get from s3 to backend: we will append that field to the form data
+              // we need the field to display errror to the user/client.
               label="Upload files"
               placeholder="Upload files"
               icon={<IconUpload size="16px" />}
@@ -229,8 +303,10 @@ const AddGame: React.FC = () => {
               value={pictureBlob}
               onChange={setPictureBlob}
             />
-            {error && error.field === AddGameFormFields.gamePicBlob ? (
-              <ErrorCard errorMessage={error.message} />
+            {error?.gamePicBlob ? (
+              <ErrorCard
+                errorMessage={"please upload image type jpeg or png"}
+              />
             ) : (
               <></>
             )}

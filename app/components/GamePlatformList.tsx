@@ -4,9 +4,9 @@ import { DateInput } from "@mantine/dates";
 import {
   FormPlatformFields,
   PlatformDropDwonList,
-  ErrorFormFields,
-} from "~/utils/zod/types";
-import { AddGameFormFields } from "~/utils/zod";
+  ErrorAddGameFormFields,
+} from "~/utils/types";
+import { AddGameFormFields } from "~/utils";
 import { ErrorCard } from "./ErrorComponent";
 
 type GamePlatformListProps = {
@@ -14,9 +14,9 @@ type GamePlatformListProps = {
   setPlatformDropdownList: (data: PlatformDropDwonList[]) => void;
   formPlatformFields: FormPlatformFields[];
   setFormPlatformFields: (val: FormPlatformFields[]) => void;
-  error: ErrorFormFields;
-  setError: (val: ErrorFormFields) => void;
-  actionData: ErrorFormFields;
+  error: ErrorAddGameFormFields;
+  setError: (val: ErrorAddGameFormFields) => void;
+  actionData: { errors: ErrorAddGameFormFields } | undefined;
 };
 
 export const GamePlatformList: React.FC<GamePlatformListProps> = ({
@@ -38,9 +38,9 @@ export const GamePlatformList: React.FC<GamePlatformListProps> = ({
     );
     if (!platform.length || !releaseDate) {
       setError({
-        isError: true,
-        field: AddGameFormFields.platformName,
-        message: "please enter value for platform name and release date",
+        ...error,
+        [AddGameFormFields.platformName]:
+          "please enter value for platform name and release date",
       });
       return;
     }
@@ -90,11 +90,14 @@ export const GamePlatformList: React.FC<GamePlatformListProps> = ({
           </Button>
         </Box>
       </Flex>
-      {(error?.isError && error.field === AddGameFormFields.platformName) ||
-      (actionData?.isError &&
-        actionData.field === AddGameFormFields.platformId) ? (
+      {error?.platformName ||
+      (actionData?.errors?.platformName && error?.platformIdNameReleaseDate) ? (
         <ErrorCard
-          errorMessage={error?.message ? error.message : actionData?.message}
+          errorMessage={
+            error?.platformName
+              ? error.platformName
+              : actionData?.errors?.platformIdNameReleaseDate
+          }
         />
       ) : (
         <></>

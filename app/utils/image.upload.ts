@@ -1,11 +1,7 @@
-import { PutObjectCommand } from "@aws-sdk/client-s3";
-import type { PutObjectCommandInput } from "@aws-sdk/client-s3";
-import { validFileType } from "./fileType";
-import { s3FormFields, ImageUploadApiZod } from "./zod";
-import { ImageUploadApi } from "./zod/types";
-import { s3Client } from "./awsS3";
+import { validFileType, s3FormFields, ImageUploadApiZod } from ".";
+import { ImageUploadApi } from "./types";
 
-export const uploadPicture = async (fileType: string) => {
+export const getSignedUrl = async (fileType: string) => {
   const testFileType = validFileType(fileType);
   if (!testFileType.isValid) {
     throw new Error("bad request: file type not valid");
@@ -31,14 +27,26 @@ export const uploadPicture = async (fileType: string) => {
 
 export const uploadToS3 = async (
   pictureBlob: File,
-  contentType: string,
+  fileType: string,
   preSignedURL: string
 ) => {
   const response = await fetch(preSignedURL, {
     method: "PUT",
-    headers: { contentType: contentType },
+    headers: { contentType: fileType },
     body: pictureBlob,
   });
   if (!response.ok) throw new Error(" failed to upload image to se");
   return response.ok;
+};
+
+type getUrlUploadImage = {
+  fileType: string;
+  image: File;
+};
+
+export const getUrlUploadImageToS3 = async (data: getUrlUploadImage) => {
+  const { fileType, image } = data;
+  const signedUrl = await getSignedUrl(fileType);
+  const uploadS3 = await uploadToS3(image, fileType, signedUrl.signedUrl);
+  return { fileName: signedUrl.fileName };
 };

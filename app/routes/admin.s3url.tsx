@@ -2,8 +2,7 @@ import type { ActionArgs, TypedResponse, LoaderArgs } from "@remix-run/node";
 import { GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { v4 as uuidv4 } from "uuid";
-import { s3Client, validFileType } from "~/utils";
-import { s3FormFields } from "~/utils/zod";
+import { s3Client, validFileType, s3FormFields } from "~/utils";
 
 // export async function loader({ params }: LoaderArgs) {
 //   // console.log(key, "holla");

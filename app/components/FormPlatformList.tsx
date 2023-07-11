@@ -8,9 +8,9 @@ import {
   Input,
   Divider,
 } from "@mantine/core";
-import { FormPlatformFields, PlatformDropDwonList } from "~/utils/zod/types";
-import { AddGameFormFields } from "~/utils/zod";
-import { formatDate } from "~/utils";
+import { FormPlatformFields, PlatformDropDwonList } from "~/utils/types";
+
+import { formatDate, AddGameFormFields } from "~/utils";
 
 type FormPlatformListProps = {
   formPlatformFields: FormPlatformFields[];
@@ -59,7 +59,7 @@ export const FormPlatformList: React.FC<FormPlatformListProps> = ({
                 variant="unstyled"
                 value={`${formValues.platformId}$${formValues.platformName}$${formValues.releaseDate}`}
                 type="hidden"
-                name={`${AddGameFormFields.IdNameReleaseDate}`}
+                name={`${AddGameFormFields.platformIdNameReleaseDate}`}
                 readOnly
               ></Input>
               <Divider my="sm" />

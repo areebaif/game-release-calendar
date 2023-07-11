@@ -5,31 +5,34 @@ import {
   useSubmit,
   useNavigation,
 } from "@remix-run/react";
-import { redirect } from "@remix-run/node";
+import { redirect, json } from "@remix-run/node";
 import { Card, Title, TextInput, Button, Loader } from "@mantine/core";
 // type import
 import type { ActionArgs, TypedResponse } from "@remix-run/node";
 // local imports
 import { ErrorCard } from "~/components";
-import { db } from "~/utils";
+import { db, ErrorAddPlatformFieldsZod } from "~/utils";
 // type imports
-import { ErrorFormFields } from "~/utils/zod/types";
-import { ErrorFormFieldsZod } from "~/utils/zod";
-import { AddPlatformFormFields } from "~/utils/zod";
+import { ErrorAddPlatformFields, AddPlatformFormFields } from "~/utils/types";
 
 export const action = async ({
   request,
-}: ActionArgs): Promise<ErrorFormFields | TypedResponse> => {
+}: ActionArgs): Promise<ErrorAddPlatformFields | TypedResponse> => {
   const form = await request.formData();
 
-  const name = form.get("name");
+  const name = form.get(AddPlatformFormFields.name);
+  const errors: ErrorAddPlatformFields = {
+    name: undefined,
+  };
+
   if (typeof name !== "string" || !name.length) {
-    return {
-      isError: true,
-      field: AddPlatformFormFields.name,
-      message: "error submitting form, please check the name field",
-    };
+    errors.name = "error submitting form, please check the name field";
   }
+  const hasError = Object.values(errors).some((errorMessage) =>
+    errorMessage?.length ? true : false
+  );
+  if (hasError) return json({ errors: errors });
+
   // TODO: uncomment this
   //const platform = await db.gamePlatform.create({ data: { name } });
   return redirect(`/`);
@@ -39,12 +42,12 @@ const AddPlatform: React.FC = () => {
   // hooks
   const navigation = useNavigation();
   const submit = useSubmit();
-  const actionData = useActionData<ErrorFormFields>();
+  const actionData = useActionData<{ errors: ErrorAddPlatformFields }>();
   // props
   const [name, setName] = React.useState("");
-  const [error, setError] = React.useState<ErrorFormFields>();
+  const [error, setError] = React.useState<ErrorAddPlatformFields>();
   // server result validation
-  const result = ErrorFormFieldsZod.safeParse(actionData);
+  const result = ErrorAddPlatformFieldsZod.safeParse(actionData?.errors);
   if (!result.success) {
     console.log(result.error);
     return (
@@ -61,9 +64,8 @@ const AddPlatform: React.FC = () => {
     // do form validation
     if (!name.length) {
       setError({
-        isError: true,
-        message: "name field cannot be empty",
-        field: AddPlatformFormFields.name,
+        ...error,
+        name: "error submitting form, please check the name field",
       });
       return;
     }
@@ -99,13 +101,9 @@ const AddPlatform: React.FC = () => {
             name={AddPlatformFormFields.name}
             onChange={(event) => setName(event.currentTarget.value)}
           ></TextInput>
-          {(error?.isError && error.field === AddPlatformFormFields.name) ||
-          (actionData?.isError &&
-            actionData.field === AddPlatformFormFields.name) ? (
+          {error?.name || actionData?.errors.name ? (
             <ErrorCard
-              errorMessage={
-                error?.message ? error.message : actionData?.message
-              }
+              errorMessage={error?.name ? error.name : actionData?.errors.name}
             />
           ) : (
             <></>

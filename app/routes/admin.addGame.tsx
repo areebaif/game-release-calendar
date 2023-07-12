@@ -20,13 +20,18 @@ import {
 import { IconUpload } from "@tabler/icons-react";
 // local imports
 import { GamePlatformList, FormPlatformList, ErrorCard } from "~/components";
-import { db, validFileType } from "~/utils";
+import {
+  db,
+  dbCreateGame,
+  validFileType,
+  getUrlUploadImageToS3,
+} from "~/utils";
 // type imports
 import {
   GamePlatform,
   FormPlatformFields,
-  AddGameDbFormFIeld,
   ErrorAddGameFormFields,
+  DbAddGame,
 } from "~/utils/types";
 import {
   GamePlatformZod,
@@ -46,9 +51,9 @@ export const action = async ({
 }: ActionArgs): Promise<ErrorAddGameFormFields | TypedResponse> => {
   const form = await request.formData();
 
-  const addToDb: AddGameDbFormFIeld = {
+  const addToDb: DbAddGame = {
     platform: [],
-    GameName: "",
+    title: "",
     description: "",
     imageUrl: "",
   };
@@ -68,12 +73,7 @@ export const action = async ({
 
         const [platformId, platformName, releaseDate] = splitFormValue;
 
-        const regexExp = /^\d+$/;
-
-        const validPlatformIdNumber = regexExp.test(platformId);
-
-        if (!validPlatformIdNumber)
-          errors.platformId = "invalid platformId provided by client";
+        // TODO: check valid uuid supplied by client for platform id
 
         if (!platformName.length)
           errors.platformName = "please provide a value for platform name";
@@ -81,12 +81,12 @@ export const action = async ({
         if (!releaseDate.length)
           errors.releaseDate = "please provide value for platform release date";
 
-        const platForm = {
-          platformId: Number(platformId),
-          platformName: platformName,
-          releaseDate: releaseDate,
+        const platform = {
+          platformId,
+          platformName,
+          releaseDate,
         };
-        addToDb.platform.push(platForm);
+        addToDb.platform.push(platform);
         break;
       case pair[0] === AddGameFormFields.gameName:
         // type checking
@@ -98,7 +98,7 @@ export const action = async ({
 
         const gameName = gameNameVal as string;
 
-        addToDb.GameName = gameName;
+        addToDb.title = gameName;
         break;
       case pair[0] === AddGameFormFields.gameDescription:
         // type checking
@@ -122,7 +122,7 @@ export const action = async ({
   if (hasError) return json({ errors: errors });
 
   // start adding values to the db
-  // create game and link metadata at same time
+  const createGame = await dbCreateGame(addToDb);
 
   return redirect(`/`);
 };
@@ -204,15 +204,18 @@ const AddGame: React.FC = () => {
         });
         return;
       }
+      const s3Data = {
+        fileType: type,
+        image: pictureBlob!,
+      };
+      // TODO: uncomment s3 upload
+      // const uploadImage = await getUrlUploadImageToS3(s3Data);
+      const uploadImage = {
+        fileName: "terst",
+      };
       const $form = e.currentTarget;
       const formData = new FormData($form);
-
-      // TODO: uncomment this, uploads file to s3
-      // add function to upload image
-
-      //const fileUrl = uploadImage?.fileName!;
-      // add the fileUrl to the formData
-      formData.append(AddGameFormFields.imageUrl, "testUrl");
+      formData.append(AddGameFormFields.imageUrl, uploadImage.fileName);
       submit(formData, {
         method: "post",
         action: "/admin/addGame",

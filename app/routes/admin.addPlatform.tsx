@@ -32,9 +32,11 @@ export const action = async ({
     errorMessage?.length ? true : false
   );
   if (hasError) return json({ errors: errors });
-
+  const platformName = name as string;
   // TODO: uncomment this
-  //const platform = await db.gamePlatform.create({ data: { name } });
+  const platform = await db.gamePlatform.create({
+    data: { name: platformName },
+  });
   return redirect(`/`);
 };
 
@@ -101,9 +103,9 @@ const AddPlatform: React.FC = () => {
             name={AddPlatformFormFields.name}
             onChange={(event) => setName(event.currentTarget.value)}
           ></TextInput>
-          {error?.name || actionData?.errors.name ? (
+          {error?.name || actionData?.errors?.name ? (
             <ErrorCard
-              errorMessage={error?.name ? error.name : actionData?.errors.name}
+              errorMessage={error?.name ? error.name : actionData?.errors?.name}
             />
           ) : (
             <></>

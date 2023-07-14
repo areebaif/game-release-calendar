@@ -1,33 +1,21 @@
-import { Card } from "@mantine/core";
-import { useLoaderData } from "@remix-run/react";
-import { GamePlatformInput } from "~/components";
-import { db } from "~/utils/db.server";
+import * as React from "react";
+import { Link } from "@remix-run/react";
+// this route will have layout of your admin dashbaord to be used by all other admin routes
 
-export async function loader() {
-  // we have to load a list of all available platforms (ps e.t.c)
-  return [];
-}
-
-const AddGame: React.FC = () => {
-  const platforms = useLoaderData();
-
+const AdminIndexRoute: React.FC = () => {
   return (
-    <Card
-      shadow="sm"
-      p="lg"
-      radius="md"
-      withBorder
-      style={{
-        overflow: "inherit",
-        margin: "15px 0 0 0",
-      }}
-      sx={(theme) => ({ backgroundColor: theme.colors.gray[1] })}
-    >
-      <Card.Section inheritPadding py="md">
-        <GamePlatformInput />
-      </Card.Section>
-    </Card>
+    <div>
+      <ul>
+        <li>
+          <Link to="/admin/addGame">Add Game</Link>
+        </li>
+        <li>
+          {" "}
+          <Link to="/admin/addPlatform">Add Platform</Link>
+        </li>
+      </ul>
+    </div>
   );
 };
 
-export default AddGame;
+export default AdminIndexRoute;

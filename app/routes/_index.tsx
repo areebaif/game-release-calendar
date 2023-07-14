@@ -1,5 +1,5 @@
 import { Button, Title } from "@mantine/core";
-import { Link } from "@remix-run/react";
+import { Link, useLoaderData } from "@remix-run/react";
 
 // export const meta: V2_MetaFunction = () => {
 //   return [
@@ -10,15 +10,14 @@ import { Link } from "@remix-run/react";
 
 export default function Index() {
   return (
-    <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.8" }}>
+    <div>
       <Title>Welcome to Remix</Title>
       <ul>
         <li>
-          <Link to="/admin">Add Game</Link>
+          <Link to="/admin">Go to admin dashbaord</Link>
         </li>
         <li>
-          {" "}
-          <Link to="/admin/platform/new">Add Platform</Link>
+          <Link to="/game">View all games</Link>
         </li>
       </ul>
     </div>

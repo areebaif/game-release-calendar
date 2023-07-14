@@ -1,10 +1,21 @@
-import * as react from "react";
+import * as React from "react";
+import { Link } from "@remix-run/react";
+// this route will have layout of your admin dashbaord to be used by all other admin routes
 
-export default function JokesIndexRoute() {
+const AdminIndexRoute: React.FC = () => {
   return (
     <div>
-      <p>Here's a random joke:</p>
-      <p>I was wondering why the frisbee was getting bigger, then it hit me.</p>
+      <ul>
+        <li>
+          <Link to="/admin/addGame">Add Game</Link>
+        </li>
+        <li>
+          {" "}
+          <Link to="/admin/addPlatform">Add Platform</Link>
+        </li>
+      </ul>
     </div>
   );
-}
+};
+
+export default AdminIndexRoute;

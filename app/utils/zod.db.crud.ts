@@ -13,3 +13,19 @@ export const DbAddGameZod = z.object({
     })
     .array(),
 });
+
+export const DbReadGameMetaDataZod = z
+  .object({
+    game: z.object({
+      title: z.string(),
+      description: z.string().nullable(),
+      imageUrl: z.string().nullable(),
+      gameId: z.string(),
+    }),
+    platform: z
+      .object({
+        platformName: z.string(),
+        releaseDate: z.string(),
+      })
+      .array(),
+  })

@@ -18,6 +18,8 @@ import { ErrorAddPlatformFieldsZod } from "./zod.addPlatform";
 import { ImageUploadApiZod } from "./zod.imageUploadApi";
 import { dbCreateGame } from "./db.crud";
 import { getUrlUploadImageToS3 } from "./image.upload";
+import { DbGetAllGamesData } from "./db.crud";
+import { DbReadGameMetaDataZod } from "./zod.db.crud";
 
 export {
   db,
@@ -35,5 +37,7 @@ export {
   ErrorAddGameFormFieldsZod,
   ErrorAddPlatformFieldsZod,
   dbCreateGame,
-  getUrlUploadImageToS3
+  getUrlUploadImageToS3,
+  DbGetAllGamesData,
+  DbReadGameMetaDataZod,
 };

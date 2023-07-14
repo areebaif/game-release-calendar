@@ -49,6 +49,7 @@ export const loader = async () => {
 export const action = async ({
   request,
 }: ActionArgs): Promise<ErrorAddGameFormFields | TypedResponse> => {
+  console.log(" inside,acsstt!!!!!!!!!!!!!!!!!!!!!!!!!!");
   const form = await request.formData();
 
   const addToDb: DbAddGame = {
@@ -204,18 +205,24 @@ const AddGame: React.FC = () => {
         });
         return;
       }
+      const $form = e.currentTarget;
       const s3Data = {
         fileType: type,
         image: pictureBlob!,
       };
       // TODO: uncomment s3 upload
-      // const uploadImage = await getUrlUploadImageToS3(s3Data);
-      const uploadImage = {
-        fileName: "terst",
-      };
-      const $form = e.currentTarget;
+      console.log(" Ia m heree!!!!!!!!!!!!!");
+      const uploadImage = await getUrlUploadImageToS3(s3Data);
+      console.log(" sisisisisisisisisisi", uploadImage.fileName);
+      // const uploadImage = {
+      //   fileName: "terst",
+      // };
+
+      console.log(" sisisisisisisisisisi", uploadImage.fileName);
       const formData = new FormData($form);
-      formData.append(AddGameFormFields.imageUrl, uploadImage.fileName);
+      console.log(" sisisisisisisisisisi", uploadImage.fileName);
+      formData.append(AddGameFormFields.imageUrl, `${uploadImage.fileName}`);
+      console.log(" sisisisisisisisisisi", uploadImage.fileName);
       submit(formData, {
         method: "post",
         action: "/admin/addGame",

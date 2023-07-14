@@ -33,6 +33,7 @@ export const action = async ({ request }: ActionArgs) => {
   if (typeof fileExt !== "string") {
     throw new Error("invalid form fields");
   }
+
   const validFileExt = validFileType(fileExt);
   if (!validFileExt.isValid) {
     throw new Error(

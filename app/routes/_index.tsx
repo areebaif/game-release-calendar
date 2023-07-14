@@ -9,13 +9,15 @@ import { Link, useLoaderData } from "@remix-run/react";
 // };
 
 export default function Index() {
-
   return (
     <div>
       <Title>Welcome to Remix</Title>
       <ul>
         <li>
           <Link to="/admin">Go to admin dashbaord</Link>
+        </li>
+        <li>
+          <Link to="/game">View all games</Link>
         </li>
       </ul>
     </div>

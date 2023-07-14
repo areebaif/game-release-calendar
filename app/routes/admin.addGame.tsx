@@ -210,19 +210,13 @@ const AddGame: React.FC = () => {
         fileType: type,
         image: pictureBlob!,
       };
-      // TODO: uncomment s3 upload
-      console.log(" Ia m heree!!!!!!!!!!!!!");
-      const uploadImage = await getUrlUploadImageToS3(s3Data);
-      console.log(" sisisisisisisisisisi", uploadImage.fileName);
-      // const uploadImage = {
-      //   fileName: "terst",
-      // };
 
-      console.log(" sisisisisisisisisisi", uploadImage.fileName);
+      const uploadImage = await getUrlUploadImageToS3(s3Data);
+
       const formData = new FormData($form);
-      console.log(" sisisisisisisisisisi", uploadImage.fileName);
+
       formData.append(AddGameFormFields.imageUrl, `${uploadImage.fileName}`);
-      console.log(" sisisisisisisisisisi", uploadImage.fileName);
+
       submit(formData, {
         method: "post",
         action: "/admin/addGame",

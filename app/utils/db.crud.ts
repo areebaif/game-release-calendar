@@ -26,6 +26,9 @@ export const dbCreateGame = async (data: DbAddGame) => {
 
 export const DbGetAllGamesData = async () => {
   const gameMetaData = await db.gameMetaData.findMany({
+    orderBy: {
+      gameId: "asc",
+    },
     include: {
       game: {
         select: {
@@ -41,7 +44,6 @@ export const DbGetAllGamesData = async () => {
       },
     },
   });
-
   const result: DbReadGameMetaData[] = [];
 
   gameMetaData.forEach((gameItem, index) => {

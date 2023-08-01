@@ -6,7 +6,6 @@ export const getSignedUrl = async (fileType: string) => {
   if (!testFileType.isValid) {
     throw new Error("bad request: file type not valid");
   }
-  console.log("filetype url", fileType);
   const s3FormData = new FormData();
   s3FormData.append(s3FormFields.fileType, fileType);
   const response = await fetch(`/admin/s3url`, {

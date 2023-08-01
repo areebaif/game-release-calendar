@@ -5,6 +5,7 @@
     "build": "remix build",
     "dev": "remix dev",
     "start": "remix-serve build",
+    "postinstall": "npx prisma generate",
     "typecheck": "tsc"
   },
   "dependencies": {

@@ -49,7 +49,6 @@ export const loader = async () => {
 export const action = async ({
   request,
 }: ActionArgs): Promise<ErrorAddGameFormFields | TypedResponse> => {
-  console.log(" inside,acsstt!!!!!!!!!!!!!!!!!!!!!!!!!!");
   const form = await request.formData();
 
   const addToDb: DbAddGame = {

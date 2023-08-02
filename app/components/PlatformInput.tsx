@@ -9,7 +9,7 @@ import {
 import { AddGameFormFields } from "~/utils";
 import { ErrorCard } from "./ErrorComponent";
 
-type GamePlatformListProps = {
+type PlatformInputProps = {
   platformDropdownList: PlatformDropDwonList[];
   setPlatformDropdownList: (data: PlatformDropDwonList[]) => void;
   formPlatformFields: FormPlatformFields[];
@@ -19,7 +19,7 @@ type GamePlatformListProps = {
   actionData: { errors: ErrorAddGameFormFields } | undefined;
 };
 
-export const GamePlatformList: React.FC<GamePlatformListProps> = ({
+export const PlatformInput: React.FC<PlatformInputProps> = ({
   platformDropdownList,
   formPlatformFields,
   setFormPlatformFields,

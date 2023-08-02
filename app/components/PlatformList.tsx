@@ -1,18 +1,10 @@
 import * as React from "react";
-import {
-  Table,
-  Grid,
-  Title,
-  Button,
-  TextInput,
-  Input,
-  Divider,
-} from "@mantine/core";
+import { Grid, Title, Button, Input, Divider } from "@mantine/core";
 import { FormPlatformFields, PlatformDropDwonList } from "~/utils/types";
 
 import { formatDate, AddGameFormFields } from "~/utils";
 
-type FormPlatformListProps = {
+export type PlatformListProps = {
   formPlatformFields: FormPlatformFields[];
   setFormPlatformFields: (data: FormPlatformFields[]) => void;
   setPlatformDropdownList: (data: PlatformDropDwonList[]) => void;
@@ -20,14 +12,14 @@ type FormPlatformListProps = {
   dropdownList: PlatformDropDwonList[];
 };
 
-export const FormPlatformList: React.FC<FormPlatformListProps> = ({
+export const PlatformList: React.FC<PlatformListProps> = ({
   formPlatformFields,
   setFormPlatformFields,
   setPlatformDropdownList,
   platformDropdownList,
   dropdownList,
 }) => {
-  const onRemoveField = (id: number) => {
+  const onRemoveField = (id: string) => {
     setFormPlatformFields(
       formPlatformFields.filter((fields) => fields.platformId !== id)
     );

@@ -7,7 +7,7 @@ import {
   useActionData,
 } from "@remix-run/react";
 import { redirect, json, Response } from "@remix-run/node";
-import { PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 // type imports
 import type { ActionArgs, TypedResponse } from "@remix-run/node";
 import {
@@ -20,14 +20,18 @@ import {
 } from "@mantine/core";
 import { IconUpload } from "@tabler/icons-react";
 // local imports
-import { GamePlatformList, FormPlatformList, ErrorCard } from "~/components";
+import {
+  PlatformInput,
+  PlatformList,
+  ErrorCard,
+  FormFieldsAddGame,
+} from "~/components";
 import {
   db,
   dbCreateGame,
   validFileType,
   getUrlUploadImageToS3,
   s3Client,
-  s3FormFields,
 } from "~/utils";
 // type imports
 import {
@@ -167,7 +171,7 @@ const AddGame: React.FC = () => {
   //props
   const [gameName, setGameName] = React.useState("");
   const [gameDescription, setGameDescription] = React.useState("");
-  const [pictureBlob, setPictureBlob] = React.useState<File | null>(null);
+  const [image, setImage] = React.useState<File | null>(null);
   const [error, setError] = React.useState<ErrorAddGameFormFields>();
   // Type checks: check if the server is sending correct values
   const parsePlatform = GamePlatformZod.safeParse(platforms[0]);
@@ -188,7 +192,6 @@ const AddGame: React.FC = () => {
       />
     );
   }
-
   if (navigation.state === "submitting" || navigation.state === "loading") {
     return <Loader />;
   }
@@ -211,7 +214,7 @@ const AddGame: React.FC = () => {
         });
         return;
       }
-      const type = pictureBlob?.type!;
+      const type = image?.type!;
       // this functioon checks if the file submitted by the user is of valid type, it also returns the extension of the file
       const validPictureType = validFileType(type);
       if (!validPictureType.isValid) {
@@ -225,7 +228,7 @@ const AddGame: React.FC = () => {
       const $form = e.currentTarget;
       const s3Data = {
         fileType: type,
-        image: pictureBlob!,
+        image: image!,
       };
 
       const uploadImage = await getUrlUploadImageToS3(s3Data);
@@ -248,7 +251,7 @@ const AddGame: React.FC = () => {
     }
   };
 
-  const gamePlatformInputProps = {
+  const platformInputProps = {
     platformDropdownList,
     setPlatformDropdownList,
     formPlatformFields,
@@ -257,13 +260,25 @@ const AddGame: React.FC = () => {
     actionData,
     setError,
   };
-  const formPlatformListProps = {
+  const platformListProps = {
     formPlatformFields,
     setFormPlatformFields,
     setPlatformDropdownList,
     platformDropdownList,
     dropdownList,
   };
+  const formFieldsAddGame = {
+    gameName,
+    setGameName,
+    gameDescription,
+    setGameDescription,
+    image,
+    setImage,
+    platformListProps,
+    actionData,
+    error,
+  };
+
   return (
     <>
       <Card
@@ -278,60 +293,13 @@ const AddGame: React.FC = () => {
         sx={(theme) => ({ backgroundColor: theme.colors.gray[1] })}
       >
         <Card.Section inheritPadding py="md">
-          <GamePlatformList {...gamePlatformInputProps} />
+          <PlatformInput {...platformInputProps} />
         </Card.Section>
       </Card>
       <Card>
         <Card.Section inheritPadding py="md">
           <Form method="post" action="/admin/addGame" onSubmit={onSubmit}>
-            <FormPlatformList {...formPlatformListProps} />
-            <TextInput
-              withAsterisk
-              label="Name"
-              placeholder="type here"
-              value={gameName}
-              type="text"
-              name={AddGameFormFields.gameName}
-              onChange={(event) => setGameName(event.currentTarget.value)}
-            ></TextInput>
-            {actionData?.errors?.gameName || error?.gameName ? (
-              <ErrorCard
-                errorMessage={
-                  actionData?.errors?.gameName
-                    ? actionData?.errors?.gameName
-                    : error?.gameName
-                }
-              />
-            ) : (
-              <></>
-            )}
-            <Textarea
-              label="Description"
-              placeholder="type here"
-              value={gameDescription}
-              name={AddGameFormFields.gameDescription}
-              onChange={(event) =>
-                setGameDescription(event.currentTarget.value)
-              }
-            ></Textarea>
-            <FileInput
-              // we will not submit this field to the backend, we will submit the fileURL we get from s3 to backend: we will append that field to the form data
-              // we need the field to display errror to the user/client.
-              label="Upload files"
-              placeholder="Upload files"
-              icon={<IconUpload size="16px" />}
-              accept="image/*"
-              value={pictureBlob}
-              onChange={setPictureBlob}
-            />
-            {error?.gamePicBlob ? (
-              <ErrorCard
-                errorMessage={"please upload image type jpeg or png"}
-              />
-            ) : (
-              <></>
-            )}
-            <Button type="submit">Submit</Button>
+            <FormFieldsAddGame {...formFieldsAddGame} />
           </Form>
         </Card.Section>
       </Card>

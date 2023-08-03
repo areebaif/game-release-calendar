@@ -1,5 +1,6 @@
-import { GamePlatformList } from "./GamePlatformList";
-import { FormPlatformList } from "./FormPlatformList";
+import { PlatformInput } from "./PlatformInput";
+import { PlatformList } from "./PlatformList";
 import { ErrorCard } from "./ErrorComponent";
+import { FormFieldsAddGame } from "./FormFieldsAddGame";
 
-export { GamePlatformList, FormPlatformList, ErrorCard };
+export { PlatformInput, PlatformList, ErrorCard, FormFieldsAddGame };

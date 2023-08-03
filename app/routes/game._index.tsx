@@ -46,7 +46,11 @@ export const GameIndexRoute: React.FC = () => {
                 <Image
                   width={`100px`}
                   radius="md"
-                  src={`https://game-calendar.s3.amazonaws.com/${game.game.imageUrl}`}
+                  src={
+                    process.env.NODE_ENV === "development"
+                      ? `https://game-calendar-development.s3.amazonaws.com/${game.game.imageUrl}`
+                      : `https://game-calendar.s3.amazonaws.com/${game.game.imageUrl}`
+                  }
                   alt="Random image"
                 />
               </Card.Section>

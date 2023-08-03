@@ -60,7 +60,6 @@ const AddPlatform: React.FC = () => {
   if (navigation.state === "submitting" || navigation.state === "loading") {
     return <Loader />;
   }
-  console.log(navigation.state, "dhdhdhdhdhdhdhdhdhd");
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(undefined);

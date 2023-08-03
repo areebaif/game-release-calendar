@@ -40,6 +40,15 @@ model GameMetaData {
   GamePlatform GamePlatform @relation(fields: [gamePlatformId], references: [id])
   @@index([gameId])
   @@index([gamePlatformId])
-
 }
+
+model User {
+  id           String   @id @default(uuid())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  username     String   @unique
+  passwordHash String
+  userType     String 
+}
+
 

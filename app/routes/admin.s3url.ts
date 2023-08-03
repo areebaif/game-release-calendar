@@ -19,7 +19,11 @@ export const action = async ({ request }: ActionArgs) => {
   }
   const stringArray = fileExt.split("/");
   const parsedFileExt = stringArray[1];
-  const fileName = `game/${uuidv4()}.${parsedFileExt}`;
+  const fileName =
+    process.env.NODE_ENV === "production"
+      ? `game/${uuidv4()}.${parsedFileExt}`
+      : `dev/${uuidv4()}.${parsedFileExt}`;
+
   const s3Params = {
     Bucket: process.env.BUCKET_NAME,
     Key: fileName,

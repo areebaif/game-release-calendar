@@ -9,6 +9,7 @@ import {
 import { ImageUploadApiZod } from "./zod.imageUploadApi";
 import { ErrorAddPlatformFieldsZod } from "./zod.addPlatform";
 import { DbAddGameZod, DbReadGameMetaDataZod } from "./zod.db.crud";
+import { ErrorLoginFormFieldsZod } from "./zod.userAuth";
 
 export type GamePlatform = z.infer<typeof GamePlatformZod>;
 export type FormPlatformFields = z.infer<typeof formPlatformFieldsZod>;
@@ -18,6 +19,7 @@ export type ErrorAddGameFormFields = z.infer<typeof ErrorAddGameFormFieldsZod>;
 export type ErrorAddPlatformFields = z.infer<typeof ErrorAddPlatformFieldsZod>;
 export type DbAddGame = z.infer<typeof DbAddGameZod>;
 export type DbReadGameMetaData = z.infer<typeof DbReadGameMetaDataZod>;
+export type ErrorLoginFormFields = z.infer<typeof ErrorLoginFormFieldsZod>;
 
 export enum AddGameFormFields {
   platformName = "platformName",
@@ -36,4 +38,10 @@ export enum AddPlatformFormFields {
 
 export enum s3FormFields {
   fileType = "fileType",
+}
+
+export enum LoginFormFields {
+  email = "email",
+  password = "password",
+  loginType = "loginType",
 }

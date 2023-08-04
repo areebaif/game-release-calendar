@@ -46,9 +46,15 @@ model User {
   id           String   @id @default(uuid())
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+  email        String   @unique
   username     String   @unique
   passwordHash String
-  userType     String 
+  userType     UserType 
+}
+
+enum UserType {
+  ADMIN
+  STANDARD
 }
 
 

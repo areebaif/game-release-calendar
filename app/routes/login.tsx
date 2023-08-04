@@ -18,7 +18,8 @@ import {
   Radio,
   Group,
 } from "@mantine/core";
-import { ErrorLoginFormFields, LoginFormFields } from "~/utils/types";
+import { ErrorLoginFormFields, LoginFormFields, User } from "~/utils/types";
+import { dbCreateUser } from "~/utils/db.crud";
 
 export const action = async ({ request }: ActionArgs) => {
   const form = await request.formData();
@@ -30,6 +31,11 @@ export const action = async ({ request }: ActionArgs) => {
   // );
   const fields = { loginType, password, email };
   const errors: ErrorLoginFormFields = {};
+  const addToDb: User = {
+    email: "",
+    passwordHash: "",
+    userType: "STANDARD",
+  };
   // do some form validation here
   if (typeof email !== "string" || !email.length) {
     errors.email = "error submitting form, please check the email field";
@@ -41,31 +47,32 @@ export const action = async ({ request }: ActionArgs) => {
     errorMessage?.length ? true : false
   );
   if (hasError) return json({ errors: errors });
-
-  switch (loginType) {
-    case "login": {
-      // login to get the user
-      // if there's no user, return the fields and a formError
-      // if there is a user, create their session and redirect to /
-    }
-    case "register": {
-      //   const userExists = await db.user.findFirst({
-      //     where: { username },
-      //   });
-      //   if (userExists) {
-      //     return badRequest({
-      //       fieldErrors: null,
-      //       fields,
-      //       formError: `User with username ${username} already exists`,
-      //     });
-      //   }
-      //   // create the user
-      // create their session and redirect to /jokes
-    }
-    default: {
-      // return error here
-    }
-  }
+  //const user = await dbCreateUser(email, password, loginType);
+  //   switch (loginType) {
+  //     case "login": {
+  //       // login to get the user
+  //       // if there's no user, return the fields and a formError
+  //       // if there is a user, create their session and redirect to /
+  //     }
+  //     case "register": {
+  //       //   const userExists = await db.user.findFirst({
+  //       //     where: { username },
+  //       //   });
+  //       //   if (userExists) {
+  //       //     return badRequest({
+  //       //       fieldErrors: null,
+  //       //       fields,
+  //       //       formError: `User with username ${username} already exists`,
+  //       //     });
+  //       //   }
+  //       //   // create the user
+  //       // create their session and redirect to /jokes
+  //     }
+  //     default: {
+  //       // return error here
+  //     }
+  //   }
+  return redirect("/");
 };
 
 const Login: React.FC = () => {
@@ -78,8 +85,7 @@ const Login: React.FC = () => {
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // grab the form element
-    
-    
+
     const $form = e.currentTarget;
     // get the formData from that form
     const formData = new FormData($form);

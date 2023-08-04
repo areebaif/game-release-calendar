@@ -13,6 +13,9 @@ export const loader = async () => {
 
 export const GameIndexRoute: React.FC = () => {
   const loaderdata = useLoaderData<{ games: DbReadGameMetaData[] }>();
+  if (!loaderdata.games.length) {
+    return <div>no data to display</div>;
+  }
   const zodParseGameMetaData = DbReadGameMetaDataZod.safeParse(
     loaderdata.games[0]
   );

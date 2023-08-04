@@ -9,7 +9,7 @@ import {
 import { ImageUploadApiZod } from "./zod.imageUploadApi";
 import { ErrorAddPlatformFieldsZod } from "./zod.addPlatform";
 import { DbAddGameZod, DbReadGameMetaDataZod } from "./zod.db.crud";
-import { ErrorLoginFormFieldsZod } from "./zod.userAuth";
+import { ErrorLoginFormFieldsZod, UserZod } from "./zod.userAuth";
 
 export type GamePlatform = z.infer<typeof GamePlatformZod>;
 export type FormPlatformFields = z.infer<typeof formPlatformFieldsZod>;
@@ -20,6 +20,7 @@ export type ErrorAddPlatformFields = z.infer<typeof ErrorAddPlatformFieldsZod>;
 export type DbAddGame = z.infer<typeof DbAddGameZod>;
 export type DbReadGameMetaData = z.infer<typeof DbReadGameMetaDataZod>;
 export type ErrorLoginFormFields = z.infer<typeof ErrorLoginFormFieldsZod>;
+export type User = z.infer<typeof UserZod>;
 
 export enum AddGameFormFields {
   platformName = "platformName",

@@ -1,5 +1,7 @@
 import { db } from "./db.server";
 import { DbAddGame, DbReadGameMetaData } from "./types";
+const bcrypt = require("bcryptjs");
+import { UserType } from "@prisma/client";
 
 export const dbCreateGame = async (data: DbAddGame) => {
   const { title, description, platform, imageUrl } = data;
@@ -45,7 +47,6 @@ export const DbGetAllGamesData = async () => {
     },
   });
   const result: DbReadGameMetaData[] = [];
-
   gameMetaData.forEach((gameItem, index) => {
     const game: DbReadGameMetaData["game"] = {
       ...gameItem.game,
@@ -59,8 +60,23 @@ export const DbGetAllGamesData = async () => {
       result[result.length - 1].platform.push(platform);
       return;
     }
-
     return result.push({ game, platform: [platform] });
   });
-  return result;
+  return gameMetaData;
+};
+
+const saltRounds = 10;
+export const dbCreateUser = async (
+  email: string,
+  password: string,
+  userType: UserType
+) => {
+  // create password hash
+  const salt = bcrypt.genSalt(saltRounds);
+  const hash = await bcrypt.hash(password, salt);
+  // create new user
+  // const user = await db.user.create({
+  //   data: { email, passwordHash: hash, userType },
+  // });
+  //console.log(user, "sjsjsjsjsjsjsjsjssj");
 };

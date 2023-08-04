@@ -10,6 +10,7 @@ Create .env.local file in the root of the project and have the following environ
 `AWS_ACCESS_KEY_ID`
 `AWS_SECRET_ACCESS_KEY`
 `BUCKET_NAME`
+`NODE_ENV="development"`
 
 Please contact admin of the repo for values of these variables.
 

@@ -28,14 +28,17 @@ import {
   LoginTypeVal,
 } from "~/utils/types";
 import {
-  comparePassword,
   dbCreateUser,
   dbGetUserEmail,
   dbGetUserName,
+  loginUser,
+  createUserSession,
+  verifyJwtToken,
 } from "~/utils";
-import { saltRounds } from "~/utils/bcrypt";
 
 export const action = async ({ request }: ActionArgs) => {
+  const user = await verifyJwtToken(request);
+  console.log(user, "dshbjdsfjhfjhdsfjhdsfjhdfsjhfdsjhdsfjhsfdhj");
   const form = await request.formData();
   const loginType = form.get(LoginFormFields.loginType);
   const password = form.get(LoginFormFields.password);
@@ -74,15 +77,33 @@ export const action = async ({ request }: ActionArgs) => {
   switch (loginType) {
     case `${LoginTypeVal.login}`: {
       // login to get the user
-      const user = await dbGetUserEmail(addToDb.email);
-      if (!user)
-        errors.email = "error loging in user, please ensure email is correct";
-      const isPasswordCorrect = await comparePassword(
-        addToDb.password,
-        user?.passwordHash!
-      );
+      const user = await loginUser(addToDb.email, addToDb.password);
+      if (!user) {
+        errors.email = "error logging in user, please check email and password";
+        break;
+      }
+      const { id, userName, userType, email } = user;
+      // const user = await dbGetUserEmail(addToDb.email);
+      // if (!user) {
+      //   errors.email = "error loging in user";
+      //   return;
+      // }
+      // const isPasswordCorrect = await comparePassword(
+      //   addToDb.password,
+      //   user?.passwordHash!
+      // );
+      // if (!isPasswordCorrect) {
+      //   errors.password = "error loging in user";
+      // }
       // TODO:
       // if there is a user, create their session and redirect to /
+      return createUserSession({
+        userId: id,
+        userName: userName,
+        userEmail: email,
+        redirectTo: "/",
+        userType: userType,
+      });
     }
     case `${LoginTypeVal.register}`: {
       const userEmailExists = await dbGetUserEmail(addToDb.email);
@@ -97,7 +118,7 @@ export const action = async ({ request }: ActionArgs) => {
       }
       const createUser = await dbCreateUser(addToDb);
       // TODO: create their session and redirect to /jokes
-      return redirect("/");
+      break;
     }
     default: {
       errors.loginType =

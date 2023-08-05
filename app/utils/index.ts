@@ -1,6 +1,6 @@
 import { db } from "./db.server";
 import { formatDate } from "./dayjs.date";
-import { s3Client } from "./aws.S3Client";
+import { s3Client } from "./awsS3Client.server";
 import { getSignedUrl } from "./image.upload";
 import { validFileType } from "./image.validFileType";
 import {
@@ -16,7 +16,7 @@ import {
 } from "./types";
 import { ErrorAddPlatformFieldsZod } from "./zod.addPlatform";
 import { ImageUploadApiZod } from "./zod.imageUploadApi";
-import { dbCreateGame } from "./db.crud";
+import { dbCreateGame } from "./db.server.crud";
 import { DbReadGameMetaDataZod } from "./zod.db.crud";
 import { getUrlUploadImageToS3 } from "./image.upload";
 import {
@@ -24,8 +24,12 @@ import {
   dbCreateUser,
   dbGetUserEmail,
   dbGetUserName,
-} from "./db.crud";
-import { comparePassword } from "./bcrypt";
+} from "./db.server.crud";
+import {
+  loginUser,
+  createUserSession,
+  verifyJwtToken,
+} from "./session.server";
 
 export {
   db,
@@ -47,7 +51,9 @@ export {
   dbGetAllGamesData,
   DbReadGameMetaDataZod,
   dbCreateUser,
-  comparePassword,
   dbGetUserEmail,
   dbGetUserName,
+  loginUser,
+  createUserSession,
+  verifyJwtToken,
 };

@@ -2,7 +2,7 @@ import bcrypt from "bcryptjs";
 import { UserType } from "@prisma/client";
 import { db } from "./db.server";
 import { DbAddGame, DbReadGameMetaData } from "./types";
-import { saltRounds } from "./bcrypt";
+import { saltRounds } from "./session.server";
 export const dbCreateGame = async (data: DbAddGame) => {
   const { title, description, platform, imageUrl } = data;
   const parsedPlatforms = platform.map((platform) => {

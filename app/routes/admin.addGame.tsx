@@ -78,7 +78,6 @@ export const action = async ({
 
           const [platformId, platformName, releaseDate] = splitFormValue;
 
-          // TODO: check valid uuid supplied by client for platform id
           if (!platformName.length)
             errors.platformName = "please provide a value for platform name";
 

@@ -19,6 +19,9 @@ export default function Index() {
         <li>
           <Link to="/game">View all games</Link>
         </li>
+        <li>
+          <Link to="/login">sign-up or login</Link>
+        </li>
       </ul>
     </div>
   );

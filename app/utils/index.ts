@@ -17,9 +17,15 @@ import {
 import { ErrorAddPlatformFieldsZod } from "./zod.addPlatform";
 import { ImageUploadApiZod } from "./zod.imageUploadApi";
 import { dbCreateGame } from "./db.crud";
-import { getUrlUploadImageToS3 } from "./image.upload";
-import { DbGetAllGamesData } from "./db.crud";
 import { DbReadGameMetaDataZod } from "./zod.db.crud";
+import { getUrlUploadImageToS3 } from "./image.upload";
+import {
+  dbGetAllGamesData,
+  dbCreateUser,
+  dbGetUserEmail,
+  dbGetUserName,
+} from "./db.crud";
+import { comparePassword } from "./bcrypt";
 
 export {
   db,
@@ -38,6 +44,10 @@ export {
   ErrorAddPlatformFieldsZod,
   dbCreateGame,
   getUrlUploadImageToS3,
-  DbGetAllGamesData,
+  dbGetAllGamesData,
   DbReadGameMetaDataZod,
+  dbCreateUser,
+  comparePassword,
+  dbGetUserEmail,
+  dbGetUserName,
 };

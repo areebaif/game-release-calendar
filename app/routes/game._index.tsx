@@ -3,11 +3,11 @@ import { Link, useLoaderData } from "@remix-run/react";
 import { redirect, json } from "@remix-run/node";
 import { Card, Image, List, Text, Group } from "@mantine/core";
 import { DbReadGameMetaData } from "~/utils/types";
-import { DbGetAllGamesData, DbReadGameMetaDataZod } from "~/utils";
+import { dbGetAllGamesData, DbReadGameMetaDataZod } from "~/utils";
 import { ErrorCard } from "~/components";
 
 export const loader = async () => {
-  const allGamesMetaData = await DbGetAllGamesData();
+  const allGamesMetaData = await dbGetAllGamesData();
   return json({ games: allGamesMetaData });
 };
 

@@ -45,4 +45,10 @@ export enum LoginFormFields {
   email = "email",
   password = "password",
   loginType = "loginType",
+  userName = "userName",
+}
+
+export enum LoginTypeVal {
+  login = "login",
+  register = "register",
 }

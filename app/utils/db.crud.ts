@@ -1,8 +1,8 @@
+import bcrypt from "bcryptjs";
+import { UserType } from "@prisma/client";
 import { db } from "./db.server";
 import { DbAddGame, DbReadGameMetaData } from "./types";
-const bcrypt = require("bcryptjs");
-import { UserType } from "@prisma/client";
-
+import { saltRounds } from "./bcrypt";
 export const dbCreateGame = async (data: DbAddGame) => {
   const { title, description, platform, imageUrl } = data;
   const parsedPlatforms = platform.map((platform) => {
@@ -26,7 +26,7 @@ export const dbCreateGame = async (data: DbAddGame) => {
   });
 };
 
-export const DbGetAllGamesData = async () => {
+export const dbGetAllGamesData = async () => {
   const gameMetaData = await db.gameMetaData.findMany({
     orderBy: {
       gameId: "asc",
@@ -65,18 +65,55 @@ export const DbGetAllGamesData = async () => {
   return gameMetaData;
 };
 
-const saltRounds = 10;
-export const dbCreateUser = async (
-  email: string,
-  password: string,
-  userType: UserType
-) => {
+export const dbCreateUser = async (data: {
+  email: string;
+  password: string;
+  userType: UserType;
+  userName: string;
+}) => {
+  const { email, password, userType, userName } = data;
   // create password hash
-  const salt = bcrypt.genSalt(saltRounds);
-  const hash = await bcrypt.hash(password, salt);
-  // create new user
-  // const user = await db.user.create({
-  //   data: { email, passwordHash: hash, userType },
-  // });
-  //console.log(user, "sjsjsjsjsjsjsjsjssj");
+  const hash = await bcrypt.hash(password, saltRounds);
+
+  //create new user
+  const user = await db.user.create({
+    data: { email, passwordHash: hash, userType, username: userName },
+  });
+
+  return user;
 };
+
+export const dbGetUserEmail = async (email: string) => {
+  const user = await db.user.findUnique({
+    where: {
+      email: email,
+    },
+    select: {
+      id: true,
+      email: true,
+      username: true,
+      userType: true,
+      passwordHash: true,
+    },
+  });
+  return user;
+};
+
+export const dbGetUserName = async (userName: string) => {
+  const user = await db.user.findUnique({
+    where: {
+      username: userName,
+    },
+    select: {
+      id: true,
+      email: true,
+      username: true,
+      userType: true,
+      passwordHash: true,
+    },
+  });
+  return user;
+};
+
+//   const hash = await bcrypt.hash(password, rounds)
+// await bcrypt.compare(password, hash)

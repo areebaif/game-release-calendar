@@ -200,7 +200,6 @@ const AddGame: React.FC = () => {
       setError(undefined);
       if (!formPlatformFields.length) {
         setError({
-          ...error,
           [AddGameFormFields.platformName]:
             "platform name and release date cannot be empty",
         });
@@ -208,7 +207,6 @@ const AddGame: React.FC = () => {
       }
       if (!gameName.length) {
         setError({
-          ...error,
           [AddGameFormFields.gameName]: "Game name cannot be empty",
         });
         return;
@@ -218,7 +216,6 @@ const AddGame: React.FC = () => {
       const validPictureType = validFileType(type);
       if (!validPictureType.isValid) {
         setError({
-          ...error,
           [AddGameFormFields.gamePicBlob]:
             "please upload correct image type of jpeg or png",
         });

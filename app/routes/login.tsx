@@ -44,20 +44,26 @@ export const action = async ({ request }: ActionArgs) => {
   // const redirectTo = validateUrl(
   //   (form.get("redirectTo") as string) || "/jokes"
   // );
+
   const errors: ErrorLoginFormFields = {};
-  // do some form validation here
+
   if (typeof email !== "string" || !email.length) {
     errors.email = "error submitting form, please check the email field";
   }
-  if (typeof userName !== "string" || !userName.length) {
+  if (
+    loginType === `${LoginTypeVal.register}` &&
+    (typeof userName !== "string" || !userName.length)
+  ) {
     errors.userName = "error submitting form, please check the user name field";
   }
   if (typeof password !== "string" || !password.length) {
     errors.password = "error submitting form, please check the password field";
   }
+
   const hasError = Object.values(errors).some((errorMessage) =>
     errorMessage?.length ? true : false
   );
+  if (hasError) return json({ errors: errors });
   const addToDb = {
     email: email as string,
     password: password as string,
@@ -98,7 +104,10 @@ export const action = async ({ request }: ActionArgs) => {
         "error submitting form, please enter correct value for login or register";
     }
   }
-  if (hasError) return json({ errors: errors });
+  const DbError = Object.values(errors).some((errorMessage) =>
+    errorMessage?.length ? true : false
+  );
+  if (DbError) return json({ errors: errors });
 
   return redirect("/");
 };
@@ -110,12 +119,31 @@ const Login: React.FC = () => {
   const [email, setEmail] = React.useState("");
   const [userName, setUserName] = React.useState("");
   const [password, setPassword] = React.useState("");
-  const [isRegister, setIsRegister] = React.useState("");
+  const [isRegister, setIsRegister] = React.useState<string>(
+    `${LoginTypeVal.register}`
+  );
   const [error, setError] = React.useState<ErrorLoginFormFields>();
-
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // grab the form element
+    setError(undefined);
+    switch (true) {
+      case !email.length:
+        setError({
+          [LoginFormFields.email]: "email value cannot be empty",
+        });
+        return;
+      case !password.length:
+        setError({
+          [LoginFormFields.password]: "password value cannot be empty",
+        });
+        return;
+      case isRegister === `${LoginTypeVal.register}` && !userName.length:
+        setError({
+          [LoginFormFields.userName]: "userName value cannot be empty",
+        });
+        return;
+    }
 
     const $form = e.currentTarget;
     // get the formData from that form

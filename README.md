@@ -4,12 +4,13 @@ Note: These commands are for Mac computer
 
 ## Define environment variables for local development
 
-Create .env.local file in the root of the project and have the following environemnt variablee defined.
+Create .env.local file in the root of the project and have the following environemnt variable defined.
 `DATABASE_URL`
 `REGION`
 `AWS_ACCESS_KEY_ID`
 `AWS_SECRET_ACCESS_KEY`
 `BUCKET_NAME`
+`JWT_SECRET`
 `NODE_ENV="development"`
 
 Please contact admin of the repo for values of these variables.

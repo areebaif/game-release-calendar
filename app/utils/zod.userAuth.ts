@@ -23,9 +23,9 @@ export const UserZod = z.object({
 
 export const UserPropsForClientZod = z.object({
   id: z.string().uuid(),
-  email: z.string().email(),
-  userName: z.string(),
+  email: z.string().email().optional(),
+  userName: z.string().optional(),
   createdAt: z.string().optional(),
   updatedAt: z.string().optional(),
-  userType: z.enum([`${UserType.ADMIN}`, `${UserType.STANDARD}`]),
+  userType: z.enum([`${UserType.ADMIN}`, `${UserType.STANDARD}`]).optional(),
 });

@@ -1,24 +1,28 @@
 import bcrypt from "bcryptjs";
 import { createCookieSessionStorage, redirect, json } from "@remix-run/node";
-import { dbGetUserEmail, dbGetUserName } from "./db.server.crud";
+import { dbGetUserByEmail, dbGetUserByUserName } from "./db.server.crud";
 import jwt from "jsonwebtoken";
 import { User, UserPropsForClient } from "./types";
 
 export const saltRounds = 10;
 
-export const loginUser = async (email: string, userInputPassword: string) => {
-  const user = await dbGetUserEmail(email);
-  if (!user) return null;
+export const loginUser = async (
+  emailUserName: string,
+  userInputPassword: string
+) => {
+  const user = await dbGetUserByEmail(emailUserName);
+  const userName = await dbGetUserByUserName(emailUserName);
+  if (!user && !userName) return null;
   const isPasswordCorrect = await bcrypt.compare(
     userInputPassword,
-    user?.passwordHash!
+    user?.passwordHash ? user?.passwordHash : userName?.passwordHash!
   );
   if (!isPasswordCorrect) return null;
   return {
-    id: user.id,
-    email: user.email,
-    userName: user.username,
-    userType: user.userType,
+    id: user?.id ? user.id : userName?.id,
+    email: user?.email ? user.email : userName?.email,
+    userName: user?.username ? user.username : userName?.username,
+    userType: user?.userType ? user.userType : userName?.userType,
   };
 };
 
@@ -40,22 +44,13 @@ export const storage = createCookieSessionStorage({
 
 export const createUserSession = async (data: {
   userId: string;
-  userEmail: string;
-  userName: string;
   redirectTo: string;
-  userType: User["userType"];
 }) => {
   const session = await storage.getSession();
-  const { userId, userEmail, userName, redirectTo, userType } = data;
-  const jwtToken = jwt.sign(
-    { userId, userEmail, userName, userType },
-    process.env.JWT_SECRET!,
-    {
-      expiresIn: 60 * 60 * 24 * 7,
-    }
-  );
-  // you will set the jwt token on the cookie
-  // what about authorization headers????
+  const { userId, redirectTo } = data;
+  const jwtToken = jwt.sign({ userId }, process.env.JWT_SECRET!, {
+    expiresIn: 60 * 60 * 24 * 7,
+  });
   session.set("jwt_token", jwtToken);
   return redirect(redirectTo, {
     headers: {
@@ -64,12 +59,12 @@ export const createUserSession = async (data: {
   });
 };
 
-export const getUserSession = (request: Request) => {
-  return storage.getSession(request.headers.get("Cookie"));
-};
+// export const getUserSession = (request: Request) => {
+//   return storage.getSession(request.headers.get("Cookie"));
+// };
 
 export const verifyJwtToken = async (request: Request) => {
-  const session = await getUserSession(request);
+  const session = await storage.getSession(request.headers.get("Cookie"));
 
   const jwt_token = session.get("jwt_token");
   try {
@@ -89,7 +84,6 @@ export const requireAdminUser = async (
   redirectTo: string = new URL(request.url).pathname
 ) => {
   const payload = await verifyJwtToken(request);
-  //const userId = session.get("userId");
   const { user } = payload;
   if (!user || user.userType !== "ADMIN") {
     //const searchParams = new URLSearchParams([["redirectTo", redirectTo]]);

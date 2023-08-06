@@ -22,14 +22,10 @@ import { getUrlUploadImageToS3 } from "./image.upload";
 import {
   dbGetAllGamesData,
   dbCreateUser,
-  dbGetUserEmail,
-  dbGetUserName,
+  dbGetUserByEmail,
+  dbGetUserByUserName,
 } from "./db.server.crud";
-import {
-  loginUser,
-  createUserSession,
-  verifyJwtToken,
-} from "./session.server";
+import { loginUser, createUserSession, verifyJwtToken } from "./session.server";
 
 export {
   db,
@@ -51,8 +47,8 @@ export {
   dbGetAllGamesData,
   DbReadGameMetaDataZod,
   dbCreateUser,
-  dbGetUserEmail,
-  dbGetUserName,
+  dbGetUserByEmail,
+  dbGetUserByUserName,
   loginUser,
   createUserSession,
   verifyJwtToken,

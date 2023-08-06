@@ -83,7 +83,7 @@ export const dbCreateUser = async (data: {
   return user;
 };
 
-export const dbGetUserEmail = async (email: string) => {
+export const dbGetUserByEmail = async (email: string) => {
   const user = await db.user.findUnique({
     where: {
       email: email,
@@ -99,7 +99,7 @@ export const dbGetUserEmail = async (email: string) => {
   return user;
 };
 
-export const dbGetUserName = async (userName: string) => {
+export const dbGetUserByUserName = async (userName: string) => {
   const user = await db.user.findUnique({
     where: {
       username: userName,

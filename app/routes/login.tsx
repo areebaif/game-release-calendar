@@ -1,7 +1,5 @@
 import * as React from "react";
-import { Link, useSearchParams } from "@remix-run/react";
-import { redirect, json } from "@remix-run/node";
-
+import { json } from "@remix-run/node";
 import type { ActionArgs } from "@remix-run/node";
 import {
   Form,
@@ -9,36 +7,32 @@ import {
   useSubmit,
   useNavigation,
 } from "@remix-run/react";
-import { Card, TextInput, Button, Loader, Radio, Group } from "@mantine/core";
+import { Card, Button, Loader } from "@mantine/core";
 // local imports
-import { ErrorCard } from "~/components";
-import {
-  ErrorLoginFormFields,
-  LoginFormFields,
-  User,
-  LoginTypeVal,
-} from "~/utils/types";
+import { LoginSignup } from "~/components";
 import {
   dbCreateUser,
   dbGetUserByEmail,
   dbGetUserByUserName,
   loginUser,
   createUserSession,
-  verifyJwtToken,
 } from "~/utils";
+import {
+  ErrorLoginFormFields,
+  LoginFormFields,
+  User,
+  LoginTypeVal,
+} from "~/utils/types";
 
 export const action = async ({ request }: ActionArgs) => {
-  //const user = await verifyJwtToken(request);
   const form = await request.formData();
   const loginType = form.get(LoginFormFields.loginType);
   const password = form.get(LoginFormFields.password);
   const email = form.get(LoginFormFields.email);
   const userName = form.get(LoginFormFields.userName);
-  // const redirectTo = validateUrl(
-  //   (form.get("redirectTo") as string) || "/jokes"
-  // );
 
   const errors: ErrorLoginFormFields = {};
+  // form validation
   if (typeof email !== "string" || !email.length) {
     errors.email = "error submitting form, please check the email field";
   }
@@ -51,7 +45,6 @@ export const action = async ({ request }: ActionArgs) => {
   if (typeof password !== "string" || !password.length) {
     errors.password = "error submitting form, please check the password field";
   }
-
   const hasError = Object.values(errors).some((errorMessage) =>
     errorMessage?.length ? true : false
   );
@@ -62,7 +55,6 @@ export const action = async ({ request }: ActionArgs) => {
       const DbValues = {
         emailUserName: email as string,
         password: password as string,
-        //userType: "ADMIN" as User["userType"],
       };
       // login the user to get userId
       const user = await loginUser(DbValues.emailUserName, DbValues.password);
@@ -109,21 +101,20 @@ export const action = async ({ request }: ActionArgs) => {
     errorMessage?.length ? true : false
   );
   if (DbError) return json({ errors: errors });
-  //return redirect("/");
 };
 
-const Login: React.FC = () => {
+const RegisterLogin: React.FC = () => {
   const submit = useSubmit();
   const navigation = useNavigation();
   const actionData = useActionData<{ errors: ErrorLoginFormFields }>();
-  const [searchParams] = useSearchParams();
   const [email, setEmail] = React.useState("");
   const [userName, setUserName] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const [error, setError] = React.useState<ErrorLoginFormFields>({});
   const [isRegister, setIsRegister] = React.useState<string>(
     `${LoginTypeVal.register}`
   );
-  const [error, setError] = React.useState<ErrorLoginFormFields>({});
+
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // grab the form element
@@ -166,7 +157,18 @@ const Login: React.FC = () => {
   if (navigation.state === "loading" || navigation.state === "submitting") {
     return <Loader />;
   }
-
+  const loginSignupProps = {
+    isRegister,
+    onChangeFormType,
+    userName,
+    setUserName,
+    password,
+    setPassword,
+    email,
+    setEmail,
+    error,
+    actionData,
+  };
   return (
     <Card
       shadow="sm"
@@ -180,93 +182,7 @@ const Login: React.FC = () => {
     >
       <Card.Section inheritPadding py="md">
         <Form onSubmit={onSubmit}>
-          <Radio.Group
-            value={isRegister}
-            onChange={(val) => {
-              onChangeFormType(val);
-            }}
-            label="login or register"
-            withAsterisk
-          >
-            <Group mt="xs">
-              <Radio
-                name={`${LoginFormFields.loginType}`}
-                value={`${LoginTypeVal.register}`}
-                label="register"
-              />
-              <Radio
-                name={`${LoginFormFields.loginType}`}
-                value={`${LoginTypeVal.login}`}
-                label="login"
-              />
-            </Group>
-          </Radio.Group>
-          {isRegister === `${LoginTypeVal.register}` ? (
-            <>
-              <TextInput
-                withAsterisk
-                label="username"
-                placeholder="type here"
-                value={userName}
-                type="test"
-                name={LoginFormFields.userName}
-                onChange={(event) => setUserName(event.currentTarget.value)}
-              />
-              {error?.userName || actionData?.errors?.userName ? (
-                <ErrorCard
-                  errorMessage={
-                    error?.userName
-                      ? error.userName
-                      : actionData?.errors?.userName
-                  }
-                />
-              ) : (
-                <></>
-              )}
-            </>
-          ) : (
-            <></>
-          )}
-          <TextInput
-            withAsterisk
-            label={
-              isRegister === `${LoginTypeVal.register}`
-                ? "Email"
-                : "Username or Email"
-            }
-            placeholder="type here"
-            value={email}
-            type="text"
-            name={LoginFormFields.email}
-            onChange={(event) => setEmail(event.currentTarget.value)}
-          ></TextInput>
-          {error?.email || actionData?.errors?.email ? (
-            <ErrorCard
-              errorMessage={
-                error?.email ? error.email : actionData?.errors?.email
-              }
-            />
-          ) : (
-            <></>
-          )}
-          <TextInput
-            withAsterisk
-            label="Password"
-            placeholder="type here"
-            value={password}
-            type="password"
-            name={LoginFormFields.password}
-            onChange={(event) => setPassword(event.currentTarget.value)}
-          ></TextInput>
-          {error?.password || actionData?.errors?.password ? (
-            <ErrorCard
-              errorMessage={
-                error?.password ? error.password : actionData?.errors?.password
-              }
-            />
-          ) : (
-            <></>
-          )}
+          <LoginSignup {...loginSignupProps} />
           <Button type="submit">Submit</Button>
         </Form>
       </Card.Section>
@@ -274,4 +190,4 @@ const Login: React.FC = () => {
   );
 };
 
-export default Login;
+export default RegisterLogin;

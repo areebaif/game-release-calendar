@@ -11,13 +11,14 @@ import { Card, Title, TextInput, Button, Loader } from "@mantine/core";
 import type { ActionArgs, TypedResponse } from "@remix-run/node";
 // local imports
 import { ErrorCard } from "~/components";
-import { db, ErrorAddPlatformFieldsZod } from "~/utils";
+import { db, ErrorAddPlatformFieldsZod, requireAdminUser } from "~/utils";
 // type imports
 import { ErrorAddPlatformFields, AddPlatformFormFields } from "~/utils/types";
 
 export const action = async ({
   request,
 }: ActionArgs): Promise<ErrorAddPlatformFields | TypedResponse> => {
+  const user = await requireAdminUser({ request, redirectTo: "/" });
   const form = await request.formData();
 
   const name = form.get(AddPlatformFormFields.name);
@@ -37,7 +38,7 @@ export const action = async ({
   const platform = await db.gamePlatform.create({
     data: { name: platformName },
   });
-  return redirect(`/`);
+  return redirect(`/admin`);
 };
 
 const AddPlatform: React.FC = () => {

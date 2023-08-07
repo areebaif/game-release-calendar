@@ -10,22 +10,9 @@ import { redirect, json, Response } from "@remix-run/node";
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 // type imports
 import type { ActionArgs, TypedResponse } from "@remix-run/node";
-import {
-  Card,
-  Button,
-  Loader,
-  TextInput,
-  Textarea,
-  FileInput,
-} from "@mantine/core";
-import { IconUpload } from "@tabler/icons-react";
+import { Card, Loader } from "@mantine/core";
 // local imports
-import {
-  PlatformInput,
-  PlatformList,
-  ErrorCard,
-  FormFieldsAddGame,
-} from "~/components";
+import { PlatformInput, ErrorCard, FormFieldsAddGame } from "~/components";
 import {
   db,
   dbCreateGame,
@@ -44,9 +31,11 @@ import {
   GamePlatformZod,
   AddGameFormFields,
   ErrorAddGameFormFieldsZod,
+  requireAdminUser,
 } from "~/utils";
 
-export const loader = async () => {
+export const loader = async ({ request }: ActionArgs) => {
+  const user = await requireAdminUser({ request, redirectTo: "/" });
   const platforms = await db.gamePlatform.findMany({
     select: { id: true, name: true },
   });
@@ -56,6 +45,7 @@ export const loader = async () => {
 export const action = async ({
   request,
 }: ActionArgs): Promise<ErrorAddGameFormFields | TypedResponse> => {
+  const user = await requireAdminUser({ request, redirectTo: "/" });
   const form = await request.formData();
   const addToDb: DbAddGame = {
     platform: [],
@@ -78,7 +68,6 @@ export const action = async ({
 
           const [platformId, platformName, releaseDate] = splitFormValue;
 
-          // TODO: check valid uuid supplied by client for platform id
           if (!platformName.length)
             errors.platformName = "please provide a value for platform name";
 
@@ -126,7 +115,7 @@ export const action = async ({
     if (hasError) return json({ errors: errors });
     // start adding values to the db
     await dbCreateGame(addToDb);
-    return redirect(`/`);
+    return redirect(`/admin`);
   } catch (err) {
     console.log(err);
     // delete aws image if for any reason this code fails, otherwise you will have an image stored in s3 without corresponding database image url
@@ -201,7 +190,6 @@ const AddGame: React.FC = () => {
       setError(undefined);
       if (!formPlatformFields.length) {
         setError({
-          ...error,
           [AddGameFormFields.platformName]:
             "platform name and release date cannot be empty",
         });
@@ -209,7 +197,6 @@ const AddGame: React.FC = () => {
       }
       if (!gameName.length) {
         setError({
-          ...error,
           [AddGameFormFields.gameName]: "Game name cannot be empty",
         });
         return;
@@ -219,7 +206,6 @@ const AddGame: React.FC = () => {
       const validPictureType = validFileType(type);
       if (!validPictureType.isValid) {
         setError({
-          ...error,
           [AddGameFormFields.gamePicBlob]:
             "please upload correct image type of jpeg or png",
         });

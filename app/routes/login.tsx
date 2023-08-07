@@ -1,38 +1,46 @@
 import * as React from "react";
-import { Link, useSearchParams } from "@remix-run/react";
-import { redirect, json } from "@remix-run/node";
-
-import type { ActionArgs, LinksFunction } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import type { ActionArgs } from "@remix-run/node";
 import {
   Form,
   useActionData,
   useSubmit,
   useNavigation,
 } from "@remix-run/react";
+import { Card, Button, Loader } from "@mantine/core";
+// local imports
+import { LoginSignup } from "~/components";
 import {
-  Card,
-  Title,
-  TextInput,
-  Button,
-  Loader,
-  Radio,
-  Group,
-} from "@mantine/core";
-import { ErrorLoginFormFields, LoginFormFields } from "~/utils/types";
+  dbCreateUser,
+  dbGetUserByEmail,
+  dbGetUserByUserName,
+  loginUser,
+  createUserSession,
+} from "~/utils";
+import {
+  ErrorLoginFormFields,
+  LoginFormFields,
+  User,
+  LoginTypeVal,
+} from "~/utils/types";
 
 export const action = async ({ request }: ActionArgs) => {
   const form = await request.formData();
   const loginType = form.get(LoginFormFields.loginType);
   const password = form.get(LoginFormFields.password);
   const email = form.get(LoginFormFields.email);
-  // const redirectTo = validateUrl(
-  //   (form.get("redirectTo") as string) || "/jokes"
-  // );
-  const fields = { loginType, password, email };
+  const userName = form.get(LoginFormFields.userName);
+
   const errors: ErrorLoginFormFields = {};
-  // do some form validation here
+  // form validation
   if (typeof email !== "string" || !email.length) {
     errors.email = "error submitting form, please check the email field";
+  }
+  if (
+    loginType === `${LoginTypeVal.register}` &&
+    (typeof userName !== "string" || !userName.length)
+  ) {
+    errors.userName = "error submitting form, please check the user name field";
   }
   if (typeof password !== "string" || !password.length) {
     errors.password = "error submitting form, please check the password field";
@@ -43,49 +51,124 @@ export const action = async ({ request }: ActionArgs) => {
   if (hasError) return json({ errors: errors });
 
   switch (loginType) {
-    case "login": {
-      // login to get the user
-      // if there's no user, return the fields and a formError
-      // if there is a user, create their session and redirect to /
+    case `${LoginTypeVal.login}`: {
+      const DbValues = {
+        emailUserName: email as string,
+        password: password as string,
+      };
+      // login the user to get userId
+      const user = await loginUser(DbValues.emailUserName, DbValues.password);
+      if (!user) {
+        errors.email = "error logging in user, please check your credentials";
+        break;
+      }
+      const { id } = user;
+      return createUserSession({
+        userId: id!,
+        redirectTo: "/",
+      });
     }
-    case "register": {
-      //   const userExists = await db.user.findFirst({
-      //     where: { username },
-      //   });
-      //   if (userExists) {
-      //     return badRequest({
-      //       fieldErrors: null,
-      //       fields,
-      //       formError: `User with username ${username} already exists`,
-      //     });
-      //   }
-      //   // create the user
-      // create their session and redirect to /jokes
+    case `${LoginTypeVal.register}`: {
+      const AddToDb = {
+        email: email as string,
+        password: password as string,
+        userName: userName as string,
+        userType: "STANDARD" as User["userType"],
+      };
+      const userEmailExists = await dbGetUserByEmail(AddToDb.email);
+      if (userEmailExists) {
+        errors.email = "error submitting form, email already in use";
+        return json({ errors: errors });
+      }
+      const userNameExists = await dbGetUserByUserName(AddToDb.userName);
+      if (userNameExists) {
+        errors.userName = "error submitting form, username already in use";
+        return json({ errors: errors });
+      }
+      const createUser = await dbCreateUser(AddToDb);
+      const { id } = createUser;
+      return createUserSession({
+        userId: id,
+        redirectTo: "/",
+      });
     }
     default: {
-      // return error here
+      errors.loginType =
+        "error submitting form, please enter correct value for login or register";
     }
   }
+  const DbError = Object.values(errors).some((errorMessage) =>
+    errorMessage?.length ? true : false
+  );
+  if (DbError) return json({ errors: errors });
 };
 
-const Login: React.FC = () => {
+const RegisterLogin: React.FC = () => {
   const submit = useSubmit();
-  const [searchParams] = useSearchParams();
+  const navigation = useNavigation();
+  const actionData = useActionData<{ errors: ErrorLoginFormFields }>();
   const [email, setEmail] = React.useState("");
+  const [userName, setUserName] = React.useState("");
   const [password, setPassword] = React.useState("");
-  const [isSignup, setIsSignup] = React.useState("register");
+  const [error, setError] = React.useState<ErrorLoginFormFields>({});
+  const [isRegister, setIsRegister] = React.useState<string>(
+    `${LoginTypeVal.register}`
+  );
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // grab the form element
-    
-    
+    setError(undefined);
+    switch (true) {
+      case !email.length:
+        setError({
+          [LoginFormFields.email]: "email value cannot be empty",
+        });
+        return;
+      case !password.length:
+        setError({
+          [LoginFormFields.password]: "password value cannot be empty",
+        });
+        return;
+      case isRegister === `${LoginTypeVal.register}` && !userName.length:
+        setError({
+          [LoginFormFields.userName]: "userName value cannot be empty",
+        });
+        return;
+    }
+
     const $form = e.currentTarget;
     // get the formData from that form
     const formData = new FormData($form);
     submit(formData, { method: "post", action: "/login" });
   };
 
+  const onChangeFormType = (val: string) => {
+    setEmail("");
+    setUserName("");
+    setPassword("");
+    setError({});
+    if (actionData?.errors) {
+      actionData!.errors = undefined;
+    }
+    setIsRegister(val);
+  };
+
+  if (navigation.state === "loading" || navigation.state === "submitting") {
+    return <Loader />;
+  }
+  const loginSignupProps = {
+    isRegister,
+    onChangeFormType,
+    userName,
+    setUserName,
+    password,
+    setPassword,
+    email,
+    setEmail,
+    error,
+    actionData,
+  };
   return (
     <Card
       shadow="sm"
@@ -99,67 +182,7 @@ const Login: React.FC = () => {
     >
       <Card.Section inheritPadding py="md">
         <Form onSubmit={onSubmit}>
-          {/* Notice in my solution I'm using useSearchParams to get the
-          redirectTo query parameter and putting that in a hidden input. This
-          way our action can know where to redirect the user. This will be
-          useful later when we redirect a user to the login page. */}
-          <input
-            type="hidden"
-            name="redirectTo"
-            value={searchParams.get("redirectTo") ?? undefined}
-          />
-          <Radio.Group
-            value={isSignup}
-            onChange={setIsSignup}
-            //name="login or register"
-            label="login or register"
-            withAsterisk
-          >
-            <Group mt="xs">
-              <Radio
-                name={`${LoginFormFields.loginType}`}
-                value="register"
-                label="register"
-              />
-              <Radio
-                name={`${LoginFormFields.loginType}`}
-                value="login"
-                label="login"
-              />
-            </Group>
-          </Radio.Group>
-          <TextInput
-            withAsterisk
-            label="Email"
-            placeholder="type here"
-            value={email}
-            type="text"
-            name={LoginFormFields.email}
-            onChange={(event) => setEmail(event.currentTarget.value)}
-          ></TextInput>
-          {/* {error?.name || actionData?.errors?.name ? (
-            <ErrorCard
-              errorMessage={error?.name ? error.name : actionData?.errors?.name}
-            />
-          ) : (
-            <></>
-          )} */}
-          <TextInput
-            withAsterisk
-            label="Password"
-            placeholder="type here"
-            value={password}
-            type="password"
-            name={LoginFormFields.password}
-            onChange={(event) => setPassword(event.currentTarget.value)}
-          ></TextInput>
-          {/* {error?.name || actionData?.errors?.name ? (
-            <ErrorCard
-              errorMessage={error?.name ? error.name : actionData?.errors?.name}
-            />
-          ) : (
-            <></>
-          )} */}
+          <LoginSignup {...loginSignupProps} />
           <Button type="submit">Submit</Button>
         </Form>
       </Card.Section>
@@ -167,4 +190,4 @@ const Login: React.FC = () => {
   );
 };
 
-export default Login;
+export default RegisterLogin;

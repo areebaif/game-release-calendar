@@ -2,9 +2,15 @@ import type { ActionArgs } from "@remix-run/node";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { v4 as uuidv4 } from "uuid";
-import { s3Client, validFileType, s3FormFields } from "~/utils";
+import {
+  s3Client,
+  validFileType,
+  s3FormFields,
+  requireAdminUser,
+} from "~/utils";
 
 export const action = async ({ request }: ActionArgs) => {
+  const user = await requireAdminUser({ request, redirectTo: "/" });
   const form = await request.formData();
   const fileExt = form.get(s3FormFields.fileType);
   if (typeof fileExt !== "string") {

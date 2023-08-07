@@ -2,6 +2,8 @@ import * as React from "react";
 import { Link } from "@remix-run/react";
 // this route will have layout of your admin dashbaord to be used by all other admin routes
 
+
+
 const AdminIndexRoute: React.FC = () => {
   return (
     <div>
@@ -12,6 +14,10 @@ const AdminIndexRoute: React.FC = () => {
         <li>
           {" "}
           <Link to="/admin/addPlatform">Add Platform</Link>
+        </li>
+        <li>
+          {" "}
+          <Link to="/admin/addUser">Add Admin User</Link>
         </li>
       </ul>
     </div>

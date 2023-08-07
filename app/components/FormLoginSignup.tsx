@@ -54,6 +54,15 @@ export const LoginSignup: React.FC<LoginSignupProps> = ({
           />
         </Group>
       </Radio.Group>
+      {error?.loginType || actionData?.errors?.loginType ? (
+        <ErrorCard
+          errorMessage={
+            error?.loginType ? error.loginType : actionData?.errors?.loginType
+          }
+        />
+      ) : (
+        <></>
+      )}
       {isRegister === `${LoginTypeVal.register}` ? (
         <>
           <TextInput

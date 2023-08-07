@@ -3,6 +3,7 @@ import { PlatformList } from "./PlatformList";
 import { ErrorCard } from "./ErrorComponent";
 import { FormFieldsAddGame } from "./FormFieldsAddGame";
 import { LoginSignup } from "./FormLoginSignup";
+import { AddAdminUser } from "./FormAddAdminUser";
 
 export {
   PlatformInput,
@@ -10,4 +11,5 @@ export {
   ErrorCard,
   FormFieldsAddGame,
   LoginSignup,
+  AddAdminUser,
 };

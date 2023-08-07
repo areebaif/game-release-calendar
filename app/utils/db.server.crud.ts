@@ -77,7 +77,7 @@ export const dbCreateUser = async (data: {
 
   //create new user
   const user = await db.user.create({
-    data: { email, passwordHash: hash, userType, username: userName },
+    data: { email, passwordHash: hash, userType, userName: userName },
   });
 
   return user;
@@ -91,7 +91,7 @@ export const dbGetUserByEmail = async (email: string) => {
     select: {
       id: true,
       email: true,
-      username: true,
+      userName: true,
       userType: true,
       passwordHash: true,
     },
@@ -102,14 +102,29 @@ export const dbGetUserByEmail = async (email: string) => {
 export const dbGetUserByUserName = async (userName: string) => {
   const user = await db.user.findUnique({
     where: {
-      username: userName,
+      userName: userName,
     },
     select: {
       id: true,
       email: true,
-      username: true,
+      userName: true,
       userType: true,
       passwordHash: true,
+    },
+  });
+  return user;
+};
+
+export const dbGetUserById = async (id: any) => {
+  const user = await db.user.findUnique({
+    where: {
+      id: id,
+    },
+    select: {
+      id: true,
+      email: true,
+      userName: true,
+      userType: true,
     },
   });
   return user;

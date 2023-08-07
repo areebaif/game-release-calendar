@@ -47,7 +47,7 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   email        String   @unique
-  username     String   @unique
+  userName     String   @unique
   passwordHash String
   userType     UserType 
 }

@@ -1,8 +1,12 @@
 import bcrypt from "bcryptjs";
 import { createCookieSessionStorage, redirect, json } from "@remix-run/node";
-import { dbGetUserByEmail, dbGetUserByUserName } from "./db.server.crud";
+import {
+  dbGetUserByEmail,
+  dbGetUserById,
+  dbGetUserByUserName,
+} from "./db.server.crud";
 import jwt from "jsonwebtoken";
-import { User, UserPropsForClient } from "./types";
+import { JwtPayload } from "./types";
 
 export const saltRounds = 10;
 
@@ -21,7 +25,7 @@ export const loginUser = async (
   return {
     id: user?.id ? user.id : userName?.id,
     email: user?.email ? user.email : userName?.email,
-    userName: user?.username ? user.username : userName?.username,
+    userName: user?.userName ? user.userName : userName?.userName,
     userType: user?.userType ? user.userType : userName?.userType,
   };
 };
@@ -48,7 +52,7 @@ export const createUserSession = async (data: {
 }) => {
   const session = await storage.getSession();
   const { userId, redirectTo } = data;
-  const jwtToken = jwt.sign({ userId }, process.env.JWT_SECRET!, {
+  const jwtToken = jwt.sign({ id: userId }, process.env.JWT_SECRET!, {
     expiresIn: 60 * 60 * 24 * 7,
   });
   session.set("jwt_token", jwtToken);
@@ -71,7 +75,7 @@ export const verifyJwtToken = async (request: Request) => {
     const payload = jwt.verify(
       jwt_token,
       process.env.JWT_SECRET!
-    ) as UserPropsForClient;
+    ) as JwtPayload;
     return { user: payload };
   } catch (err) {
     // handle invalid token here
@@ -79,15 +83,23 @@ export const verifyJwtToken = async (request: Request) => {
   }
 };
 
-export const requireAdminUser = async (
-  request: Request,
-  redirectTo: string = new URL(request.url).pathname
-) => {
+export const requireAdminUser = async (data: {
+  request: Request;
+  redirectTo: string;
+}) => {
+  const { request, redirectTo } = data;
   const payload = await verifyJwtToken(request);
+
   const { user } = payload;
-  if (!user || user.userType !== "ADMIN") {
-    //const searchParams = new URLSearchParams([["redirectTo", redirectTo]]);
+  if (!user?.id) {
     throw redirect(`${redirectTo}`);
   }
-  return user;
+
+  // return userData
+  const userProps = await dbGetUserById(user.id);
+
+  if (userProps?.userType !== "ADMIN") {
+    throw redirect(`${redirectTo}`);
+  }
+  return userProps;
 };

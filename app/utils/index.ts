@@ -16,6 +16,7 @@ import {
 } from "./types";
 import { ErrorAddPlatformFieldsZod } from "./zod.addPlatform";
 import { ImageUploadApiZod } from "./zod.imageUploadApi";
+import { UserPropsForClientZod } from "./zod.userAuth";
 import { dbCreateGame } from "./db.server.crud";
 import { DbReadGameMetaDataZod } from "./zod.db.crud";
 import { getUrlUploadImageToS3 } from "./image.upload";
@@ -24,8 +25,14 @@ import {
   dbCreateUser,
   dbGetUserByEmail,
   dbGetUserByUserName,
+  dbGetUserById,
 } from "./db.server.crud";
-import { loginUser, createUserSession, verifyJwtToken } from "./session.server";
+import {
+  loginUser,
+  createUserSession,
+  verifyJwtToken,
+  requireAdminUser,
+} from "./session.server";
 
 export {
   db,
@@ -36,6 +43,7 @@ export {
   GamePlatformZod,
   formPlatformFieldsZod,
   PlatformDropDwonListZod,
+  UserPropsForClientZod,
   AddGameFormFields,
   AddPlatformFormFields,
   s3FormFields,
@@ -52,4 +60,6 @@ export {
   loginUser,
   createUserSession,
   verifyJwtToken,
+  requireAdminUser,
+  dbGetUserById,
 };

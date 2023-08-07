@@ -37,7 +37,7 @@ export const action = async ({
   const platform = await db.gamePlatform.create({
     data: { name: platformName },
   });
-  return redirect(`/`);
+  return redirect(`/admin`);
 };
 
 const AddPlatform: React.FC = () => {

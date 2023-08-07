@@ -10,22 +10,9 @@ import { redirect, json, Response } from "@remix-run/node";
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 // type imports
 import type { ActionArgs, TypedResponse } from "@remix-run/node";
-import {
-  Card,
-  Button,
-  Loader,
-  TextInput,
-  Textarea,
-  FileInput,
-} from "@mantine/core";
-import { IconUpload } from "@tabler/icons-react";
+import { Card, Loader } from "@mantine/core";
 // local imports
-import {
-  PlatformInput,
-  PlatformList,
-  ErrorCard,
-  FormFieldsAddGame,
-} from "~/components";
+import { PlatformInput, ErrorCard, FormFieldsAddGame } from "~/components";
 import {
   db,
   dbCreateGame,
@@ -125,7 +112,7 @@ export const action = async ({
     if (hasError) return json({ errors: errors });
     // start adding values to the db
     await dbCreateGame(addToDb);
-    return redirect(`/`);
+    return redirect(`/admin`);
   } catch (err) {
     console.log(err);
     // delete aws image if for any reason this code fails, otherwise you will have an image stored in s3 without corresponding database image url

@@ -29,9 +29,11 @@ import {
 } from "./db.server.crud";
 import {
   loginUser,
+  logoutUser,
   createUserSession,
   verifyJwtToken,
   requireAdminUser,
+  authenticatedUser,
 } from "./session.server";
 
 export {
@@ -62,4 +64,6 @@ export {
   verifyJwtToken,
   requireAdminUser,
   dbGetUserById,
+  authenticatedUser,
+  logoutUser,
 };

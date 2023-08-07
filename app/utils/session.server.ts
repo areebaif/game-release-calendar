@@ -30,6 +30,19 @@ export const loginUser = async (
   };
 };
 
+export const logoutUser = async (data: {
+  request: Request;
+  redirectTo: string;
+}) => {
+  const { redirectTo, request } = data;
+  const session = await storage.getSession(request.headers.get("Cookie"));
+  return redirect(`${redirectTo}`, {
+    headers: {
+      "Set-Cookie": await storage.destroySession(session),
+    },
+  });
+};
+
 export const storage = createCookieSessionStorage({
   cookie: {
     name: "JWT_session",
@@ -94,7 +107,6 @@ export const requireAdminUser = async (data: {
   if (!user?.id) {
     throw redirect(`${redirectTo}`);
   }
-
   // return userData
   const userProps = await dbGetUserById(user.id);
 
@@ -102,4 +114,15 @@ export const requireAdminUser = async (data: {
     throw redirect(`${redirectTo}`);
   }
   return userProps;
+};
+
+export const authenticatedUser = async (request: Request) => {
+  const payload = await verifyJwtToken(request);
+  const { user } = payload;
+  if (!user?.id) {
+    return { user: null };
+  }
+  // return userData
+  const userProps = await dbGetUserById(user.id);
+  return { user: userProps };
 };

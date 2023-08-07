@@ -31,9 +31,11 @@ import {
   GamePlatformZod,
   AddGameFormFields,
   ErrorAddGameFormFieldsZod,
+  requireAdminUser,
 } from "~/utils";
 
-export const loader = async () => {
+export const loader = async ({ request }: ActionArgs) => {
+  const user = await requireAdminUser({ request, redirectTo: "/" });
   const platforms = await db.gamePlatform.findMany({
     select: { id: true, name: true },
   });
@@ -43,6 +45,7 @@ export const loader = async () => {
 export const action = async ({
   request,
 }: ActionArgs): Promise<ErrorAddGameFormFields | TypedResponse> => {
+  const user = await requireAdminUser({ request, redirectTo: "/" });
   const form = await request.formData();
   const addToDb: DbAddGame = {
     platform: [],

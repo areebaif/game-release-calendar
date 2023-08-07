@@ -11,11 +11,17 @@ import { useDisclosure } from "@mantine/hooks";
 import { Card, Button, Loader, Modal, Text } from "@mantine/core";
 // local imports
 import { AddAdminUser, ErrorCard } from "~/components";
-import { dbCreateUser, dbGetUserByEmail, dbGetUserByUserName } from "~/utils";
+import {
+  dbCreateUser,
+  dbGetUserByEmail,
+  dbGetUserByUserName,
+  requireAdminUser,
+} from "~/utils";
 import { ErrorLoginFormFields, LoginFormFields, User } from "~/utils/types";
 import { ErrorLoginFormFieldsZod, UserZod } from "~/utils/zod.userAuth";
 
 export const action = async ({ request }: ActionArgs) => {
+  const user = await requireAdminUser({ request, redirectTo: "/" });
   const form = await request.formData();
   const password = form.get(LoginFormFields.password);
   const email = form.get(LoginFormFields.email);

@@ -62,7 +62,7 @@ export const dbGetAllGamesData = async () => {
     }
     return result.push({ game, platform: [platform] });
   });
-  return gameMetaData;
+  return result;
 };
 
 export const dbCreateUser = async (data: {

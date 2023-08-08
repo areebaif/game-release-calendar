@@ -30,7 +30,7 @@ export const GameIndexRoute: React.FC = () => {
   // TODO: this needs to be refactored into separate components
   return (
     <List icon={" "}>
-      {loaderdata.games.map((game) => {
+      {loaderdata?.games?.map((game) => {
         return (
           <List.Item key={game.game.gameId}>
             <Card

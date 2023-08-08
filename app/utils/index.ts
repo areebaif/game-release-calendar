@@ -27,6 +27,7 @@ import {
   dbGetUserById,
   dbCreateGame,
   dbGetGameDataById,
+  dbDeleteGameById,
 } from "./db.server.crud";
 import {
   loginUser,
@@ -68,4 +69,5 @@ export {
   authenticatedUser,
   logoutUser,
   dbGetGameDataById,
+  dbDeleteGameById,
 };

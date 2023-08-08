@@ -22,14 +22,16 @@ export const UserZod = z.object({
   userPassword: z.string().optional(),
 });
 
-export const UserPropsForClientZod = z.object({
-  id: z.string().uuid(),
-  email: z.string().email(),
-  userName: z.string(),
-  userType: z.enum([`${UserType.ADMIN}`, `${UserType.STANDARD}`]),
-  createdAt: z.string().optional(),
-  updatedAt: z.string().optional(),
-});
+export const UserPropsForClientZod = z
+  .object({
+    id: z.string().uuid(),
+    email: z.string().email(),
+    userName: z.string(),
+    userType: z.enum([`${UserType.ADMIN}`, `${UserType.STANDARD}`]),
+    createdAt: z.string().optional(),
+    updatedAt: z.string().optional(),
+  })
+  .nullable();
 
 export const JwtPayloadZod = z.object({
   id: z.string(),

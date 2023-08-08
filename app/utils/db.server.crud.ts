@@ -107,6 +107,20 @@ export const dbGetGameDataById = async (gameId: string) => {
   return result;
 };
 
+export const dbDeleteGameById = async (gameId: string) => {
+  // delete game MetaData frist
+  await db.gameMetaData.deleteMany({
+    where: {
+      gameId: gameId,
+    },
+  });
+  await db.game.delete({
+    where: {
+      id: gameId,
+    },
+  });
+};
+
 export const dbCreateUser = async (data: {
   email: string;
   password: string;

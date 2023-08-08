@@ -65,6 +65,48 @@ export const dbGetAllGamesData = async () => {
   return result;
 };
 
+export const dbGetGameDataById = async (gameId: string) => {
+  const gameMetaData = await db.gameMetaData.findMany({
+    where: {
+      gameId: gameId,
+    },
+    orderBy: {
+      gameId: "asc",
+    },
+    include: {
+      game: {
+        select: {
+          title: true,
+          imageUrl: true,
+          description: true,
+        },
+      },
+      GamePlatform: {
+        select: {
+          name: true,
+        },
+      },
+    },
+  });
+  const result: DbReadGameMetaData[] = [];
+  gameMetaData.forEach((gameItem, index) => {
+    const game: DbReadGameMetaData["game"] = {
+      ...gameItem.game,
+      gameId: gameItem.gameId,
+    };
+    const platform: DbReadGameMetaData["platform"][0] = {
+      platformName: gameItem.GamePlatform.name,
+      releaseDate: new Date(`${gameItem.releaseDate}`).toISOString(),
+    };
+    if (index !== 0 && gameItem.gameId === gameMetaData[index - 1].gameId) {
+      result[result.length - 1].platform.push(platform);
+      return;
+    }
+    return result.push({ game, platform: [platform] });
+  });
+  return result;
+};
+
 export const dbCreateUser = async (data: {
   email: string;
   password: string;

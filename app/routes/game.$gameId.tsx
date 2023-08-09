@@ -1,7 +1,12 @@
 import { json, redirect } from "@remix-run/node";
 import type { ActionArgs, LoaderArgs } from "@remix-run/node";
-import { useParams, useLoaderData, useNavigate, Form } from "@remix-run/react";
-import { Button, Group } from "@mantine/core";
+import {
+  useParams,
+  useLoaderData,
+  useNavigation,
+  Form,
+} from "@remix-run/react";
+import { Button, Group, Loader } from "@mantine/core";
 import {
   dbGetGameDataById,
   DbReadGameMetaDataZod,
@@ -43,11 +48,15 @@ export const loader = async ({ request, params }: ActionArgs) => {
 
 const GameItem: React.FC = () => {
   const gameId = useParams();
+  const navigation = useNavigation();
   const loaderData = useLoaderData<{
     game: DbReadGameMetaData;
     user: UserPropsForClient;
   }>();
-
+  // conditional renders
+  if (navigation.state === "submitting" || navigation.state === "loading") {
+    return <Loader />;
+  }
   const typeCheckUser = UserPropsForClientZod.safeParse(loaderData.user);
   if (!typeCheckUser.success) {
     console.log(typeCheckUser.error.issues);
@@ -55,7 +64,6 @@ const GameItem: React.FC = () => {
       <ErrorCard errorMessage="something went wrong with the server, please try again" />
     );
   }
-
   const typeCheckGameData = DbReadGameMetaDataZod.safeParse(loaderData.game);
   if (!typeCheckGameData.success) {
     // log error in console

@@ -3,6 +3,9 @@ import { UserType } from "@prisma/client";
 import { db } from "./db.server";
 import { DbAddGame, DbReadGameMetaData } from "./types";
 import { saltRounds } from "./session.server";
+import { s3Client } from "~/utils";
+import { DeleteObjectCommand } from "@aws-sdk/client-s3";
+
 export const dbCreateGame = async (data: DbAddGame) => {
   const { title, description, platform, imageUrl } = data;
   const parsedPlatforms = platform.map((platform) => {
@@ -109,16 +112,40 @@ export const dbGetGameDataById = async (gameId: string) => {
 
 export const dbDeleteGameById = async (gameId: string) => {
   // delete game MetaData frist
-  await db.gameMetaData.deleteMany({
+  const game = await db.game.findUnique({ where: { id: gameId } });
+  if (!game)
+    throw new Response(null, {
+      status: 404,
+      statusText: "gam does not exist with provided id",
+    });
+  const s3Params = {
+    Bucket: process.env.BUCKET_NAME,
+    Key: game.imageUrl!,
+  };
+  const command = new DeleteObjectCommand(s3Params);
+  try {
+    const response = await s3Client.send(command);
+    console.log(response);
+  } catch (err) {
+    // This error happens while deleteing s3 object
+    console.log(err);
+    throw new Response(null, {
+      status: 500,
+      statusText: "internal server error please try again",
+    });
+  }
+  // do these transactions in a lock
+  const deleteMetadata = db.gameMetaData.deleteMany({
     where: {
       gameId: gameId,
     },
   });
-  await db.game.delete({
+  const deleteGame = db.game.delete({
     where: {
       id: gameId,
     },
   });
+  await db.$transaction([deleteMetadata, deleteGame]);
 };
 
 export const dbCreateUser = async (data: {

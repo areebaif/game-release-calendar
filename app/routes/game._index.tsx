@@ -7,8 +7,16 @@ import { dbGetAllGamesData, DbReadGameMetaDataZod } from "~/utils";
 import { ErrorCard, GameCard } from "~/components";
 
 export const loader = async () => {
-  const allGamesMetaData = await dbGetAllGamesData();
-  return json(allGamesMetaData);
+  try {
+    const allGamesMetaData = await dbGetAllGamesData();
+    return json(allGamesMetaData);
+  } catch (err) {
+    console.log(err);
+    throw new Response(null, {
+      status: 500,
+      statusText: "internal server error, failed to get games data",
+    });
+  }
 };
 
 export const GameIndexRoute: React.FC = () => {

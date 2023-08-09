@@ -9,8 +9,16 @@ import { PlatformInput, ErrorCard, FormFieldsAddGame } from "~/components";
 
 export const loader = async ({ request }: ActionArgs) => {
   // only admin can access this route, if the user is not admin or a user is not signedIn, requireAdminUser redirects the user to homepage
-  const user = await requireAdminUser({ request, redirectTo: "/" });
-  return json({ user: user });
+  try {
+    const user = await requireAdminUser({ request, redirectTo: "/" });
+    return json({ user: user });
+  } catch (err) {
+    console.log(err);
+    throw new Response(null, {
+      status: 500,
+      statusText: "internal server error, failed to authenticate user",
+    });
+  }
 };
 
 const Admin: React.FC = () => {
@@ -28,9 +36,9 @@ const Admin: React.FC = () => {
   return (
     <>
       <Title order={1}>Admin Dahsboard</Title>
-      <Text>email: {loaderData.user.email}</Text>
-      <Text>userName: {loaderData.user.userName}</Text>
-      <Text>userType: {loaderData.user.userType}</Text>
+      <Text>email: {loaderData.user?.email}</Text>
+      <Text>userName: {loaderData.user?.userName}</Text>
+      <Text>userType: {loaderData.user?.userType}</Text>
       <main>
         <Outlet />
       </main>

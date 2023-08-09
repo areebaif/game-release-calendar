@@ -36,11 +36,19 @@ import {
 } from "~/utils";
 
 export const loader = async ({ request }: ActionArgs) => {
-  const user = await requireAdminUser({ request, redirectTo: "/" });
-  const platforms = await db.gamePlatform.findMany({
-    select: { id: true, name: true },
-  });
-  return platforms;
+  try {
+    const user = await requireAdminUser({ request, redirectTo: "/" });
+    const platforms = await db.gamePlatform.findMany({
+      select: { id: true, name: true },
+    });
+    return platforms;
+  } catch (err) {
+    console.log(err);
+    throw new Response(null, {
+      status: 500,
+      statusText: "internal server error, failed to load platform data",
+    });
+  }
 };
 
 export const action = async ({

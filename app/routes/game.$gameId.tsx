@@ -24,8 +24,16 @@ export const action = async ({ request }: ActionArgs) => {
   //const ActionType = form.get("delete") as string;
   // TODO: define action type switch accordingly for update
   const id = form.get("gameId") as string;
-  await dbDeleteGameById(id);
-  return redirect("/game");
+  try {
+    await dbDeleteGameById(id);
+    return redirect("/game");
+  } catch (err) {
+    console.log(err);
+    throw new Response(null, {
+      status: 500,
+      statusText: "internal server error, failed to delete game",
+    });
+  }
 };
 
 export const loader = async ({ request, params }: ActionArgs) => {
@@ -42,8 +50,16 @@ export const loader = async ({ request, params }: ActionArgs) => {
       statusText: "no game exists with the id provided",
     });
   }
-  const isAuthenticated = await authenticatedUser(request);
-  return json({ game: gameItem[0], user: isAuthenticated.user });
+  try {
+    const isAuthenticated = await authenticatedUser(request);
+    return json({ game: gameItem[0], user: isAuthenticated.user });
+  } catch (err) {
+    console.log(err);
+    throw new Response(null, {
+      status: 500,
+      statusText: "internal server error, failed to authenticate user",
+    });
+  }
 };
 
 const GameItem: React.FC = () => {

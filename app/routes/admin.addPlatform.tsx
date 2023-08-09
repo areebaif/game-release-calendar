@@ -35,10 +35,18 @@ export const action = async ({
   if (hasError) return json({ errors: errors });
   const platformName = name as string;
   // TODO: uncomment this
-  const platform = await db.gamePlatform.create({
-    data: { name: platformName },
-  });
-  return redirect(`/admin`);
+  try {
+    const platform = await db.gamePlatform.create({
+      data: { name: platformName },
+    });
+    return redirect(`/admin`);
+  } catch (err) {
+    console.log(err);
+    throw new Response(null, {
+      status: 500,
+      statusText: "internal server error, failed to create platform",
+    });
+  }
 };
 
 const AddPlatform: React.FC = () => {

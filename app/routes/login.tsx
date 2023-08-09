@@ -49,58 +49,65 @@ export const action = async ({ request }: ActionArgs) => {
     errorMessage?.length ? true : false
   );
   if (hasError) return json({ errors: errors });
-
-  switch (loginType) {
-    case `${LoginTypeVal.login}`: {
-      const DbValues = {
-        emailUserName: email as string,
-        password: password as string,
-      };
-      // login the user to get userId
-      const user = await loginUser(DbValues.emailUserName, DbValues.password);
-      if (!user) {
-        errors.email = "error logging in user, please check your credentials";
-        break;
+  try {
+    switch (loginType) {
+      case `${LoginTypeVal.login}`: {
+        const DbValues = {
+          emailUserName: email as string,
+          password: password as string,
+        };
+        // login the user to get userId
+        const user = await loginUser(DbValues.emailUserName, DbValues.password);
+        if (!user) {
+          errors.email = "error logging in user, please check your credentials";
+          break;
+        }
+        const { id } = user;
+        return createUserSession({
+          userId: id!,
+          redirectTo: "/",
+        });
       }
-      const { id } = user;
-      return createUserSession({
-        userId: id!,
-        redirectTo: "/",
-      });
-    }
-    case `${LoginTypeVal.register}`: {
-      const AddToDb = {
-        email: email as string,
-        password: password as string,
-        userName: userName as string,
-        userType: "STANDARD" as User["userType"],
-      };
-      const userEmailExists = await dbGetUserByEmail(AddToDb.email);
-      if (userEmailExists) {
-        errors.email = "error submitting form, email already in use";
-        return json({ errors: errors });
+      case `${LoginTypeVal.register}`: {
+        const AddToDb = {
+          email: email as string,
+          password: password as string,
+          userName: userName as string,
+          userType: "STANDARD" as User["userType"],
+        };
+        const userEmailExists = await dbGetUserByEmail(AddToDb.email);
+        if (userEmailExists) {
+          errors.email = "error submitting form, email already in use";
+          return json({ errors: errors });
+        }
+        const userNameExists = await dbGetUserByUserName(AddToDb.userName);
+        if (userNameExists) {
+          errors.userName = "error submitting form, username already in use";
+          return json({ errors: errors });
+        }
+        const createUser = await dbCreateUser(AddToDb);
+        const { id } = createUser;
+        return createUserSession({
+          userId: id,
+          redirectTo: "/",
+        });
       }
-      const userNameExists = await dbGetUserByUserName(AddToDb.userName);
-      if (userNameExists) {
-        errors.userName = "error submitting form, username already in use";
-        return json({ errors: errors });
+      default: {
+        errors.loginType =
+          "error submitting form, please enter correct value for login or register";
       }
-      const createUser = await dbCreateUser(AddToDb);
-      const { id } = createUser;
-      return createUserSession({
-        userId: id,
-        redirectTo: "/",
-      });
     }
-    default: {
-      errors.loginType =
-        "error submitting form, please enter correct value for login or register";
-    }
+    const DbError = Object.values(errors).some((errorMessage) =>
+      errorMessage?.length ? true : false
+    );
+    if (DbError) return json({ errors: errors });
+  } catch (err) {
+    console.log(err);
+    throw new Response(null, {
+      status: 500,
+      statusText: "internal server error, failed to/ login user",
+    });
   }
-  const DbError = Object.values(errors).some((errorMessage) =>
-    errorMessage?.length ? true : false
-  );
-  if (DbError) return json({ errors: errors });
 };
 
 const RegisterLogin: React.FC = () => {

@@ -5,8 +5,17 @@ import { logoutUser } from "~/utils";
 import { Form } from "@remix-run/react";
 import { Button } from "@mantine/core";
 
-export const action = async ({ request }: ActionArgs) =>
-  logoutUser({ request, redirectTo: "/login" });
+export const action = async ({ request }: ActionArgs) => {
+  try {
+    return logoutUser({ request, redirectTo: "/login" });
+  } catch (err) {
+    console.log(err);
+    throw new Response(null, {
+      status: 500,
+      statusText: "internal server error, failed to logout user",
+    });
+  }
+};
 
 /*
 The reason that we're using an action to logout (rather than a loader) is because we want to avoid CSRF problems by using a POST request rather than a GET request.

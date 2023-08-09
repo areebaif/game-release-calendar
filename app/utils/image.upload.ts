@@ -4,7 +4,10 @@ import { ImageUploadApi } from "./types";
 export const getSignedUrl = async (fileType: string) => {
   const testFileType = validFileType(fileType);
   if (!testFileType.isValid) {
-    throw new Error("bad request: file type not valid");
+    throw new Response(null, {
+      status: 400,
+      statusText: "invalid file type provided",
+    });
   }
   const s3FormData = new FormData();
   s3FormData.append(s3FormFields.fileType, fileType);
@@ -14,13 +17,19 @@ export const getSignedUrl = async (fileType: string) => {
   });
 
   if (!response.ok) {
-    throw new Error("Network response was not ok");
+    throw new Response(null, {
+      status: 500,
+      statusText: "internal server error, failed to upload image",
+    });
   }
   const res: ImageUploadApi = await response.json();
   const parseResponse = ImageUploadApiZod.safeParse(res);
   if (!parseResponse.success) {
     console.log(parseResponse.error);
-    throw new Error("internal server error: type incompatibility");
+    throw new Response(null, {
+      status: 500,
+      statusText: "internal server error, type incompatibility",
+    });
   }
   return res;
 };
@@ -36,7 +45,11 @@ export const uploadToS3 = async (
     body: pictureBlob,
   });
 
-  if (!response.ok) throw new Error(" failed to upload image to se");
+  if (!response.ok)
+    throw new Response(null, {
+      status: 500,
+      statusText: " internal server error, failed to upload image",
+    });
   return response.ok;
 };
 

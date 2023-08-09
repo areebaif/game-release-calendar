@@ -63,16 +63,24 @@ export const action = async ({ request }: ActionArgs) => {
     errorMessage?.length ? true : false
   );
   if (DbError) return json({ errors: errors });
-  const createUser = await dbCreateUser(AddToDb);
-  return {
-    user: {
-      id: createUser.id,
-      email: createUser.email,
-      userName: createUser.userName,
-      userPassword: password as string,
-      userType: createUser.userType,
-    },
-  };
+  try {
+    const createUser = await dbCreateUser(AddToDb);
+    return {
+      user: {
+        id: createUser.id,
+        email: createUser.email,
+        userName: createUser.userName,
+        userPassword: password as string,
+        userType: createUser.userType,
+      },
+    };
+  } catch (err) {
+    console.log(err);
+    throw new Response(null, {
+      status: 500,
+      statusText: "internal server error, failed to create create",
+    });
+  }
 };
 
 const RegisterAdminUser: React.FC = () => {

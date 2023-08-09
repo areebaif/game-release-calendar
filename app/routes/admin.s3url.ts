@@ -14,14 +14,18 @@ export const action = async ({ request }: ActionArgs) => {
   const form = await request.formData();
   const fileExt = form.get(s3FormFields.fileType);
   if (typeof fileExt !== "string") {
-    throw new Error("invalid form fields");
+    throw new Response(null, {
+      status: 404,
+      statusText: "invalid form fields",
+    });
   }
 
   const validFileExt = validFileType(fileExt);
   if (!validFileExt.isValid) {
-    throw new Error(
-      "bad request: invalid picture format. Supply image of type png, or jpeg"
-    );
+    throw new Response(null, {
+      status: 404,
+      statusText: "provde valid picture format",
+    });
   }
   const stringArray = fileExt.split("/");
   const parsedFileExt = stringArray[1];

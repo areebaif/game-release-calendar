@@ -10,7 +10,8 @@ import { redirect, json, Response } from "@remix-run/node";
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 // type imports
 import type { ActionArgs, TypedResponse } from "@remix-run/node";
-import { Card, Loader } from "@mantine/core";
+import { Card, Loader, Modal } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 // local imports
 import { PlatformInput, ErrorCard, FormFieldsAddGame } from "~/components";
 import {
@@ -104,9 +105,11 @@ export const action = async ({
           addToDb.imageUrl = imageUrlVal;
           break;
         default:
-          throw new Error(
-            "You have submitted a form field that is not supported by the backend"
-          );
+          throw new Response(null, {
+            status: 400,
+            statusText:
+              "You have submitted a form field that is not supported by the backend",
+          });
       }
     }
     const hasError = Object.values(errors).some((errorMessage) =>
@@ -126,12 +129,14 @@ export const action = async ({
     const command = new DeleteObjectCommand(s3Params);
     try {
       const response = await s3Client.send(command);
-      console.log(response);
+      throw new Response(null, {
+        status: 500,
+        statusText: "Internal Server Error, Please try again",
+      });
     } catch (err) {
       // This error happens while deleteing s3 object
       console.log(err);
-    } finally {
-      const res: Response = new Response(null, {
+      throw new Response(null, {
         status: 500,
         statusText: "Internal Server Error, Please try again",
       });
@@ -162,11 +167,18 @@ const AddGame: React.FC = () => {
   const [gameDescription, setGameDescription] = React.useState("");
   const [image, setImage] = React.useState<File | null>(null);
   const [error, setError] = React.useState<ErrorAddGameFormFields>();
+  const [isS3UploadComplete, setIsS3UploadComplete] = React.useState(false);
+  const [opened, { open, close }] = useDisclosure(false);
   // Type checks: check if the server is sending correct values
   const parsePlatform = GamePlatformZod.safeParse(platforms[0]);
   const serverPostError = ErrorAddGameFormFieldsZod.safeParse(
     actionData?.errors
   );
+
+  React.useEffect(() => {
+    if (isS3UploadComplete) close();
+  }, [opened, isS3UploadComplete]);
+
   if (!parsePlatform.success || !serverPostError.success) {
     // log error in console
     !parsePlatform.success
@@ -185,54 +197,52 @@ const AddGame: React.FC = () => {
     return <Loader />;
   }
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError(undefined);
+    if (!formPlatformFields.length) {
+      setError({
+        [AddGameFormFields.platformName]:
+          "platform name and release date cannot be empty",
+      });
+      return;
+    }
+    if (!gameName.length) {
+      setError({
+        [AddGameFormFields.gameName]: "Game name cannot be empty",
+      });
+      return;
+    }
+    const type = image?.type!;
+    // this functioon checks if the file submitted by the user is of valid type, it also returns the extension of the file
+    const validPictureType = validFileType(type);
+    if (!validPictureType.isValid) {
+      setError({
+        [AddGameFormFields.gamePicBlob]:
+          "please upload correct image type of jpeg or png",
+      });
+      return;
+    }
+    open();
+    const $form = e.currentTarget;
+    const s3Data = {
+      fileType: type,
+      image: image!,
+    };
     try {
-      e.preventDefault();
-      setError(undefined);
-      if (!formPlatformFields.length) {
-        setError({
-          [AddGameFormFields.platformName]:
-            "platform name and release date cannot be empty",
-        });
-        return;
-      }
-      if (!gameName.length) {
-        setError({
-          [AddGameFormFields.gameName]: "Game name cannot be empty",
-        });
-        return;
-      }
-      const type = image?.type!;
-      // this functioon checks if the file submitted by the user is of valid type, it also returns the extension of the file
-      const validPictureType = validFileType(type);
-      if (!validPictureType.isValid) {
-        setError({
-          [AddGameFormFields.gamePicBlob]:
-            "please upload correct image type of jpeg or png",
-        });
-        return;
-      }
-      const $form = e.currentTarget;
-      const s3Data = {
-        fileType: type,
-        image: image!,
-      };
-
       const uploadImage = await getUrlUploadImageToS3(s3Data);
-
+      close();
       const formData = new FormData($form);
-
       formData.append(AddGameFormFields.imageUrl, `${uploadImage.fileName}`);
-
       submit(formData, {
         method: "post",
         action: "/admin/addGame",
       });
     } catch (err) {
       console.log(error);
-      setError({
-        ...error,
-        [AddGameFormFields.gamePicBlob]:
-          "internal server error: something went wrong with image upload",
+      setIsS3UploadComplete(true);
+      throw new Response(null, {
+        status: 500,
+        statusText: "internal server error, failed to upload image",
       });
     }
   };
@@ -289,6 +299,14 @@ const AddGame: React.FC = () => {
           </Form>
         </Card.Section>
       </Card>
+      <Modal
+        opened={opened}
+        onClose={close}
+        title="Submitting Image to S3 for upload"
+        centered
+      >
+        <Loader></Loader>
+      </Modal>
     </>
   );
 };

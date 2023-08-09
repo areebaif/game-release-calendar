@@ -3,6 +3,9 @@ import { UserType } from "@prisma/client";
 import { db } from "./db.server";
 import { DbAddGame, DbReadGameMetaData } from "./types";
 import { saltRounds } from "./session.server";
+import { s3Client } from "~/utils";
+import { DeleteObjectCommand } from "@aws-sdk/client-s3";
+
 export const dbCreateGame = async (data: DbAddGame) => {
   const { title, description, platform, imageUrl } = data;
   const parsedPlatforms = platform.map((platform) => {
@@ -62,7 +65,87 @@ export const dbGetAllGamesData = async () => {
     }
     return result.push({ game, platform: [platform] });
   });
-  return gameMetaData;
+  return result;
+};
+
+export const dbGetGameDataById = async (gameId: string) => {
+  const gameMetaData = await db.gameMetaData.findMany({
+    where: {
+      gameId: gameId,
+    },
+    orderBy: {
+      gameId: "asc",
+    },
+    include: {
+      game: {
+        select: {
+          title: true,
+          imageUrl: true,
+          description: true,
+        },
+      },
+      GamePlatform: {
+        select: {
+          name: true,
+        },
+      },
+    },
+  });
+  const result: DbReadGameMetaData[] = [];
+  gameMetaData.forEach((gameItem, index) => {
+    const game: DbReadGameMetaData["game"] = {
+      ...gameItem.game,
+      gameId: gameItem.gameId,
+    };
+    const platform: DbReadGameMetaData["platform"][0] = {
+      platformName: gameItem.GamePlatform.name,
+      releaseDate: new Date(`${gameItem.releaseDate}`).toISOString(),
+    };
+    if (index !== 0 && gameItem.gameId === gameMetaData[index - 1].gameId) {
+      result[result.length - 1].platform.push(platform);
+      return;
+    }
+    return result.push({ game, platform: [platform] });
+  });
+  return result;
+};
+
+export const dbDeleteGameById = async (gameId: string) => {
+  // delete game MetaData frist
+  const game = await db.game.findUnique({ where: { id: gameId } });
+  if (!game)
+    throw new Response(null, {
+      status: 404,
+      statusText: "gam does not exist with provided id",
+    });
+  const s3Params = {
+    Bucket: process.env.BUCKET_NAME,
+    Key: game.imageUrl!,
+  };
+  const command = new DeleteObjectCommand(s3Params);
+  try {
+    const response = await s3Client.send(command);
+    console.log(response);
+  } catch (err) {
+    // This error happens while deleteing s3 object
+    console.log(err);
+    throw new Response(null, {
+      status: 500,
+      statusText: "internal server error please try again",
+    });
+  }
+  // do these transactions in a lock
+  const deleteMetadata = db.gameMetaData.deleteMany({
+    where: {
+      gameId: gameId,
+    },
+  });
+  const deleteGame = db.game.delete({
+    where: {
+      id: gameId,
+    },
+  });
+  await db.$transaction([deleteMetadata, deleteGame]);
 };
 
 export const dbCreateUser = async (data: {

@@ -17,7 +17,6 @@ import {
 import { ErrorAddPlatformFieldsZod } from "./zod.addPlatform";
 import { ImageUploadApiZod } from "./zod.imageUploadApi";
 import { UserPropsForClientZod } from "./zod.userAuth";
-import { dbCreateGame } from "./db.server.crud";
 import { DbReadGameMetaDataZod } from "./zod.db.crud";
 import { getUrlUploadImageToS3 } from "./image.upload";
 import {
@@ -26,6 +25,9 @@ import {
   dbGetUserByEmail,
   dbGetUserByUserName,
   dbGetUserById,
+  dbCreateGame,
+  dbGetGameDataById,
+  dbDeleteGameById,
 } from "./db.server.crud";
 import {
   loginUser,
@@ -66,4 +68,6 @@ export {
   dbGetUserById,
   authenticatedUser,
   logoutUser,
+  dbGetGameDataById,
+  dbDeleteGameById,
 };

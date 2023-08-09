@@ -20,16 +20,15 @@ export const loader = async ({ request }: ActionArgs) => {
 };
 
 export default function Index() {
-  const loaderData = useLoaderData<{ user: UserPropsForClient | null }>();
+  const loaderData = useLoaderData<{ user: UserPropsForClient }>();
   // typecheck loaderData
-  if (loaderData.user) {
-    const typeCheckUser = UserPropsForClientZod.safeParse(loaderData.user);
-    if (!typeCheckUser.success) {
-      console.log(typeCheckUser.error.issues);
-      return (
-        <ErrorCard errorMessage="something went wrong with the server, please try again" />
-      );
-    }
+
+  const typeCheckUser = UserPropsForClientZod.safeParse(loaderData.user);
+  if (!typeCheckUser.success) {
+    console.log(typeCheckUser.error.issues);
+    return (
+      <ErrorCard errorMessage="something went wrong with the server, please try again" />
+    );
   }
 
   return (

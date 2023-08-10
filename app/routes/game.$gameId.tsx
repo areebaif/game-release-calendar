@@ -14,7 +14,12 @@ import {
   db,
   dbDeleteGameById,
 } from "~/utils";
-import { DbReadGameMetaData, UserPropsForClient } from "~/utils/types";
+import {
+  DbReadGameMetaData,
+  EditDeleteGameActionTypeVal,
+  EditDeleteGameFields,
+  UserPropsForClient,
+} from "~/utils/types";
 import { ErrorCard, GameCard } from "~/components";
 import { UserPropsForClientZod, requireAdminUser } from "~/utils";
 
@@ -23,7 +28,11 @@ export const action = async ({ request }: ActionArgs) => {
   const form = await request.formData();
   //const ActionType = form.get("delete") as string;
   // TODO: define action type switch accordingly for update
-  const id = form.get("gameId") as string;
+
+  const id = form.get(`${EditDeleteGameFields.GameId}`);
+  const actionType = form.get(`${EditDeleteGameFields.ActionType}`);
+  //switch (loginType) {
+ const errors: ErrorLoginFormFields = {};
   try {
     await dbDeleteGameById(id);
     return redirect("/game");
@@ -97,11 +106,15 @@ const GameItem: React.FC = () => {
             <input
               type="text"
               hidden
-              name="gameId"
+              name={`${EditDeleteGameFields.GameId}`}
               readOnly
               value={`${gameId.gameId}`}
             ></input>
-            <Button name="delete" value="delete" type="submit">
+            <Button
+              name={`${EditDeleteGameFields.ActionType}`}
+              value={`${EditDeleteGameActionTypeVal.delete}`}
+              type="submit"
+            >
               Delete
             </Button>
           </Form>

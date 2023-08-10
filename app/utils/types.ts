@@ -4,7 +4,7 @@ import {
   PlatformDropDwonListZod,
   formPlatformFieldsZod,
   ErrorAddGameFormFieldsZod,
-} from "./zod.addGame";
+} from "./zod.Game";
 
 import { ImageUploadApiZod } from "./zod.imageUploadApi";
 import { ErrorAddPlatformFieldsZod } from "./zod.addPlatform";
@@ -38,6 +38,16 @@ export enum AddGameFormFields {
   gameDescription = "gameDescription",
   gamePicBlob = "gamePicBlob",
   imageUrl = "imageUrl",
+}
+
+export enum EditDeleteGameFields {
+  ActionType = "actionType",
+  GameId = "GameId",
+}
+
+export enum EditDeleteGameActionTypeVal {
+  delete = "delete",
+  edit = "edit",
 }
 
 export enum AddPlatformFormFields {

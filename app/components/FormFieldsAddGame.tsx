@@ -1,3 +1,4 @@
+import * as React from "react";
 import { Button, TextInput, Textarea, FileInput } from "@mantine/core";
 import { IconUpload } from "@tabler/icons-react";
 import { PlatformList, ErrorCard } from "~/components";

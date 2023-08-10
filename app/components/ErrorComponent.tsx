@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Card, Alert } from "@mantine/core";
+import { Alert } from "@mantine/core";
 import { IconAlertCircle } from "@tabler/icons-react";
 
 type ErrorCardProps = {

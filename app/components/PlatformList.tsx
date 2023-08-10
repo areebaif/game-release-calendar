@@ -1,7 +1,6 @@
 import * as React from "react";
 import { Grid, Title, Button, Input, Divider } from "@mantine/core";
 import { FormPlatformFields, PlatformDropDwonList } from "~/utils/types";
-
 import { formatDate, AddGameFormFields } from "~/utils";
 
 export type PlatformListProps = {

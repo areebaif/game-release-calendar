@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Flex, Select, Box, Button, Alert } from "@mantine/core";
+import { Flex, Select, Box, Button} from "@mantine/core";
 import { DateInput } from "@mantine/dates";
 import {
   FormPlatformFields,

@@ -12,7 +12,6 @@ import type { ActionArgs, TypedResponse } from "@remix-run/node";
 // local imports
 import { ErrorCard } from "~/components";
 import { db, ErrorAddPlatformFieldsZod, requireAdminUser } from "~/utils";
-// type imports
 import { ErrorAddPlatformFields, AddPlatformFormFields } from "~/utils/types";
 
 export const action = async ({

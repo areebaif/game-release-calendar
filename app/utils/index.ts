@@ -8,7 +8,7 @@ import {
   formPlatformFieldsZod,
   PlatformDropDwonListZod,
   ErrorAddGameFormFieldsZod,
-} from "./zod.addGame";
+} from "./zod.Game";
 import {
   AddGameFormFields,
   AddPlatformFormFields,
@@ -16,7 +16,11 @@ import {
 } from "./types";
 import { ErrorAddPlatformFieldsZod } from "./zod.addPlatform";
 import { ImageUploadApiZod } from "./zod.imageUploadApi";
-import { UserPropsForClientZod } from "./zod.userAuth";
+import {
+  UserPropsForClientZod,
+  ErrorLoginFormFieldsZod,
+  UserZod,
+} from "./zod.userAuth";
 import { DbReadGameMetaDataZod } from "./zod.db.crud";
 import { getUrlUploadImageToS3 } from "./image.upload";
 import {
@@ -70,4 +74,6 @@ export {
   logoutUser,
   dbGetGameDataById,
   dbDeleteGameById,
+  ErrorLoginFormFieldsZod,
+  UserZod,
 };

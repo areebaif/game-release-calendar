@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { AddGameFormFields } from "./types";
+import { AddGameFormFields, EditDeleteGameFields } from "./types";
 
 export const GamePlatformZod = z.object({
   id: z.string().uuid(),
@@ -35,3 +35,17 @@ export const ErrorAddGameFormFieldsZod = z
     [AddGameFormFields.platformIdNameReleaseDate]: z.string().optional(),
   })
   .optional();
+
+export const ErrorEditDeleteGameFormFields = z
+  .object({
+    [EditDeleteGameFields.ActionType]: z.string().optional(),
+    [EditDeleteGameFields.GameId]: z.string().optional(),
+  })
+  .optional();
+
+// export const EditDeleteGameFormFieldsZod = z.object({
+//   [EditDeleteGameFields.ActionType]: z.enum([
+//     `${EditDeleteGameActionTypeVal.delete}`,
+//     `${EditDeleteGameActionTypeVal.edit}`,
+//   ]),
+// });

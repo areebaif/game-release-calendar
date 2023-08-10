@@ -125,7 +125,6 @@ export const dbDeleteGameById = async (gameId: string) => {
   const command = new DeleteObjectCommand(s3Params);
   try {
     const response = await s3Client.send(command);
-    console.log(response);
   } catch (err) {
     // This error happens while deleteing s3 object
     console.log(err);
@@ -212,6 +211,3 @@ export const dbGetUserById = async (id: any) => {
   });
   return user;
 };
-
-//   const hash = await bcrypt.hash(password, rounds)
-// await bcrypt.compare(password, hash)

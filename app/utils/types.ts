@@ -4,6 +4,7 @@ import {
   PlatformDropDwonListZod,
   formPlatformFieldsZod,
   ErrorAddGameFormFieldsZod,
+  ErrorEditDeleteGameFormFieldsZod,
 } from "./zod.Game";
 
 import { ImageUploadApiZod } from "./zod.imageUploadApi";
@@ -28,6 +29,9 @@ export type ErrorLoginFormFields = z.infer<typeof ErrorLoginFormFieldsZod>;
 export type User = z.infer<typeof UserZod>;
 export type UserPropsForClient = z.infer<typeof UserPropsForClientZod>;
 export type JwtPayload = z.infer<typeof JwtPayloadZod>;
+export type ErrorEditDeleteGameFormFields = z.infer<
+  typeof ErrorEditDeleteGameFormFieldsZod
+>;
 
 export enum AddGameFormFields {
   platformName = "platformName",

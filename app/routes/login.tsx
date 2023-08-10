@@ -1,6 +1,7 @@
 import * as React from "react";
 import { json } from "@remix-run/node";
 import type { ActionArgs } from "@remix-run/node";
+import { z } from "zod";
 import {
   Form,
   useActionData,
@@ -33,7 +34,7 @@ export const action = async ({ request }: ActionArgs) => {
 
   const errors: ErrorLoginFormFields = {};
   // form validation
-  if (typeof email !== "string" || !email.length) {
+  if (!z.string().email().safeParse(email).success) {
     errors.email = "error submitting form, please check the email field";
   }
   if (
@@ -127,9 +128,9 @@ const RegisterLogin: React.FC = () => {
     // grab the form element
     setError(undefined);
     switch (true) {
-      case !email.length:
+      case !z.string().email().safeParse(email).success:
         setError({
-          [LoginFormFields.email]: "email value cannot be empty",
+          [LoginFormFields.email]: "please provide valid email",
         });
         return;
       case !password.length:

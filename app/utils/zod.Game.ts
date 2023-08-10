@@ -36,12 +36,13 @@ export const ErrorAddGameFormFieldsZod = z
   })
   .optional();
 
-export const ErrorEditDeleteGameFormFields = z
+export const ErrorEditDeleteGameFormFieldsZod = z
   .object({
     [EditDeleteGameFields.ActionType]: z.string().optional(),
     [EditDeleteGameFields.GameId]: z.string().optional(),
   })
   .optional();
+
 
 // export const EditDeleteGameFormFieldsZod = z.object({
 //   [EditDeleteGameFields.ActionType]: z.enum([

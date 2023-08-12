@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Link, useLoaderData } from "@remix-run/react";
-import { redirect, json } from "@remix-run/node";
-import { Card, Image, List, Text, Group } from "@mantine/core";
+import { json } from "@remix-run/node";
+import { List } from "@mantine/core";
 import { DbReadGameMetaData } from "~/utils/types";
 import { dbGetAllGamesData, DbReadGameMetaDataZod } from "~/utils";
 import { ErrorCard, GameCard } from "~/components";

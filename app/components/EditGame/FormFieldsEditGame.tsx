@@ -1,44 +1,45 @@
+import * as React from "react";
 import { Button, TextInput, Textarea, FileInput } from "@mantine/core";
 import { IconUpload } from "@tabler/icons-react";
-import { PlatformList, ErrorCard } from "~/components";
+import { ErrorCard, EditGamePlatformList } from "~/components";
 // type imports
-import { ErrorAddGameFormFields } from "~/utils/types";
-import { AddGameFormFields } from "~/utils";
-import { PlatformListProps } from "./PlatformList";
+import { ErrorEditGameFormField, EditGameFormFields } from "~/utils/types";
 
-type FormFieldsAddGame = {
+import { EditGamePlatformListProps } from "./EditGamePlatformList";
+
+type FormFieldsEditGame = {
   gameName: string;
   setGameName: (val: string) => void;
   gameDescription: string;
   setGameDescription: (val: string) => void;
-  image: File | null;
-  setImage: (val: File) => void;
-  platformListProps: PlatformListProps;
-  actionData: { errors: ErrorAddGameFormFields } | undefined;
-  error: ErrorAddGameFormFields;
+  platformListProps: EditGamePlatformListProps;
+  actionData: { errors: ErrorEditGameFormField } | undefined;
+  error: ErrorEditGameFormField;
+  imageUrl: string;
+  gameId: string;
 };
 
-export const FormFieldsAddGame: React.FC<FormFieldsAddGame> = ({
+export const FormFieldsEditGame: React.FC<FormFieldsEditGame> = ({
+  gameId,
   gameName,
   setGameName,
   gameDescription,
   setGameDescription,
-  image,
-  setImage,
   platformListProps,
   actionData,
   error,
+  imageUrl,
 }) => {
   return (
     <>
-      <PlatformList {...platformListProps} />
+      <EditGamePlatformList {...platformListProps} />
       <TextInput
         withAsterisk
         label="Name"
         placeholder="type here"
         value={gameName}
         type="text"
-        name={AddGameFormFields.gameName}
+        name={EditGameFormFields.gameName}
         onChange={(event) => setGameName(event.currentTarget.value)}
       ></TextInput>
       {actionData?.errors?.gameName || error?.gameName ? (
@@ -56,21 +57,24 @@ export const FormFieldsAddGame: React.FC<FormFieldsAddGame> = ({
         label="Description"
         placeholder="type here"
         value={gameDescription}
-        name={AddGameFormFields.gameDescription}
+        name={EditGameFormFields.gameDescription}
         onChange={(event) => setGameDescription(event.currentTarget.value)}
       ></Textarea>
-      <FileInput
-        // we will not submit this field to the backend, we will submit the fileURL we get from s3 to backend: we will append that field to the form data
-        // we need the field to display errror to the user/client.
-        label="Upload files"
-        placeholder="Upload files"
-        icon={<IconUpload size="16px" />}
-        accept="image/*"
-        value={image}
-        onChange={setImage}
-      />
-      {error?.gamePicBlob ? (
-        <ErrorCard errorMessage={"please upload image type jpeg or png"} />
+      <TextInput label="Image" disabled value={imageUrl}></TextInput>
+      <input
+        hidden={true}
+        readOnly
+        name={EditGameFormFields.gameId}
+        value={gameId}
+      ></input>
+      {actionData?.errors?.gameId || error?.gameId ? (
+        <ErrorCard
+          errorMessage={
+            actionData?.errors?.gameId
+              ? actionData?.errors?.gameId
+              : error?.gameId
+          }
+        />
       ) : (
         <></>
       )}

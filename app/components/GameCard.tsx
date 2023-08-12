@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Card, Image, List, Text, Group } from "@mantine/core";
+import { Card, Image, Text, Group } from "@mantine/core";
 import { DbReadGameMetaData } from "~/utils/types";
 
 type GameCardProps = {

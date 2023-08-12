@@ -16,9 +16,10 @@ import {
   dbGetUserByEmail,
   dbGetUserByUserName,
   requireAdminUser,
+  ErrorLoginFormFieldsZod,
+  UserZod,
 } from "~/utils";
 import { ErrorLoginFormFields, LoginFormFields, User } from "~/utils/types";
-import { ErrorLoginFormFieldsZod, UserZod } from "~/utils/zod.userAuth";
 
 export const action = async ({ request }: ActionArgs) => {
   const user = await requireAdminUser({ request, redirectTo: "/" });

@@ -8,10 +8,10 @@ import {
 } from "@remix-run/react";
 import { redirect, json, Response } from "@remix-run/node";
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
-// type imports
-import type { ActionArgs, TypedResponse } from "@remix-run/node";
 import { Card, Loader, Modal } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+// type imports
+import type { ActionArgs, TypedResponse } from "@remix-run/node";
 // local imports
 import { PlatformInput, ErrorCard, FormFieldsAddGame } from "~/components";
 import {
@@ -20,6 +20,9 @@ import {
   validFileType,
   getUrlUploadImageToS3,
   s3Client,
+  GamePlatformZod,
+  ErrorAddGameFormFieldsZod,
+  requireAdminUser,
 } from "~/utils";
 // type imports
 import {
@@ -27,13 +30,8 @@ import {
   FormPlatformFields,
   ErrorAddGameFormFields,
   DbAddGame,
-} from "~/utils/types";
-import {
-  GamePlatformZod,
   AddGameFormFields,
-  ErrorAddGameFormFieldsZod,
-  requireAdminUser,
-} from "~/utils";
+} from "~/utils/types";
 
 export const loader = async ({ request }: ActionArgs) => {
   try {

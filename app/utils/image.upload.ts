@@ -1,5 +1,5 @@
-import { validFileType, s3FormFields, ImageUploadApiZod } from ".";
-import { ImageUploadApi } from "./types";
+import { validFileType, ImageUploadApiZod } from ".";
+import { ImageUploadApi, s3FormFields } from "./types";
 
 export const getSignedUrl = async (fileType: string) => {
   const testFileType = validFileType(fileType);

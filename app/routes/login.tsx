@@ -34,9 +34,14 @@ export const action = async ({ request }: ActionArgs) => {
 
   const errors: ErrorLoginFormFields = {};
   // form validation
-  if (!z.string().email().safeParse(email).success) {
+  if (!z.string().safeParse(email).success) {
     errors.email = "error submitting form, please check the email field";
   }
+  if (
+    loginType === `${LoginTypeVal.register}` &&
+    !z.string().email().safeParse(email).success
+  )
+    errors.email = "error submitting form, please check the email field";
   if (
     loginType === `${LoginTypeVal.register}` &&
     (typeof userName !== "string" || !userName.length)
@@ -128,7 +133,7 @@ const RegisterLogin: React.FC = () => {
     // grab the form element
     setError(undefined);
     switch (true) {
-      case !z.string().email().safeParse(email).success:
+      case !z.string().safeParse(email).success:
         setError({
           [LoginFormFields.email]: "please provide valid email",
         });

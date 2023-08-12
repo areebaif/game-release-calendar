@@ -1,30 +1,21 @@
 import * as React from "react";
 import { Grid, Title, Button, Input, Divider } from "@mantine/core";
-import { FormPlatformFields, PlatformDropDwonList } from "~/utils/types";
-import { formatDate, AddGameFormFields } from "~/utils";
+import { FormPlatformFields, EditGameFormFields } from "~/utils/types";
+import { formatDate } from "~/utils";
 
-type FormPlatformListProps = {
+export type EditGamePlatformListProps = {
   formPlatformFields: FormPlatformFields[];
   setFormPlatformFields: (data: FormPlatformFields[]) => void;
-  setPlatformDropdownList: (data: PlatformDropDwonList[]) => void;
-  platformDropdownList: PlatformDropDwonList[];
-  dropdownList: PlatformDropDwonList[];
 };
 
-export const FormPlatformList: React.FC<FormPlatformListProps> = ({
+export const EditGamePlatformList: React.FC<EditGamePlatformListProps> = ({
   formPlatformFields,
   setFormPlatformFields,
-  setPlatformDropdownList,
-  platformDropdownList,
-  dropdownList,
 }) => {
   const onRemoveField = (id: string) => {
     setFormPlatformFields(
       formPlatformFields.filter((fields) => fields.platformId !== id)
     );
-    const valueToAdd = dropdownList.filter((item) => item.id === id);
-    // add fields back to your select input
-    setPlatformDropdownList([...platformDropdownList, ...valueToAdd]);
   };
   return (
     <>
@@ -45,12 +36,12 @@ export const FormPlatformList: React.FC<FormPlatformListProps> = ({
             </Grid.Col>
           </Grid>
           {formPlatformFields.map((formValues, index) => (
-            <React.Fragment key={formValues.platformId}>
+            <React.Fragment key={index}>
               <Input
                 variant="unstyled"
                 value={`${formValues.platformId}$${formValues.platformName}$${formValues.releaseDate}`}
                 type="hidden"
-                name={`${AddGameFormFields.platformIdNameReleaseDate}`}
+                name={`${EditGameFormFields.platformIdNameReleaseDate}`}
                 readOnly
               ></Input>
               <Divider my="sm" />

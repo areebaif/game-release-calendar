@@ -21,7 +21,6 @@ import {
   getUrlUploadImageToS3,
   s3Client,
   GamePlatformZod,
-  AddGameFormFields,
   ErrorAddGameFormFieldsZod,
   requireAdminUser,
 } from "~/utils";
@@ -31,6 +30,7 @@ import {
   FormPlatformFields,
   ErrorAddGameFormFields,
   DbAddGame,
+  AddGameFormFields,
 } from "~/utils/types";
 
 export const loader = async ({ request }: ActionArgs) => {

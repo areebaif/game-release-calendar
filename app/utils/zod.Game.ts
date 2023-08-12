@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { AddGameFormFields, EditDeleteGameFields } from "./types";
+import { AddGameFormFields, EditGameFormFields } from "./types";
 
 export const GamePlatformZod = z.object({
   id: z.string().uuid(),
@@ -36,17 +36,21 @@ export const ErrorAddGameFormFieldsZod = z
   })
   .optional();
 
-export const ErrorEditDeleteGameFormFieldsZod = z
+export const ErrorEditGameFormFieldsZod = z
   .object({
-    [EditDeleteGameFields.ActionType]: z.string().optional(),
-    [EditDeleteGameFields.GameId]: z.string().optional(),
+    [EditGameFormFields.platformName]: z.string().optional(),
+    [EditGameFormFields.releaseDate]: z.string().optional(),
+    [EditGameFormFields.platformId]: z.string().optional(),
+    [EditGameFormFields.gameName]: z.string().optional(),
+    [EditGameFormFields.gameDescription]: z.string().optional(),
+    [EditGameFormFields.gameId]: z.string().optional(),
+    [EditGameFormFields.platformIdNameReleaseDate]: z.string().optional(),
   })
   .optional();
 
+export const ErrorDeleteGameFormFieldsZod = z
+  .object({
+    [EditGameFormFields.gameId]: z.string().optional(),
+  })
+  .optional();
 
-// export const EditDeleteGameFormFieldsZod = z.object({
-//   [EditDeleteGameFields.ActionType]: z.enum([
-//     `${EditDeleteGameActionTypeVal.delete}`,
-//     `${EditDeleteGameActionTypeVal.edit}`,
-//   ]),
-// });

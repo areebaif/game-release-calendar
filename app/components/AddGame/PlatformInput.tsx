@@ -1,17 +1,18 @@
 import * as React from "react";
-import { Flex, Select, Box, Button} from "@mantine/core";
+import { Flex, Select, Box, Button } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
 import {
   FormPlatformFields,
   PlatformDropDwonList,
   ErrorAddGameFormFields,
+  AddGameFormFields,
 } from "~/utils/types";
-import { AddGameFormFields } from "~/utils";
-import { ErrorCard } from "./ErrorComponent";
+
+import { ErrorCard } from "../ErrorComponent";
 
 type PlatformInputProps = {
   platformDropdownList: PlatformDropDwonList[];
-  setPlatformDropdownList: (data: PlatformDropDwonList[]) => void;
+  setPlatformDropdownList?: (data: PlatformDropDwonList[]) => void;
   formPlatformFields: FormPlatformFields[];
   setFormPlatformFields: (val: FormPlatformFields[]) => void;
   error: ErrorAddGameFormFields;
@@ -54,9 +55,11 @@ export const PlatformInput: React.FC<PlatformInputProps> = ({
     ]);
     setNamePlatform("");
     setReleaseDate(null);
-    setPlatformDropdownList(
-      platformDropdownList.filter((item) => `${item.id}` !== val)
-    );
+    setPlatformDropdownList
+      ? setPlatformDropdownList(
+          platformDropdownList.filter((item) => `${item.id}` !== val)
+        )
+      : undefined;
   };
 
   return (

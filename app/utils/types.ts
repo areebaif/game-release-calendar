@@ -4,12 +4,17 @@ import {
   PlatformDropDwonListZod,
   formPlatformFieldsZod,
   ErrorAddGameFormFieldsZod,
-  ErrorEditDeleteGameFormFieldsZod,
+  ErrorEditGameFormFieldsZod,
+  ErrorDeleteGameFormFieldsZod,
 } from "./zod.Game";
 
 import { ImageUploadApiZod } from "./zod.imageUploadApi";
 import { ErrorAddPlatformFieldsZod } from "./zod.addPlatform";
-import { DbAddGameZod, DbReadGameMetaDataZod } from "./zod.db.crud";
+import {
+  DbAddGameZod,
+  DbEditGameZod,
+  DbReadGameMetaDataZod,
+} from "./zod.db.crud";
 import {
   ErrorLoginFormFieldsZod,
   JwtPayloadZod,
@@ -29,9 +34,11 @@ export type ErrorLoginFormFields = z.infer<typeof ErrorLoginFormFieldsZod>;
 export type User = z.infer<typeof UserZod>;
 export type UserPropsForClient = z.infer<typeof UserPropsForClientZod>;
 export type JwtPayload = z.infer<typeof JwtPayloadZod>;
-export type ErrorEditDeleteGameFormFields = z.infer<
-  typeof ErrorEditDeleteGameFormFieldsZod
+export type ErrorEditGameFormField = z.infer<typeof ErrorEditGameFormFieldsZod>;
+export type ErrorDeleteGameFormField = z.infer<
+  typeof ErrorDeleteGameFormFieldsZod
 >;
+export type DbEditGame = z.infer<typeof DbEditGameZod>;
 
 export enum AddGameFormFields {
   platformName = "platformName",
@@ -44,14 +51,18 @@ export enum AddGameFormFields {
   imageUrl = "imageUrl",
 }
 
-export enum EditDeleteGameFields {
-  ActionType = "actionType",
-  GameId = "GameId",
+export enum EditGameFormFields {
+  platformName = "platformName",
+  releaseDate = "releaseDate",
+  platformId = "platformId",
+  platformIdNameReleaseDate = "platformIdNameReleaseDate",
+  gameName = "gameName",
+  gameDescription = "gameDescription",
+  gameId = "gameId",
 }
 
-export enum EditDeleteGameActionTypeVal {
-  delete = "delete",
-  edit = "edit",
+export enum DeleteGameFormFields {
+  GameId = "GameId",
 }
 
 export enum AddPlatformFormFields {

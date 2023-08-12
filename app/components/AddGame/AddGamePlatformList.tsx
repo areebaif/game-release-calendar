@@ -1,9 +1,13 @@
 import * as React from "react";
 import { Grid, Title, Button, Input, Divider } from "@mantine/core";
-import { FormPlatformFields, PlatformDropDwonList } from "~/utils/types";
-import { formatDate, AddGameFormFields } from "~/utils";
+import {
+  FormPlatformFields,
+  PlatformDropDwonList,
+  AddGameFormFields,
+} from "~/utils/types";
+import { formatDate } from "~/utils";
 
-export type PlatformListProps = {
+export type AddGamePlatformListProps = {
   formPlatformFields: FormPlatformFields[];
   setFormPlatformFields: (data: FormPlatformFields[]) => void;
   setPlatformDropdownList: (data: PlatformDropDwonList[]) => void;
@@ -11,7 +15,7 @@ export type PlatformListProps = {
   dropdownList: PlatformDropDwonList[];
 };
 
-export const PlatformList: React.FC<PlatformListProps> = ({
+export const AddGamePlatformList: React.FC<AddGamePlatformListProps> = ({
   formPlatformFields,
   setFormPlatformFields,
   setPlatformDropdownList,

@@ -17,6 +17,10 @@ const AdminIndexRoute: React.FC = () => {
           {" "}
           <Link to="/admin/addUser">Add Admin User</Link>
         </li>
+        <li>
+          {" "}
+          <Link to="/game">veiw all games</Link>
+        </li>
       </ul>
     </div>
   );

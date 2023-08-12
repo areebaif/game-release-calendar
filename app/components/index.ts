@@ -1,17 +1,21 @@
-import { PlatformInput } from "./PlatformInput";
-import { PlatformList } from "./PlatformList";
+import { PlatformInput } from "./AddGame/PlatformInput";
+import { AddGamePlatformList } from "./AddGame/AddGamePlatformList";
 import { ErrorCard } from "./ErrorComponent";
-import { FormFieldsAddGame } from "./FormFieldsAddGame";
-import { LoginSignup } from "./FormLoginSignup";
-import { AddAdminUser } from "./FormAddAdminUser";
+import { FormFieldsAddGame } from "./AddGame/FormFieldsAddGame";
+import { LoginSignup } from "./Auth/FormLoginSignup";
+import { AddAdminUser } from "./Auth/FormAddAdminUser";
 import { GameCard } from "./GameCard";
+import { EditGamePlatformList } from "./EditGame/EditGamePlatformList";
+import { FormFieldsEditGame } from "./EditGame/FormFieldsEditGame";
 
 export {
   PlatformInput,
-  PlatformList,
+  AddGamePlatformList,
   ErrorCard,
   FormFieldsAddGame,
   LoginSignup,
   AddAdminUser,
   GameCard,
+  EditGamePlatformList,
+  FormFieldsEditGame,
 };

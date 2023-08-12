@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import { UserType } from "@prisma/client";
 import { db } from "./db.server";
-import { DbAddGame, DbReadGameMetaData } from "./types";
+import { DbAddGame, DbReadGameMetaData, DbEditGame } from "./types";
 import { saltRounds } from "./session.server";
 import { s3Client } from "~/utils";
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
@@ -29,6 +29,37 @@ export const dbCreateGame = async (data: DbAddGame) => {
   });
 };
 
+export const dbEditGame = async (data: DbEditGame) => {
+  const { title, description, platform, gameId } = data;
+  const parsedPlatforms = platform.map((platform) => {
+    return {
+      gamePlatformId: platform.platformId,
+      releaseDate: platform.releaseDate,
+    };
+  });
+  // delete old values
+  const deleteMetaData = db.gameMetaData.deleteMany({
+    where: {
+      gameId: gameId,
+    },
+  });
+  const game = db.game.update({
+    where: {
+      id: gameId,
+    },
+    data: {
+      title: title,
+      description: description,
+      gameMetaData: {
+        createMany: {
+          data: parsedPlatforms,
+        },
+      },
+    },
+  });
+  await db.$transaction([deleteMetaData, game]);
+};
+
 export const dbGetAllGamesData = async () => {
   const gameMetaData = await db.gameMetaData.findMany({
     orderBy: {
@@ -44,6 +75,7 @@ export const dbGetAllGamesData = async () => {
       },
       GamePlatform: {
         select: {
+          id: true,
           name: true,
         },
       },
@@ -56,6 +88,7 @@ export const dbGetAllGamesData = async () => {
       gameId: gameItem.gameId,
     };
     const platform: DbReadGameMetaData["platform"][0] = {
+      platformId: gameItem.GamePlatform.id,
       platformName: gameItem.GamePlatform.name,
       releaseDate: new Date(`${gameItem.releaseDate}`).toISOString(),
     };
@@ -87,6 +120,7 @@ export const dbGetGameDataById = async (gameId: string) => {
       GamePlatform: {
         select: {
           name: true,
+          id: true,
         },
       },
     },
@@ -98,6 +132,7 @@ export const dbGetGameDataById = async (gameId: string) => {
       gameId: gameItem.gameId,
     };
     const platform: DbReadGameMetaData["platform"][0] = {
+      platformId: gameItem.GamePlatform.id,
       platformName: gameItem.GamePlatform.name,
       releaseDate: new Date(`${gameItem.releaseDate}`).toISOString(),
     };

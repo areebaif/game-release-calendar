@@ -6,8 +6,10 @@ import {
   useLoaderData,
   useNavigation,
   Form,
+  Link,
 } from "@remix-run/react";
 import { Button, Group, Loader } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 import {
   dbGetGameDataById,
   DbReadGameMetaDataZod,
@@ -16,10 +18,9 @@ import {
 } from "~/utils";
 import {
   DbReadGameMetaData,
-  EditDeleteGameActionTypeVal,
-  EditDeleteGameFields,
-  ErrorEditDeleteGameFormFields,
+  DeleteGameFormFields,
   UserPropsForClient,
+  ErrorDeleteGameFormField,
 } from "~/utils/types";
 import { ErrorCard, GameCard } from "~/components";
 import { UserPropsForClientZod, requireAdminUser } from "~/utils";
@@ -28,40 +29,31 @@ export const action = async ({ request }: ActionArgs) => {
   const user = await requireAdminUser({ request, redirectTo: "/" });
 
   const form = await request.formData();
-  const id = form.get(`${EditDeleteGameFields.GameId}`);
-  const actionType = form.get(`${EditDeleteGameFields.ActionType}`);
+  const id = form.get(`${DeleteGameFormFields.GameId}`);
 
-  const errors: ErrorEditDeleteGameFormFields = {};
+  const errors: ErrorDeleteGameFormField = {};
 
   const typeCheckId = z.string().uuid().safeParse(id);
   if (!typeCheckId.success) {
-    errors.GameId = "please provide a valid id to delete game";
+    errors.gameId = "please provide a valid id to delete game";
   }
 
-  switch (actionType) {
-    case `${EditDeleteGameActionTypeVal.delete}`:
-      try {
-        // we have already typechecked this
-        const gameId = id as string;
-        await dbDeleteGameById(gameId);
-        return redirect("/game");
-      } catch (err) {
-        console.log(err);
-        throw new Response(null, {
-          status: 500,
-          statusText: "internal server error, failed to delete game",
-        });
-      }
-    case `${EditDeleteGameActionTypeVal.edit}`:
-      return redirect("/game");
-    default:
-      errors.actionType =
-        "please provide valid value for action type it can be either delete or edit";
+  try {
+    // we have already typechecked this
+    const gameId = id as string;
+    await dbDeleteGameById(gameId);
+    const hasError = Object.values(errors).some((errorMessage) =>
+      errorMessage?.length ? true : false
+    );
+    if (hasError) return json({ errors: errors });
+    return redirect("/game");
+  } catch (err) {
+    console.log(err);
+    throw new Response(null, {
+      status: 500,
+      statusText: "internal server error, failed to delete game",
+    });
   }
-  const hasError = Object.values(errors).some((errorMessage) =>
-    errorMessage?.length ? true : false
-  );
-  if (hasError) return json({ errors: errors });
 };
 
 export const loader = async ({ request, params }: ActionArgs) => {
@@ -98,6 +90,7 @@ const GameItem: React.FC = () => {
     game: DbReadGameMetaData;
     user: UserPropsForClient;
   }>();
+  const [opened, { open, close }] = useDisclosure(false);
   // conditional renders
   if (navigation.state === "submitting" || navigation.state === "loading") {
     return <Loader />;
@@ -121,22 +114,18 @@ const GameItem: React.FC = () => {
     <>
       {loaderData.user?.userType === "ADMIN" ? (
         <Group>
-          <Button>Edit</Button>
+          <Button component={Link} to={`/admin/editGame/${gameId.gameId}`}>
+            Edit
+          </Button>
           <Form method="post">
             <input
               type="text"
               hidden
-              name={`${EditDeleteGameFields.GameId}`}
+              name={`${DeleteGameFormFields.GameId}`}
               readOnly
               value={`${gameId.gameId}`}
             ></input>
-            <Button
-              name={`${EditDeleteGameFields.ActionType}`}
-              value={`${EditDeleteGameActionTypeVal.delete}`}
-              type="submit"
-            >
-              Delete
-            </Button>
+            <Button type="submit">Delete</Button>
           </Form>
         </Group>
       ) : (

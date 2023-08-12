@@ -9,11 +9,7 @@ import {
   PlatformDropDwonListZod,
   ErrorAddGameFormFieldsZod,
 } from "./zod.Game";
-import {
-  AddGameFormFields,
-  AddPlatformFormFields,
-  s3FormFields,
-} from "./types";
+
 import { ErrorAddPlatformFieldsZod } from "./zod.addPlatform";
 import { ImageUploadApiZod } from "./zod.imageUploadApi";
 import {
@@ -52,9 +48,6 @@ export {
   formPlatformFieldsZod,
   PlatformDropDwonListZod,
   UserPropsForClientZod,
-  AddGameFormFields,
-  AddPlatformFormFields,
-  s3FormFields,
   ImageUploadApiZod,
   ErrorAddGameFormFieldsZod,
   ErrorAddPlatformFieldsZod,

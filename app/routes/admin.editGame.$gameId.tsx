@@ -31,7 +31,8 @@ import {
 import { dbEditGame } from "~/utils/db.server.crud";
 
 export const loader = async ({ request, params }: ActionArgs) => {
-  const user = await requireAdminUser({ request, redirectTo: "/" });
+  const user = await requireAdminUser({ request });
+  if (!user) return redirect("/");
   const typeCheckGameId = z.string().uuid().safeParse(params.gameId);
   if (!typeCheckGameId.success)
     throw new Response(null, {
@@ -63,7 +64,8 @@ export const loader = async ({ request, params }: ActionArgs) => {
 export const action = async ({
   request,
 }: ActionArgs): Promise<ErrorEditGameFormField | TypedResponse> => {
-  const user = await requireAdminUser({ request, redirectTo: "/" });
+  const user = await requireAdminUser({ request });
+  if (!user) return redirect("/");
   const form = await request.formData();
   const editGame: DbEditGame = {
     platform: [],

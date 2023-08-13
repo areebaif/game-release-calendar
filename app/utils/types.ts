@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { UserType } from "@prisma/client";
 import {
   GamePlatformZod,
   PlatformDropDwonListZod,
@@ -17,6 +18,7 @@ import {
 } from "./zod.db.crud";
 import {
   ErrorLoginFormFieldsZod,
+  ErrorRegisterUserFormFieldsZod,
   JwtPayloadZod,
   UserPropsForClientZod,
   UserZod,
@@ -39,6 +41,9 @@ export type ErrorDeleteGameFormField = z.infer<
   typeof ErrorDeleteGameFormFieldsZod
 >;
 export type DbEditGame = z.infer<typeof DbEditGameZod>;
+export type ErrorRegisterUserFormFields = z.infer<
+  typeof ErrorRegisterUserFormFieldsZod
+>;
 
 export enum AddGameFormFields {
   platformName = "platformName",
@@ -74,13 +79,19 @@ export enum s3FormFields {
 }
 
 export enum LoginFormFields {
+  emailUserName = "emailUserName",
+  password = "password",
+  userType = "userType",
+}
+
+export enum RegisterUserFormFields {
   email = "email",
   password = "password",
-  loginType = "loginType",
+  userType = "userType",
   userName = "userName",
 }
 
-export enum LoginTypeVal {
-  login = "login",
-  register = "register",
+export enum UserTypeForm {
+  ADMIN = "ADMIN",
+  STANDARD = "STANDARD",
 }

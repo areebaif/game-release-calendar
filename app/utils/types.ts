@@ -17,6 +17,7 @@ import {
 } from "./zod.db.crud";
 import {
   ErrorLoginFormFieldsZod,
+  ErrorRegisterUserFormFieldsZod,
   JwtPayloadZod,
   UserPropsForClientZod,
   UserZod,
@@ -39,6 +40,9 @@ export type ErrorDeleteGameFormField = z.infer<
   typeof ErrorDeleteGameFormFieldsZod
 >;
 export type DbEditGame = z.infer<typeof DbEditGameZod>;
+export type ErrorRegisterUserFormFields = z.infer<
+  typeof ErrorRegisterUserFormFieldsZod
+>;
 
 export enum AddGameFormFields {
   platformName = "platformName",
@@ -74,13 +78,14 @@ export enum s3FormFields {
 }
 
 export enum LoginFormFields {
-  email = "email",
+  emailUserName = "emailUserName",
   password = "password",
-  loginType = "loginType",
-  userName = "userName",
+  userType = "userType",
 }
 
-export enum LoginTypeVal {
-  login = "login",
-  register = "register",
+export enum RegisterUserFormFields {
+  email = "email",
+  password = "password",
+  userType = "userType",
+  userName = "userName",
 }

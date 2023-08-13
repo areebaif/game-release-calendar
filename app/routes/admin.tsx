@@ -35,7 +35,7 @@ const Admin: React.FC = () => {
 
   return (
     <>
-      <Title order={1}>Admin Dahsboard</Title>
+      <Title order={1}>Admin Dashboard</Title>
       <Text>email: {loaderData.user?.email}</Text>
       <Text>userName: {loaderData.user?.userName}</Text>
       <Text>userType: {loaderData.user?.userType}</Text>

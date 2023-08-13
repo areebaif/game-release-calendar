@@ -15,6 +15,7 @@ import { ImageUploadApiZod } from "./zod.imageUploadApi";
 import {
   UserPropsForClientZod,
   ErrorLoginFormFieldsZod,
+  ErrorRegisterUserFormFieldsZod,
   UserZod,
 } from "./zod.userAuth";
 import { DbReadGameMetaDataZod } from "./zod.db.crud";
@@ -37,6 +38,7 @@ import {
   requireAdminUser,
   authenticatedUser,
 } from "./session.server";
+import { sendEmail } from "./sendgrid.server";
 
 export {
   db,
@@ -69,4 +71,6 @@ export {
   dbDeleteGameById,
   ErrorLoginFormFieldsZod,
   UserZod,
+  sendEmail,
+  ErrorRegisterUserFormFieldsZod,
 };

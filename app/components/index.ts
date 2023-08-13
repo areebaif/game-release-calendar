@@ -2,7 +2,7 @@ import { PlatformInput } from "./AddGame/PlatformInput";
 import { AddGamePlatformList } from "./AddGame/AddGamePlatformList";
 import { ErrorCard } from "./ErrorComponent";
 import { FormFieldsAddGame } from "./AddGame/FormFieldsAddGame";
-import { LoginSignup } from "./Auth/FormLoginSignup";
+import { Login } from "./Auth/FormLogin";
 import { AddAdminUser } from "./Auth/FormAddAdminUser";
 import { GameCard } from "./GameCard";
 import { EditGamePlatformList } from "./EditGame/EditGamePlatformList";
@@ -13,7 +13,7 @@ export {
   AddGamePlatformList,
   ErrorCard,
   FormFieldsAddGame,
-  LoginSignup,
+  Login,
   AddAdminUser,
   GameCard,
   EditGamePlatformList,

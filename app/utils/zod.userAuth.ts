@@ -1,13 +1,21 @@
 import { z } from "zod";
-import { LoginFormFields } from "./types";
+import { LoginFormFields, RegisterUserFormFields } from "./types";
 import { UserType } from "@prisma/client";
 
 export const ErrorLoginFormFieldsZod = z
   .object({
-    [LoginFormFields.email]: z.string().optional(),
+    [LoginFormFields.emailUserName]: z.string().optional(),
     [LoginFormFields.password]: z.string().optional(),
-    [LoginFormFields.loginType]: z.string().optional(),
-    [LoginFormFields.userName]: z.string().optional(),
+    [LoginFormFields.userType]: z.string().optional(),
+  })
+  .optional();
+
+export const ErrorRegisterUserFormFieldsZod = z
+  .object({
+    [RegisterUserFormFields.email]: z.string().optional(),
+    [RegisterUserFormFields.password]: z.string().optional(),
+    [RegisterUserFormFields.userType]: z.string().optional(),
+    [RegisterUserFormFields.userName]: z.string().optional(),
   })
   .optional();
 

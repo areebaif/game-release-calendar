@@ -1,6 +1,7 @@
 import * as React from "react";
 import { json } from "@remix-run/node";
 import type { ActionArgs } from "@remix-run/node";
+const sgMail = require("@sendgrid/mail");
 import {
   Form,
   useActionData,
@@ -16,19 +17,24 @@ import {
   dbGetUserByEmail,
   dbGetUserByUserName,
   requireAdminUser,
-  ErrorLoginFormFieldsZod,
+  ErrorRegisterUserFormFieldsZod,
   UserZod,
+  sendEmail,
 } from "~/utils";
-import { ErrorLoginFormFields, LoginFormFields, User } from "~/utils/types";
+import {
+  ErrorRegisterUserFormFields,
+  RegisterUserFormFields,
+  User,
+} from "~/utils/types";
 
 export const action = async ({ request }: ActionArgs) => {
   const user = await requireAdminUser({ request, redirectTo: "/" });
   const form = await request.formData();
-  const password = form.get(LoginFormFields.password);
-  const email = form.get(LoginFormFields.email);
-  const userName = form.get(LoginFormFields.userName);
+  const password = form.get(RegisterUserFormFields.password);
+  const email = form.get(RegisterUserFormFields.email);
+  const userName = form.get(RegisterUserFormFields.userName);
 
-  const errors: ErrorLoginFormFields = {};
+  const errors: ErrorRegisterUserFormFields = {};
   // form validation
   if (typeof email !== "string" || !email.length) {
     errors.email = "error submitting form, please check the email field";
@@ -66,6 +72,8 @@ export const action = async ({ request }: ActionArgs) => {
   if (DbError) return json({ errors: errors });
   try {
     const createUser = await dbCreateUser(AddToDb);
+    //const email = await sendEmail();
+    console.log(email);
     return {
       user: {
         id: createUser.id,
@@ -88,13 +96,13 @@ const RegisterAdminUser: React.FC = () => {
   const submit = useSubmit();
   const navigation = useNavigation();
   const actionData = useActionData<{
-    errors: ErrorLoginFormFields;
+    errors: ErrorRegisterUserFormFields;
     user: User;
   }>();
   const [email, setEmail] = React.useState("");
   const [userName, setUserName] = React.useState("");
   const [password, setPassword] = React.useState("");
-  const [error, setError] = React.useState<ErrorLoginFormFields>({});
+  const [error, setError] = React.useState<ErrorRegisterUserFormFields>({});
   const [serverTypeCheckError, setServerTypeCheckError] = React.useState(false);
   const [isModalOpen, { open, close }] = useDisclosure(false);
 
@@ -124,7 +132,9 @@ const RegisterAdminUser: React.FC = () => {
   }, [isReloading]);
 
   // typecheck api returned data with zod
-  const typeCheckError = ErrorLoginFormFieldsZod.safeParse(actionData?.errors);
+  const typeCheckError = ErrorRegisterUserFormFieldsZod.safeParse(
+    actionData?.errors
+  );
 
   if (!typeCheckError.success || serverTypeCheckError) {
     console.log(error);
@@ -144,17 +154,17 @@ const RegisterAdminUser: React.FC = () => {
     switch (true) {
       case !email.length:
         setError({
-          [LoginFormFields.email]: "email value cannot be empty",
+          [RegisterUserFormFields.email]: "email value cannot be empty",
         });
         return;
       case !password.length:
         setError({
-          [LoginFormFields.password]: "password value cannot be empty",
+          [RegisterUserFormFields.password]: "password value cannot be empty",
         });
         return;
       case !userName.length:
         setError({
-          [LoginFormFields.userName]: "userName value cannot be empty",
+          [RegisterUserFormFields.userName]: "userName value cannot be empty",
         });
         return;
     }

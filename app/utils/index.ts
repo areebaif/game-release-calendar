@@ -38,7 +38,7 @@ import {
   requireAdminUser,
   authenticatedUser,
 } from "./session.server";
-import { sendEmail } from "./sendgrid.server";
+import { sendCredentialsEmail } from "./sendgrid.server";
 
 export {
   db,
@@ -71,6 +71,6 @@ export {
   dbDeleteGameById,
   ErrorLoginFormFieldsZod,
   UserZod,
-  sendEmail,
+  sendCredentialsEmail,
   ErrorRegisterUserFormFieldsZod,
 };

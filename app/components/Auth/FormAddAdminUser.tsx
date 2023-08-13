@@ -3,15 +3,15 @@ import { TextInput, Group, Radio } from "@mantine/core";
 import {
   RegisterUserFormFields,
   ErrorRegisterUserFormFields,
-  User,
+  UserTypeForm,
 } from "~/utils/types";
 import { ErrorCard } from "~/components";
 
 type AddAdminUser = {
   userName: string;
   setUserName: (val: string) => void;
-  password: string;
-  setPassword: (val: string) => void;
+  // password: string;
+  // setPassword: (val: string) => void;
   email: string;
   setEmail: (val: string) => void;
   error: ErrorRegisterUserFormFields;
@@ -21,8 +21,8 @@ type AddAdminUser = {
 export const AddAdminUser: React.FC<AddAdminUser> = ({
   userName,
   setUserName,
-  password,
-  setPassword,
+  // password,
+  // setPassword,
   email,
   setEmail,
   error,
@@ -33,12 +33,12 @@ export const AddAdminUser: React.FC<AddAdminUser> = ({
       <Group mt="xs">
         <Radio
           name={`${RegisterUserFormFields.userType}`}
-          value={`ADMIN`}
+          value={`${UserTypeForm.ADMIN}`}
           label="admin"
         />
         <Radio
           name={`${RegisterUserFormFields.userType}`}
-          value="STANDARD"
+          value={`${UserTypeForm.STANDARD}`}
           label="standard"
         />
       </Group>
@@ -77,7 +77,7 @@ export const AddAdminUser: React.FC<AddAdminUser> = ({
       ) : (
         <></>
       )}
-      <TextInput
+      {/* <TextInput
         withAsterisk
         label="Password"
         placeholder="type here"
@@ -94,7 +94,7 @@ export const AddAdminUser: React.FC<AddAdminUser> = ({
         />
       ) : (
         <></>
-      )}
+      )} */}
     </>
   );
 };

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { UserType } from "@prisma/client";
 import {
   GamePlatformZod,
   PlatformDropDwonListZod,
@@ -88,4 +89,9 @@ export enum RegisterUserFormFields {
   password = "password",
   userType = "userType",
   userName = "userName",
+}
+
+export enum UserTypeForm {
+  ADMIN = "ADMIN",
+  STANDARD = "STANDARD",
 }

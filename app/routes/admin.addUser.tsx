@@ -1,13 +1,14 @@
 import * as React from "react";
 import { json } from "@remix-run/node";
 import type { ActionArgs } from "@remix-run/node";
-const sgMail = require("@sendgrid/mail");
+import { UserType } from "@prisma/client";
 import {
   Form,
   useActionData,
   useSubmit,
   useNavigation,
 } from "@remix-run/react";
+import { v4 as uuidv4 } from "uuid";
 import { useDisclosure } from "@mantine/hooks";
 import { Card, Button, Loader, Modal, Text } from "@mantine/core";
 // local imports
@@ -19,7 +20,7 @@ import {
   requireAdminUser,
   ErrorRegisterUserFormFieldsZod,
   UserZod,
-  sendEmail,
+  sendCredentialsEmail,
 } from "~/utils";
 import {
   ErrorRegisterUserFormFields,
@@ -30,9 +31,10 @@ import {
 export const action = async ({ request }: ActionArgs) => {
   const user = await requireAdminUser({ request, redirectTo: "/" });
   const form = await request.formData();
-  const password = form.get(RegisterUserFormFields.password);
+  //const password = form.get(RegisterUserFormFields.password);
   const email = form.get(RegisterUserFormFields.email);
   const userName = form.get(RegisterUserFormFields.userName);
+  const userType = form.get(RegisterUserFormFields.userType);
 
   const errors: ErrorRegisterUserFormFields = {};
   // form validation
@@ -42,19 +44,21 @@ export const action = async ({ request }: ActionArgs) => {
   if (typeof userName !== "string" || !userName.length) {
     errors.userName = "error submitting form, please check the user name field";
   }
-  if (typeof password !== "string" || !password.length) {
-    errors.password = "error submitting form, please check the password field";
-  }
+  // if (typeof password !== "string" || !password.length) {
+  //   errors.password = "error submitting form, please check the password field";
+  // }
+  if (userType !== UserType.ADMIN && userType !== UserType.STANDARD)
+    errors.userType = "please submit correct userType";
   const hasError = Object.values(errors).some((errorMessage) =>
     errorMessage?.length ? true : false
   );
   if (hasError) return json({ errors: errors });
-
+  const password = uuidv4();
   const AddToDb = {
     email: email as string,
-    password: password as string,
+    password: password,
     userName: userName as string,
-    userType: "ADMIN" as User["userType"],
+    userType: userType as User["userType"],
   };
   const userEmailExists = await dbGetUserByEmail(AddToDb.email);
   if (userEmailExists) {
@@ -72,8 +76,13 @@ export const action = async ({ request }: ActionArgs) => {
   if (DbError) return json({ errors: errors });
   try {
     const createUser = await dbCreateUser(AddToDb);
-    //const email = await sendEmail();
-    console.log(email);
+    const emailData = {
+      to: AddToDb.email,
+      password: AddToDb.password,
+      userName: AddToDb.userName,
+    };
+    const emailSent = await sendCredentialsEmail(emailData);
+    console.log(emailSent, "hshshsh", password);
     return {
       user: {
         id: createUser.id,
@@ -82,6 +91,7 @@ export const action = async ({ request }: ActionArgs) => {
         userPassword: password as string,
         userType: createUser.userType,
       },
+      emailSent,
     };
   } catch (err) {
     console.log(err);
@@ -98,10 +108,14 @@ const RegisterAdminUser: React.FC = () => {
   const actionData = useActionData<{
     errors: ErrorRegisterUserFormFields;
     user: User;
+    emailSent: {
+      message: string;
+      success: boolean;
+    };
   }>();
   const [email, setEmail] = React.useState("");
   const [userName, setUserName] = React.useState("");
-  const [password, setPassword] = React.useState("");
+  //const [password, setPassword] = React.useState("");
   const [error, setError] = React.useState<ErrorRegisterUserFormFields>({});
   const [serverTypeCheckError, setServerTypeCheckError] = React.useState(false);
   const [isModalOpen, { open, close }] = useDisclosure(false);
@@ -117,7 +131,7 @@ const RegisterAdminUser: React.FC = () => {
     if (actionData?.user) {
       // clear the form and react fields
       setUserName("");
-      setPassword("");
+      //setPassword("");
       setEmail("");
       formRef?.current?.reset();
       const typeCheckUser = UserZod.safeParse(actionData.user);
@@ -157,11 +171,11 @@ const RegisterAdminUser: React.FC = () => {
           [RegisterUserFormFields.email]: "email value cannot be empty",
         });
         return;
-      case !password.length:
-        setError({
-          [RegisterUserFormFields.password]: "password value cannot be empty",
-        });
-        return;
+      // case !password.length:
+      //   setError({
+      //     [RegisterUserFormFields.password]: "password value cannot be empty",
+      //   });
+      //   return;
       case !userName.length:
         setError({
           [RegisterUserFormFields.userName]: "userName value cannot be empty",
@@ -178,8 +192,8 @@ const RegisterAdminUser: React.FC = () => {
   const signupProps = {
     userName,
     setUserName,
-    password,
-    setPassword,
+    // password,
+    // setPassword,
     email,
     setEmail,
     error,
@@ -203,7 +217,7 @@ const RegisterAdminUser: React.FC = () => {
         </Form>
       </Card.Section>
       <Modal opened={isModalOpen} onClose={close} title="User Credentials">
-        <Text>email: {actionData?.user.email}</Text>
+        <Text>{actionData?.emailSent.message}</Text>
         <Text>userName: {actionData?.user.userName}</Text>
         <Text>userType: {actionData?.user.userType}</Text>
         <Text>userPassword: {actionData?.user.userPassword}</Text>

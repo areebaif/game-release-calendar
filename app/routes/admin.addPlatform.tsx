@@ -6,7 +6,7 @@ import {
   useNavigation,
 } from "@remix-run/react";
 import { redirect, json } from "@remix-run/node";
-import { Card, Title, TextInput, Button, Loader } from "@mantine/core";
+import { Card, Title, TextInput, Button, Loader, Group } from "@mantine/core";
 // type import
 import type { ActionArgs, TypedResponse } from "@remix-run/node";
 // local imports
@@ -17,7 +17,8 @@ import { ErrorAddPlatformFields, AddPlatformFormFields } from "~/utils/types";
 export const action = async ({
   request,
 }: ActionArgs): Promise<ErrorAddPlatformFields | TypedResponse> => {
-  const user = await requireAdminUser({ request, redirectTo: "/" });
+  const user = await requireAdminUser({ request });
+  if (!user) return redirect("/");
   const form = await request.formData();
 
   const name = form.get(AddPlatformFormFields.name);
@@ -97,30 +98,35 @@ const AddPlatform: React.FC = () => {
         margin: "15px 0 0 0",
       }}
     >
-      <Card.Section inheritPadding py="md">
+      <Card.Section withBorder inheritPadding py="xs">
         <Title order={3}>Add Platform</Title>
       </Card.Section>
-      <Card.Section inheritPadding py="md">
-        <Form onSubmit={onSubmit}>
-          <TextInput
-            withAsterisk
-            label="Name"
-            placeholder="type here"
-            value={name}
-            type="text"
-            name={AddPlatformFormFields.name}
-            onChange={(event) => setName(event.currentTarget.value)}
-          ></TextInput>
-          {error?.name || actionData?.errors?.name ? (
-            <ErrorCard
-              errorMessage={error?.name ? error.name : actionData?.errors?.name}
-            />
-          ) : (
-            <></>
-          )}
-          <Button type="submit">Submit</Button>
-        </Form>
-      </Card.Section>
+
+      <Form onSubmit={onSubmit}>
+        <TextInput
+          mt="xs"
+          withAsterisk
+          label="Name"
+          placeholder="type here"
+          value={name}
+          type="text"
+          name={AddPlatformFormFields.name}
+          onChange={(event) => setName(event.currentTarget.value)}
+        ></TextInput>
+        {error?.name || actionData?.errors?.name ? (
+          <ErrorCard
+            errorMessage={error?.name ? error.name : actionData?.errors?.name}
+          />
+        ) : (
+          <></>
+        )}
+
+        <Group position="center" mt="sm">
+          <Button size="sm" type="submit">
+            Submit
+          </Button>
+        </Group>
+      </Form>
     </Card>
   );
 };

@@ -35,15 +35,6 @@ export const action = async ({ request }: ActionArgs) => {
   if (!email?.length)
     errors.emailUserName =
       "error submitting form, please check the email field";
-  // if (
-  //   !z.string().email().safeParse(email).success
-  // )
-  //   errors.email = "error submitting form, please check the email field";
-  // if (
-  //   (typeof userName !== "string" || !userName.length)
-  // ) {
-  //   errors.userName = "error submitting form, please check the user name field";
-  // }
   if (typeof password !== "string" || !password.length) {
     errors.password = "error submitting form, please check the password field";
   }
@@ -65,7 +56,7 @@ export const action = async ({ request }: ActionArgs) => {
     const id = user?.id;
     return createUserSession({
       userId: id!,
-      redirectTo: "/",
+      redirectTo: "/admin",
     });
   } catch (err) {
     console.log(err);
@@ -110,7 +101,7 @@ const RegisterLogin: React.FC = () => {
   if (navigation.state === "loading" || navigation.state === "submitting") {
     return <Loader />;
   }
-  const loginSignupProps = {
+  const loginProps = {
     password,
     setPassword,
     emailUserName,
@@ -131,7 +122,7 @@ const RegisterLogin: React.FC = () => {
     >
       <Card.Section inheritPadding py="md">
         <Form onSubmit={onSubmit}>
-          <Login {...loginSignupProps} />
+          <Login {...loginProps} />
           <Button type="submit">Submit</Button>
         </Form>
       </Card.Section>

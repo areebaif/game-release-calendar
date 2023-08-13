@@ -7,7 +7,7 @@ import { AddAdminUser } from "./Auth/FormAddAdminUser";
 import { GameCard } from "./GameCard";
 import { EditGamePlatformList } from "./EditGame/EditGamePlatformList";
 import { FormFieldsEditGame } from "./EditGame/FormFieldsEditGame";
-import { AdminNavigation } from "./admin/AdminNavbar";
+import { AdminNavigation } from "./AdminLayout/AdminNavbar";
 
 export {
   PlatformInput,

@@ -48,7 +48,7 @@ export default function Index() {
         </li>
         {!loaderData.user?.id ? (
           <li>
-            <Link to="/login">sign-up or login</Link>
+            <Link to="/login">login</Link>
           </li>
         ) : (
           <li>

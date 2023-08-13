@@ -1,29 +1,52 @@
 import * as React from "react";
-import { Link } from "@remix-run/react";
-// this route will have layout of your admin dashbaord to be used by all other admin routes
+import { Link, useLoaderData } from "@remix-run/react";
+import { json } from "@remix-run/node";
+import { List } from "@mantine/core";
+import { DbReadGameMetaData } from "~/utils/types";
+import { dbGetAllGamesData, DbReadGameMetaDataZod } from "~/utils";
+import { ErrorCard, GameCard } from "~/components";
 
-const AdminIndexRoute: React.FC = () => {
+export const loader = async () => {
+  try {
+    const allGamesMetaData = await dbGetAllGamesData();
+    return json(allGamesMetaData);
+  } catch (err) {
+    console.log(err);
+    throw new Response(null, {
+      status: 500,
+      statusText: "internal server error, failed to get games data",
+    });
+  }
+};
+
+export const GameIndexRoute: React.FC = () => {
+  const loaderdata = useLoaderData<DbReadGameMetaData[]>();
+  if (!loaderdata.length) {
+    return <div>no data to display</div>;
+  }
+  const zodParseGameMetaData = DbReadGameMetaDataZod.safeParse(loaderdata[0]);
+
+  if (!zodParseGameMetaData.success) {
+    // log error in console
+    console.log(zodParseGameMetaData.error);
+    return (
+      <ErrorCard errorMessage="something went wrong with the server please try again" />
+    );
+  }
+  // TODO: add link to open a game separately
   return (
-    <div>
-      <ul>
-        <li>
-          <Link to="/admin/addGame">Add Game</Link>
-        </li>
-        <li>
-          {" "}
-          <Link to="/admin/addPlatform">Add Platform</Link>
-        </li>
-        <li>
-          {" "}
-          <Link to="/admin/addUser">Add Admin User</Link>
-        </li>
-        <li>
-          {" "}
-          <Link to="/game">veiw all games</Link>
-        </li>
-      </ul>
-    </div>
+    <List icon={" "}>
+      {loaderdata?.map((gameItem) => {
+        return (
+          <List.Item key={gameItem.game.gameId}>
+            <Link to={`/game/${gameItem.game.gameId}`}>
+              <GameCard gameItem={gameItem} />
+            </Link>
+          </List.Item>
+        );
+      })}
+    </List>
   );
 };
 
-export default AdminIndexRoute;
+export default GameIndexRoute;

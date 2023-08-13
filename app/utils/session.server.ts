@@ -96,22 +96,18 @@ export const verifyJwtToken = async (request: Request) => {
   }
 };
 
-export const requireAdminUser = async (data: {
-  request: Request;
-  redirectTo: string;
-}) => {
-  const { request, redirectTo } = data;
+export const requireAdminUser = async (data: { request: Request }) => {
+  const { request } = data;
   const payload = await verifyJwtToken(request);
-
   const { user } = payload;
-  if (!user?.id) {
-    throw redirect(`${redirectTo}`);
+  if (!user) {
+    return;
   }
   // return userData
-  const userProps = await dbGetUserById(user.id);
 
+  const userProps = await dbGetUserById(user.id);
   if (userProps?.userType !== "ADMIN") {
-    throw redirect(`${redirectTo}`);
+    return;
   }
   return userProps;
 };

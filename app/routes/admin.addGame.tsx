@@ -35,7 +35,8 @@ import {
 
 export const loader = async ({ request }: ActionArgs) => {
   try {
-    const user = await requireAdminUser({ request, redirectTo: "/" });
+    const user = await requireAdminUser({ request });
+    if (!user) return redirect("/");
     const platforms = await db.gamePlatform.findMany({
       select: { id: true, name: true },
     });
@@ -52,7 +53,8 @@ export const loader = async ({ request }: ActionArgs) => {
 export const action = async ({
   request,
 }: ActionArgs): Promise<ErrorAddGameFormFields | TypedResponse> => {
-  const user = await requireAdminUser({ request, redirectTo: "/" });
+  const user = await requireAdminUser({ request });
+  if (!user) return redirect("/");
   const form = await request.formData();
   const addToDb: DbAddGame = {
     platform: [],

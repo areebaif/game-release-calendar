@@ -1,5 +1,5 @@
 import * as React from "react";
-import { json } from "@remix-run/node";
+import { json, redirect } from "@remix-run/node";
 import type { ActionArgs } from "@remix-run/node";
 import { UserType } from "@prisma/client";
 import {
@@ -29,7 +29,8 @@ import {
 } from "~/utils/types";
 
 export const action = async ({ request }: ActionArgs) => {
-  const user = await requireAdminUser({ request, redirectTo: "/" });
+  const user = await requireAdminUser({ request });
+  if (!user) return redirect("/");
   const form = await request.formData();
   //const password = form.get(RegisterUserFormFields.password);
   const email = form.get(RegisterUserFormFields.email);

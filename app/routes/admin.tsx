@@ -48,18 +48,26 @@ const Admin: React.FC = () => {
           padding="md"
           navbar={<AdminNavigation {...loaderData.user!} />}
           header={
-            <Header pl="xl" height={70}>
-              <Title py="lg" order={2}>
+            <Header
+              sx={(theme) => ({
+                backgroundColor: theme.colors.dark[5],
+                borderBottom: `1px solid ${theme.colors.dark[2]}`,
+              })}
+              pl="xl"
+              height={70}
+            >
+              <Title py="lg" color="dimmed" order={2}>
                 Admin Dashboard
               </Title>
             </Header>
           }
           styles={(theme) => ({
             main: {
-              backgroundColor:
-                theme.colorScheme === "dark"
-                  ? theme.colors.dark[8]
-                  : theme.colors.gray[0],
+              backgroundColor: theme.colors.dark[8],
+              // backgroundColor:
+              //   theme.colorScheme === "dark"
+              //     ? theme.colors.dark[8]
+              //     : theme.colors.gray[0],
             },
           })}
         >

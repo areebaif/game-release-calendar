@@ -9,14 +9,29 @@ import {
   IconLogin,
   IconAlertCircle,
   IconUser,
+  IconEditCircle,
 } from "@tabler/icons-react";
 
 export const AdminNavigation: React.FC<UserPropsForClient> = (props) => {
   const user = props!;
   return (
-    <Navbar p="xs" width={{ base: 275 }}>
+    <Navbar
+      sx={(theme) => ({
+        backgroundColor: theme.colors.dark[5],
+        borderRight: "none",
+      })}
+      p="xs"
+      width={{ base: 275 }}
+    >
       <Navbar.Section grow mt="md">
-        <MainLinks />
+        <Text size="sm" sx={(theme) => ({ color: theme.colors.dark[2] })}>
+          GAME
+        </Text>
+        <GameMainLinks />
+        <Text size="sm" sx={(theme) => ({ color: theme.colors.dark[2] })}>
+          USER
+        </Text>
+        <UserMainLinks />
       </Navbar.Section>
       <Navbar.Section>
         <User {...user} />
@@ -41,14 +56,9 @@ function MainLink({ icon, color, label, link }: MainLinkProps) {
         width: "100%",
         padding: theme.spacing.xs,
         borderRadius: theme.radius.sm,
-        color:
-          theme.colorScheme === "dark" ? theme.colors.dark[0] : theme.black,
-
+        color: theme.colors.dark[0],
         "&:hover": {
-          backgroundColor:
-            theme.colorScheme === "dark"
-              ? theme.colors.dark[6]
-              : theme.colors.gray[0],
+          backgroundColor: theme.colors.dark[3],
         },
       })}
       onClick={() => {
@@ -56,7 +66,7 @@ function MainLink({ icon, color, label, link }: MainLinkProps) {
       }}
     >
       <Group>
-        <ThemeIcon color={color} variant="light">
+        <ThemeIcon color={color} variant="dark">
           {icon}
         </ThemeIcon>
         <Text size="sm">{label}</Text>
@@ -65,40 +75,49 @@ function MainLink({ icon, color, label, link }: MainLinkProps) {
   );
 }
 
-const data = [
+const gameData = [
   {
     icon: <IconDatabase size={16} />,
-    color: "teal",
-    label: "Add Game",
+    color: "gray",
+    label: "Add games",
     link: "/admin/addGame",
   },
   {
-    icon: <IconMessages size={16} />,
-    color: "blue",
-    label: "Add Gaming Platform",
-    link: "/admin/addPlatform",
-  },
-  {
-    icon: <IconUser size={16} />,
-    color: "violet",
-    label: "Add User",
-    link: "/admin/addUser",
-  },
-  {
-    icon: <IconAlertCircle size={16} />,
-    color: "orange",
-    label: "Admin Dashboard",
+    icon: <IconEditCircle size={16} />,
+    color: "gray",
+    label: "View /Edit games",
     link: "/admin",
   },
   {
+    icon: <IconMessages size={16} />,
+    color: "gray",
+    label: "Add gaming platform",
+    link: "/admin/addPlatform",
+  },
+];
+
+const userData = [
+  {
+    icon: <IconUser size={16} />,
+    color: "gray",
+    label: "Add user",
+    link: "/admin/addUser",
+  },
+
+  {
     icon: <IconLogin size={16} />,
-    color: "red",
+    color: "gray",
     label: "Logout",
     link: "/admin/logout",
   },
 ];
 
-export function MainLinks() {
-  const links = data.map((link) => <MainLink {...link} key={link.label} />);
+export function GameMainLinks() {
+  const links = gameData.map((link) => <MainLink {...link} key={link.label} />);
+  return <div>{links}</div>;
+}
+
+export function UserMainLinks() {
+  const links = userData.map((link) => <MainLink {...link} key={link.label} />);
   return <div>{links}</div>;
 }

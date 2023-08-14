@@ -18,7 +18,7 @@ type AddAdminUser = {
   actionData: { errors: ErrorRegisterUserFormFields } | undefined;
 };
 
-export const AddAdminUser: React.FC<AddAdminUser> = ({
+export const AddUser: React.FC<AddAdminUser> = ({
   userName,
   setUserName,
   // password,
@@ -30,24 +30,12 @@ export const AddAdminUser: React.FC<AddAdminUser> = ({
 }) => {
   return (
     <>
-      <Group mt="xs">
-        <Radio
-          name={`${RegisterUserFormFields.userType}`}
-          value={`${UserTypeForm.ADMIN}`}
-          label="admin"
-        />
-        <Radio
-          name={`${RegisterUserFormFields.userType}`}
-          value={`${UserTypeForm.STANDARD}`}
-          label="standard"
-        />
-      </Group>
       <TextInput
+        mt="xs"
         withAsterisk
-        label="username"
+        label="Username"
         placeholder="type here"
         value={userName}
-        type="test"
         name={RegisterUserFormFields.userName}
         onChange={(event) => setUserName(event.currentTarget.value)}
       />
@@ -62,6 +50,7 @@ export const AddAdminUser: React.FC<AddAdminUser> = ({
       )}
 
       <TextInput
+        mt="xs"
         withAsterisk
         label="Email"
         placeholder="type here"
@@ -73,6 +62,29 @@ export const AddAdminUser: React.FC<AddAdminUser> = ({
       {error?.email || actionData?.errors?.email ? (
         <ErrorCard
           errorMessage={error?.email ? error.email : actionData?.errors?.email}
+        />
+      ) : (
+        <></>
+      )}
+      <Radio.Group mt="xs" label="User type" withAsterisk>
+        <Group>
+          <Radio
+            name={`${RegisterUserFormFields.userType}`}
+            value={`${UserTypeForm.ADMIN}`}
+            label="Admin"
+          />
+          <Radio
+            name={`${RegisterUserFormFields.userType}`}
+            value={`${UserTypeForm.STANDARD}`}
+            label="Standard"
+          />
+        </Group>
+      </Radio.Group>
+      {error?.userType || actionData?.errors?.userType ? (
+        <ErrorCard
+          errorMessage={
+            error?.userType ? error.userType : actionData?.errors?.userType
+          }
         />
       ) : (
         <></>

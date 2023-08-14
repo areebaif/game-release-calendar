@@ -18,9 +18,12 @@ export const sendCredentialsEmail = async (msgData: EmailMessageProps) => {
   };
   try {
     await mail.send(msg);
-    return { message: `Email successfully sent to:${msg.to}`, success: true };
+    return {
+      message: `Email successfully sent to:${" "}${msg.to}`,
+      success: true,
+    };
   } catch (error) {
-    const message = `Error sending email to: ${msg.to}`;
+    const message = `Error sending email to:${" "}${msg.to}`;
     console.log(error);
     return { message, success: false };
   }

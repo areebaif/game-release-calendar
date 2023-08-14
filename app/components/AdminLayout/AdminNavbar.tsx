@@ -8,6 +8,7 @@ import {
   IconDatabase,
   IconLogin,
   IconAlertCircle,
+  IconUser,
 } from "@tabler/icons-react";
 
 export const AdminNavigation: React.FC<UserPropsForClient> = (props) => {
@@ -78,14 +79,20 @@ const data = [
     link: "/admin/addPlatform",
   },
   {
+    icon: <IconUser size={16} />,
+    color: "violet",
+    label: "Add User",
+    link: "/admin/addUser",
+  },
+  {
     icon: <IconAlertCircle size={16} />,
-    color: "blue",
+    color: "orange",
     label: "Admin Dashboard",
     link: "/admin",
   },
   {
     icon: <IconLogin size={16} />,
-    color: "violet",
+    color: "red",
     label: "Logout",
     link: "/admin/logout",
   },

@@ -52,7 +52,7 @@ export default function Index() {
           </li>
         ) : (
           <li>
-            <Link to="/logout">logout</Link>
+            <Link to="/admin/logout">logout</Link>
           </li>
         )}
       </ul>

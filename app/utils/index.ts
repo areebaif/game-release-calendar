@@ -17,6 +17,7 @@ import {
   ErrorLoginFormFieldsZod,
   ErrorRegisterUserFormFieldsZod,
   UserZod,
+  CredentialEmailZod,
 } from "./zod.userAuth";
 import { DbReadGameMetaDataZod } from "./zod.db.crud";
 import { getUrlUploadImageToS3 } from "./image.upload";
@@ -73,4 +74,5 @@ export {
   UserZod,
   sendCredentialsEmail,
   ErrorRegisterUserFormFieldsZod,
+  CredentialEmailZod,
 };

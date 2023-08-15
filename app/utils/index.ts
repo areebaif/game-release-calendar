@@ -30,6 +30,7 @@ import {
   dbCreateGame,
   dbGetGameDataById,
   dbDeleteGameById,
+  getCurrentMonthGame,
 } from "./db.server.crud";
 import {
   loginUser,
@@ -75,4 +76,5 @@ export {
   sendCredentialsEmail,
   ErrorRegisterUserFormFieldsZod,
   CredentialEmailZod,
+  getCurrentMonthGame,
 };

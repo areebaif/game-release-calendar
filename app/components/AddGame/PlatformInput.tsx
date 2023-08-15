@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Flex, Select, Box, Button } from "@mantine/core";
+import { Flex, Select, Box, Button, Chip, Card, Group } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
 import {
   FormPlatformFields,
@@ -32,6 +32,7 @@ export const PlatformInput: React.FC<PlatformInputProps> = ({
   // props
   const [namePlatform, setNamePlatform] = React.useState<string | null>("");
   const [releaseDate, setReleaseDate] = React.useState<Date | null>(null);
+  const [showPlatformCard, setShowPlatformCard] = React.useState(false);
   const onAddToPlatformList = (val: string | null) => {
     setError(undefined);
     const platform = platformDropdownList.filter(
@@ -64,35 +65,76 @@ export const PlatformInput: React.FC<PlatformInputProps> = ({
 
   return (
     <>
-      <Flex direction="row" align="flex-start" gap="md" justify="flex-start">
-        <Select
-          value={namePlatform}
-          onChange={setNamePlatform}
-          label="platform"
-          withAsterisk
-          placeholder="pick one"
-          nothingFound="No options"
-          data={platformDropdownList}
-        />
-        <DateInput
-          valueFormat="MMM DD YYYY"
-          label={"select date"}
-          placeholder={"mm dd yyyy"}
-          withAsterisk
-          value={releaseDate}
-          onChange={setReleaseDate}
-        />
-        <Box sx={(theme) => ({ paddingTop: theme.spacing.xl })}>
-          <Button
-            variant="outline"
-            onClick={() => {
-              onAddToPlatformList(namePlatform);
-            }}
-          >
-            Add
-          </Button>
-        </Box>
-      </Flex>
+      {/* <Select
+        value={namePlatform}
+        onChange={setNamePlatform}
+        label="platform"
+        withAsterisk
+        placeholder="pick one"
+        nothingFound="No options"
+        data={platformDropdownList}
+      /> */}
+
+      {!showPlatformCard ? (
+        <Flex direction="row" align="flex-start" gap="md" justify="flex-start">
+          {" "}
+          <DateInput
+            valueFormat="MMM DD YYYY"
+            label={"select date"}
+            placeholder={"mm dd yyyy"}
+            withAsterisk
+            value={releaseDate}
+            onChange={setReleaseDate}
+          />
+          <Box sx={(theme) => ({ paddingTop: theme.spacing.xl })}>
+            <Button
+              variant="outline"
+              onClick={() => {
+                // card should change to display platforms
+                setShowPlatformCard(true);
+                //onAddToPlatformList(namePlatform);
+              }}
+            >
+              Add Platforms
+            </Button>
+          </Box>
+        </Flex>
+      ) : (
+        <Group position="apart">
+          <Chip.Group multiple>
+            <Group>
+              {platformDropdownList.map((item) => (
+                <Chip value={`${item.id}`}>{item.name}</Chip>
+              ))}
+            </Group>
+            <Group>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  // card should change to display platforms
+                  // TODO: remove state of chips
+                  setShowPlatformCard(false);
+                  //onAddToPlatformList(namePlatform);
+                }}
+              >
+                Back
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  // card should change to display platforms
+                  setShowPlatformCard(false);
+                  // TODO: trigger adding to list
+                  //onAddToPlatformList(namePlatform);
+                }}
+              >
+                Add
+              </Button>
+            </Group>
+          </Chip.Group>
+        </Group>
+      )}
+
       {error?.platformName ||
       (actionData?.errors?.platformName && error?.platformIdNameReleaseDate) ? (
         <ErrorCard

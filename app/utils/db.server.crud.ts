@@ -60,6 +60,68 @@ export const dbEditGame = async (data: DbEditGame) => {
   await db.$transaction([deleteMetaData, game]);
 };
 
+export const getCurrentMonthGame = async () => {
+  const currentDate = new Date();
+  const newDate = new Date(currentDate.setMonth(currentDate.getMonth() + 1));
+  console.log(
+    newDate,
+    currentDate,
+    "sjsksksksk!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  );
+  const gameMetaData = await db.gameMetaData.findMany({
+    orderBy: {
+      gameId: "asc",
+    },
+    where: {
+      //AND: [
+      // {
+      releaseDate: {
+        gte: currentDate,
+      },
+      //   },
+      //   {
+      //     releaseDate: {
+      //       lte: newDate,
+      //     },
+      //   },
+      // ],
+    },
+    include: {
+      game: {
+        select: {
+          title: true,
+          imageUrl: true,
+          description: true,
+        },
+      },
+      GamePlatform: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+  });
+  const result: DbReadGameMetaData[] = [];
+  gameMetaData.forEach((gameItem, index) => {
+    const game: DbReadGameMetaData["game"] = {
+      ...gameItem.game,
+      gameId: gameItem.gameId,
+    };
+    const platform: DbReadGameMetaData["platform"][0] = {
+      platformId: gameItem.GamePlatform.id,
+      platformName: gameItem.GamePlatform.name,
+      releaseDate: new Date(`${gameItem.releaseDate}`).toISOString(),
+    };
+    if (index !== 0 && gameItem.gameId === gameMetaData[index - 1].gameId) {
+      result[result.length - 1].platform.push(platform);
+      return;
+    }
+    return result.push({ game, platform: [platform] });
+  });
+  return result;
+};
+
 export const dbGetAllGamesData = async () => {
   const gameMetaData = await db.gameMetaData.findMany({
     orderBy: {

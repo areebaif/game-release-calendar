@@ -1,14 +1,14 @@
 import * as React from "react";
-import { Link, useLoaderData } from "@remix-run/react";
 import { json } from "@remix-run/node";
+import { useLoaderData, Link } from "@remix-run/react";
 import { List } from "@mantine/core";
-import { DbReadGameMetaData } from "~/utils/types";
-import { dbGetAllGamesData, DbReadGameMetaDataZod } from "~/utils";
+import { dbGetCurrentMonthGames, DbReadGameMetaDataZod } from "~/utils";
 import { ErrorCard, GameCard } from "~/components";
+import { DbReadGameMetaData } from "~/utils/types";
 
 export const loader = async () => {
   try {
-    const allGamesMetaData = await dbGetAllGamesData();
+    const allGamesMetaData = await dbGetCurrentMonthGames();
     return json(allGamesMetaData);
   } catch (err) {
     console.log(err);
@@ -19,24 +19,23 @@ export const loader = async () => {
   }
 };
 
-export const GameIndexRoute: React.FC = () => {
-  const loaderdata = useLoaderData<DbReadGameMetaData[]>();
-  if (!loaderdata.length) {
+const CurrentMonth: React.FC = () => {
+  const currentMonthGame = useLoaderData<DbReadGameMetaData[]>();
+  if (!currentMonthGame.length) {
     return <div>no data to display</div>;
   }
-  const zodParseGameMetaData = DbReadGameMetaDataZod.safeParse(loaderdata[0]);
-
+  const zodParseGameMetaData = DbReadGameMetaDataZod.safeParse(
+    currentMonthGame[0]
+  );
   if (!zodParseGameMetaData.success) {
-    // log error in console
     console.log(zodParseGameMetaData.error);
     return (
       <ErrorCard errorMessage="something went wrong with the server please try again" />
     );
   }
-
   return (
     <List icon={" "}>
-      {loaderdata?.map((gameItem) => {
+      {currentMonthGame?.map((gameItem) => {
         return (
           <List.Item key={gameItem.game.gameId}>
             <Link to={`/game/${gameItem.game.gameId}`}>
@@ -49,4 +48,4 @@ export const GameIndexRoute: React.FC = () => {
   );
 };
 
-export default GameIndexRoute;
+export default CurrentMonth;

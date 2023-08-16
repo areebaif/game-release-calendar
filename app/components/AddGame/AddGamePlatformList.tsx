@@ -21,7 +21,6 @@ export const AddGamePlatformList: React.FC<AddGamePlatformListProps> = ({
     <>
       {formPlatformFields.length ? (
         <>
-          <Divider my="sm" />
           <Grid>
             <Grid.Col span={"auto"}>
               <Title order={5}>Platform Name</Title>
@@ -35,6 +34,7 @@ export const AddGamePlatformList: React.FC<AddGamePlatformListProps> = ({
               <Title order={5}>Delete</Title>
             </Grid.Col>
           </Grid>
+          <Divider my="sm" />
           {formPlatformFields.map((formValues, index) => (
             <React.Fragment key={formValues.platformId}>
               <Input
@@ -44,7 +44,7 @@ export const AddGamePlatformList: React.FC<AddGamePlatformListProps> = ({
                 name={`${AddGameFormFields.platformIdNameReleaseDate}`}
                 readOnly
               ></Input>
-              <Divider my="sm" />
+
               <Grid>
                 <Grid.Col span={"auto"}>
                   <Input
@@ -71,6 +71,7 @@ export const AddGamePlatformList: React.FC<AddGamePlatformListProps> = ({
                   </Button>
                 </Grid.Col>
               </Grid>
+              <Divider my="sm" />
             </React.Fragment>
           ))}
         </>

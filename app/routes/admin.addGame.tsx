@@ -8,12 +8,17 @@ import {
 } from "@remix-run/react";
 import { redirect, json, Response } from "@remix-run/node";
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
-import { Card, Loader, Modal } from "@mantine/core";
+import { Card, Loader, Modal, Title } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 // type imports
 import type { ActionArgs, TypedResponse } from "@remix-run/node";
 // local imports
-import { PlatformInput, ErrorCard, FormFieldsAddGame } from "~/components";
+import {
+  PlatformInput,
+  ErrorCard,
+  FormFieldsAddGame,
+  AddGamePlatformList,
+} from "~/components";
 import {
   db,
   dbCreateGame,
@@ -105,8 +110,15 @@ export const action = async ({
           break;
         case pair[0] === AddGameFormFields.gameDescription:
           // type checking
-          const descriptionVal = pair[1] as string;
-          addToDb.description = descriptionVal;
+
+          const descriptionVal = pair[1];
+          if (
+            typeof descriptionVal !== "string" ||
+            descriptionVal.length > 1000
+          )
+            errors.gameDescription =
+              "please submit description as string and character length cannot exceed 1000";
+          addToDb.description = descriptionVal as string;
           break;
         case pair[0] === AddGameFormFields.imageUrl:
           const imageUrlVal = pair[1] as string;
@@ -211,6 +223,13 @@ const AddGame: React.FC = () => {
       });
       return;
     }
+    if (gameDescription.length > 1000) {
+      setError({
+        [AddGameFormFields.gameDescription]:
+          "Please add description of 1000 charcters or less",
+      });
+      return;
+    }
     const type = image?.type!;
     // this functioon checks if the file submitted by the user is of valid type, it also returns the extension of the file
     const validPictureType = validFileType(type);
@@ -265,7 +284,6 @@ const AddGame: React.FC = () => {
     setGameDescription,
     image,
     setImage,
-    platformListProps,
     actionData,
     error,
   };
@@ -279,20 +297,28 @@ const AddGame: React.FC = () => {
         withBorder
         style={{
           overflow: "inherit",
-          margin: "15px 0 0 0",
+          margin: "15px 0 15px 0",
         }}
       >
+        <Card.Section inheritPadding py="sm" withBorder>
+          <Title order={4}>Add Platform</Title>
+        </Card.Section>
         <Card.Section inheritPadding py="md">
           <PlatformInput {...platformInputProps} />
         </Card.Section>
       </Card>
-      <Card>
-        <Card.Section inheritPadding py="md">
-          <Form method="post" action="/admin/addGame" onSubmit={onSubmit}>
+      <Form method="post" action="/admin/addGame" onSubmit={onSubmit}>
+        {formPlatformFields.length ? (
+          <Card>
+            <Card shadow="sm" radius="md" withBorder>
+              <AddGamePlatformList {...platformListProps} />
+            </Card>
             <FormFieldsAddGame {...formFieldsAddGame} />
-          </Form>
-        </Card.Section>
-      </Card>
+          </Card>
+        ) : (
+          <FormFieldsAddGame {...formFieldsAddGame} />
+        )}
+      </Form>
       <Modal
         opened={opened}
         onClose={close}

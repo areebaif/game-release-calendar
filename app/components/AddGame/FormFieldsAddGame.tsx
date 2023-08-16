@@ -1,13 +1,17 @@
 import * as React from "react";
-import { Button, TextInput, Textarea, FileInput } from "@mantine/core";
+import {
+  Button,
+  TextInput,
+  Textarea,
+  FileInput,
+  Card,
+  Title,
+  Group,
+} from "@mantine/core";
 import { IconUpload } from "@tabler/icons-react";
 import { ErrorCard } from "~/components";
 // type imports
 import { ErrorAddGameFormFields, AddGameFormFields } from "~/utils/types";
-import {
-  AddGamePlatformList,
-  AddGamePlatformListProps,
-} from "./AddGamePlatformList";
 
 type FormFieldsAddGame = {
   gameName: string;
@@ -16,7 +20,7 @@ type FormFieldsAddGame = {
   setGameDescription: (val: string) => void;
   image: File | null;
   setImage: (val: File) => void;
-  platformListProps: AddGamePlatformListProps;
+
   actionData: { errors: ErrorAddGameFormFields } | undefined;
   error: ErrorAddGameFormFields;
 };
@@ -28,16 +32,27 @@ export const FormFieldsAddGame: React.FC<FormFieldsAddGame> = ({
   setGameDescription,
   image,
   setImage,
-  platformListProps,
   actionData,
   error,
 }) => {
   return (
-    <>
-      <AddGamePlatformList {...platformListProps} />
+    <Card
+      shadow="sm"
+      p="lg"
+      radius="md"
+      withBorder
+      style={{
+        overflow: "inherit",
+        margin: "15px 0 15px 0",
+      }}
+    >
+      <Card.Section inheritPadding py="sm" withBorder>
+        <Title order={4}>Add Game</Title>
+      </Card.Section>
       <TextInput
+        pt="xs"
         withAsterisk
-        label="Name"
+        label="name"
         placeholder="type here"
         value={gameName}
         type="text"
@@ -56,17 +71,42 @@ export const FormFieldsAddGame: React.FC<FormFieldsAddGame> = ({
         <></>
       )}
       <Textarea
-        label="Description"
+        pt="xs"
+        label="description"
         placeholder="type here"
         value={gameDescription}
+        autosize
         name={AddGameFormFields.gameDescription}
         onChange={(event) => setGameDescription(event.currentTarget.value)}
       ></Textarea>
+      {actionData?.errors?.gameDescription || error?.gameDescription ? (
+        <ErrorCard
+          errorMessage={
+            actionData?.errors?.gameDescription
+              ? actionData?.errors?.gameDescription
+              : error?.gameDescription
+          }
+        />
+      ) : (
+        <></>
+      )}
+      <Group position="right">
+        <label
+          style={{
+            display: "inline-block",
+            fontSize: "0.875rem",
+            fontWeight: 500,
+            wordBreak: "break-word",
+          }}
+        >
+          character count: {gameDescription.length}/1000
+        </label>
+      </Group>
       <FileInput
         // we will not submit this field to the backend, we will submit the fileURL we get from s3 to backend: we will append that field to the form data
         // we need the field to display errror to the user/client.
-        label="Upload files"
-        placeholder="Upload files"
+        label="upload image"
+        placeholder="upload image"
         icon={<IconUpload size="16px" />}
         accept="image/*"
         value={image}
@@ -77,7 +117,11 @@ export const FormFieldsAddGame: React.FC<FormFieldsAddGame> = ({
       ) : (
         <></>
       )}
-      <Button type="submit">Submit</Button>
-    </>
+      <Group mt="sm" position="right">
+        <Button variant="outline" type="submit">
+          Add
+        </Button>
+      </Group>
+    </Card>
   );
 };

@@ -14,15 +14,6 @@ export const formPlatformFieldsZod = z.object({
   releaseDate: z.string(),
 });
 
-export const PlatformDropDwonListZod = z.object({
-  value: z.string(),
-  label: z.string(),
-  id: z.string().uuid(),
-  name: z.string(),
-  createdAt: z.string().optional(),
-  updatedAt: z.string().optional(),
-});
-
 export const ErrorAddGameFormFieldsZod = z
   .object({
     [AddGameFormFields.platformName]: z.string().optional(),
@@ -53,4 +44,3 @@ export const ErrorDeleteGameFormFieldsZod = z
     [EditGameFormFields.gameId]: z.string().optional(),
   })
   .optional();
-

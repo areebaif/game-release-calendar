@@ -159,14 +159,6 @@ const AddGame: React.FC = () => {
   const actionData = useActionData<{ errors: ErrorAddGameFormFields }>();
   const navigation = useNavigation();
   const submit = useSubmit();
-  // derive props
-  const dropdownList = platforms.map((item) => ({
-    ...item,
-    value: `${item.id}`,
-    label: item.name,
-  }));
-  const [platformDropdownList, setPlatformDropdownList] =
-    React.useState(dropdownList);
   const [formPlatformFields, setFormPlatformFields] = React.useState<
     FormPlatformFields[]
   >([]);
@@ -182,7 +174,6 @@ const AddGame: React.FC = () => {
   const serverPostError = ErrorAddGameFormFieldsZod.safeParse(
     actionData?.errors
   );
-
   React.useEffect(() => {
     if (isS3UploadComplete) close();
   }, [opened, isS3UploadComplete]);
@@ -256,8 +247,7 @@ const AddGame: React.FC = () => {
   };
 
   const platformInputProps = {
-    platformDropdownList,
-    setPlatformDropdownList,
+    platforms,
     formPlatformFields,
     setFormPlatformFields,
     error,
@@ -267,9 +257,6 @@ const AddGame: React.FC = () => {
   const platformListProps = {
     formPlatformFields,
     setFormPlatformFields,
-    setPlatformDropdownList,
-    platformDropdownList,
-    dropdownList,
   };
   const formFieldsAddGame = {
     gameName,
@@ -294,7 +281,6 @@ const AddGame: React.FC = () => {
           overflow: "inherit",
           margin: "15px 0 0 0",
         }}
-        sx={(theme) => ({ backgroundColor: theme.colors.gray[1] })}
       >
         <Card.Section inheritPadding py="md">
           <PlatformInput {...platformInputProps} />

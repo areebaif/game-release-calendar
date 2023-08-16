@@ -1,34 +1,21 @@
 import * as React from "react";
 import { Grid, Title, Button, Input, Divider } from "@mantine/core";
-import {
-  FormPlatformFields,
-  PlatformDropDwonList,
-  AddGameFormFields,
-} from "~/utils/types";
+import { FormPlatformFields, AddGameFormFields } from "~/utils/types";
 import { formatDate } from "~/utils";
 
 export type AddGamePlatformListProps = {
   formPlatformFields: FormPlatformFields[];
   setFormPlatformFields: (data: FormPlatformFields[]) => void;
-  setPlatformDropdownList: (data: PlatformDropDwonList[]) => void;
-  platformDropdownList: PlatformDropDwonList[];
-  dropdownList: PlatformDropDwonList[];
 };
 
 export const AddGamePlatformList: React.FC<AddGamePlatformListProps> = ({
   formPlatformFields,
   setFormPlatformFields,
-  setPlatformDropdownList,
-  platformDropdownList,
-  dropdownList,
 }) => {
   const onRemoveField = (id: string) => {
     setFormPlatformFields(
       formPlatformFields.filter((fields) => fields.platformId !== id)
     );
-    const valueToAdd = dropdownList.filter((item) => item.id === id);
-    // add fields back to your select input
-    setPlatformDropdownList([...platformDropdownList, ...valueToAdd]);
   };
   return (
     <>

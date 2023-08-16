@@ -17,7 +17,11 @@ export const User: React.FC<UserPropsForClient> = (props) => {
     <Box
       sx={{
         paddingTop: theme.spacing.sm,
-        borderTop: `1px solid ${theme.colors.dark[2]}`,
+        borderTop: `1px solid ${
+          theme.colorScheme === "dark"
+            ? theme.colors.dark[4]
+            : theme.colors.gray[2]
+        }`,
       }}
     >
       <UnstyledButton
@@ -30,21 +34,22 @@ export const User: React.FC<UserPropsForClient> = (props) => {
             theme.colorScheme === "dark" ? theme.colors.dark[0] : theme.black,
 
           "&:hover": {
-            backgroundColor: theme.colors.dark[3],
+            backgroundColor:
+              theme.colorScheme === "dark"
+                ? theme.colors.dark[6]
+                : theme.colors.gray[0],
           },
         }}
       >
         <Group>
           <ThemeIcon variant="dark">
-            <IconUser color={theme.colors.dark[0]} size={20} />
+            <IconUser color="gray" size={20} />
           </ThemeIcon>
           <Box sx={{ flex: 1 }}>
             <Text color={`gray`} size="sm" weight={500}>
               {user.userName}
             </Text>
-            <Text sx={(theme) => ({ color: theme.colors.dark[0] })} size="xs">
-              {user.email}
-            </Text>
+            <Text size="xs">{user.email}</Text>
           </Box>
         </Group>
       </UnstyledButton>

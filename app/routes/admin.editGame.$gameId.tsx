@@ -29,6 +29,7 @@ import {
   EditGameFormFields,
 } from "~/utils/types";
 import { dbEditGame } from "~/utils/db.server.crud";
+import GameItem from "./game.$gameId";
 
 export const loader = async ({ request, params }: ActionArgs) => {
   const user = await requireAdminUser({ request });
@@ -225,7 +226,7 @@ const EditGame: React.FC = () => {
     setFormPlatformFields,
   };
   const platformInputProps = {
-    platformDropdownList: dropdownList,
+    platforms: loaderData.platforms,
     formPlatformFields,
     setFormPlatformFields,
     error,

@@ -15,14 +15,7 @@ import {
 export const AdminNavigation: React.FC<UserPropsForClient> = (props) => {
   const user = props!;
   return (
-    <Navbar
-      sx={(theme) => ({
-        backgroundColor: theme.colors.dark[5],
-        borderRight: "none",
-      })}
-      p="xs"
-      width={{ base: 275 }}
-    >
+    <Navbar p="xs" width={{ base: 275 }}>
       <Navbar.Section grow mt="md">
         <Text size="sm" sx={(theme) => ({ color: theme.colors.dark[2] })}>
           GAME
@@ -56,9 +49,14 @@ function MainLink({ icon, color, label, link }: MainLinkProps) {
         width: "100%",
         padding: theme.spacing.xs,
         borderRadius: theme.radius.sm,
-        color: theme.colors.dark[0],
+        // color:
+        //   theme.colorScheme === "dark" ? theme.colors.dark[1] : theme.black,
+
         "&:hover": {
-          backgroundColor: theme.colors.dark[3],
+          backgroundColor:
+            theme.colorScheme === "dark"
+              ? theme.colors.dark[6]
+              : theme.colors.gray[0],
         },
       })}
       onClick={() => {

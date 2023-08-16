@@ -2,7 +2,6 @@ import { z } from "zod";
 import { UserType } from "@prisma/client";
 import {
   GamePlatformZod,
-  PlatformDropDwonListZod,
   formPlatformFieldsZod,
   ErrorAddGameFormFieldsZod,
   ErrorEditGameFormFieldsZod,
@@ -26,7 +25,6 @@ import {
 
 export type GamePlatform = z.infer<typeof GamePlatformZod>;
 export type FormPlatformFields = z.infer<typeof formPlatformFieldsZod>;
-export type PlatformDropDwonList = z.infer<typeof PlatformDropDwonListZod>;
 export type ImageUploadApi = z.infer<typeof ImageUploadApiZod>;
 export type ErrorAddGameFormFields = z.infer<typeof ErrorAddGameFormFieldsZod>;
 export type ErrorAddPlatformFields = z.infer<typeof ErrorAddPlatformFieldsZod>;

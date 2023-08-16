@@ -1,18 +1,17 @@
 import * as React from "react";
-import { Flex, Select, Box, Button, Chip, Card, Group } from "@mantine/core";
+import { Flex, Box, Button, Chip, Group } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
 import {
   FormPlatformFields,
-  PlatformDropDwonList,
   ErrorAddGameFormFields,
   AddGameFormFields,
+  GamePlatform,
 } from "~/utils/types";
 
 import { ErrorCard } from "../ErrorComponent";
 
 type PlatformInputProps = {
-  platformDropdownList: PlatformDropDwonList[];
-  setPlatformDropdownList?: (data: PlatformDropDwonList[]) => void;
+  platforms: GamePlatform[];
   formPlatformFields: FormPlatformFields[];
   setFormPlatformFields: (val: FormPlatformFields[]) => void;
   error: ErrorAddGameFormFields;
@@ -21,24 +20,47 @@ type PlatformInputProps = {
 };
 
 export const PlatformInput: React.FC<PlatformInputProps> = ({
-  platformDropdownList,
+  platforms,
   formPlatformFields,
   setFormPlatformFields,
-  setPlatformDropdownList,
   error,
   setError,
   actionData,
 }) => {
   // props
-  const [namePlatform, setNamePlatform] = React.useState<string | null>("");
+  const [userPlatformList, setUserPlatformList] = React.useState<string[]>();
   const [releaseDate, setReleaseDate] = React.useState<Date | null>(null);
-  const [showPlatformCard, setShowPlatformCard] = React.useState(false);
-  const onAddToPlatformList = (val: string | null) => {
+
+  const onAddToPlatformList = (val: string[] | undefined) => {
     setError(undefined);
-    const platform = platformDropdownList.filter(
-      (item) => `${item.id}` === val
-    );
-    if (!platform.length || !releaseDate) {
+    const platformsToAdd = val?.map((platformId) => {
+      const platformName = platforms.filter(
+        (item) => `${item.id}` === platformId
+      );
+      if (!platformName.length || !releaseDate) {
+        setError({
+          ...error,
+          [AddGameFormFields.platformName]:
+            "please enter value for platform name and release date",
+        });
+        return;
+      }
+      return {
+        platformId: platformId,
+        platformName: platformName[0].name,
+        releaseDate: releaseDate?.toISOString()!,
+      };
+    });
+
+    const platformsFiltered: {
+      platformId: string;
+      platformName: string;
+      releaseDate: string;
+    }[] = [];
+    platformsToAdd?.forEach((item) => {
+      if (Boolean(item?.platformId)) platformsFiltered.push(item!);
+    });
+    if (!platformsFiltered.length) {
       setError({
         ...error,
         [AddGameFormFields.platformName]:
@@ -46,95 +68,60 @@ export const PlatformInput: React.FC<PlatformInputProps> = ({
       });
       return;
     }
-    setFormPlatformFields([
-      ...formPlatformFields,
-      {
-        platformId: platform[0].id,
-        platformName: platform[0].name,
-        releaseDate: releaseDate?.toISOString()!,
-      },
-    ]);
-    setNamePlatform("");
+    setFormPlatformFields([...formPlatformFields, ...platformsFiltered]);
+    setUserPlatformList([]);
     setReleaseDate(null);
-    setPlatformDropdownList
-      ? setPlatformDropdownList(
-          platformDropdownList.filter((item) => `${item.id}` !== val)
-        )
-      : undefined;
   };
 
   return (
     <>
-      {/* <Select
-        value={namePlatform}
-        onChange={setNamePlatform}
-        label="platform"
-        withAsterisk
-        placeholder="pick one"
-        nothingFound="No options"
-        data={platformDropdownList}
-      /> */}
-
-      {!showPlatformCard ? (
+      <Group position="apart">
         <Flex direction="row" align="flex-start" gap="md" justify="flex-start">
           {" "}
           <DateInput
             valueFormat="MMM DD YYYY"
             label={"select date"}
             placeholder={"mm dd yyyy"}
-            withAsterisk
             value={releaseDate}
             onChange={setReleaseDate}
           />
-          <Box sx={(theme) => ({ paddingTop: theme.spacing.xl })}>
-            <Button
-              variant="outline"
-              onClick={() => {
-                // card should change to display platforms
-                setShowPlatformCard(true);
-                //onAddToPlatformList(namePlatform);
+          <Flex direction={"column"} gap="xs" wrap="wrap">
+            <label
+              style={{
+                display: "inline-block",
+                fontSize: "0.875rem",
+                fontWeight: 500,
+                wordBreak: "break-word",
               }}
             >
-              Add Platforms
-            </Button>
-          </Box>
+              select platforms
+            </label>
+            <Chip.Group
+              multiple
+              value={userPlatformList}
+              onChange={setUserPlatformList}
+            >
+              <Group>
+                {platforms.map((item) => (
+                  <Chip key={item.id} value={`${item.id}`}>
+                    {item.name}
+                  </Chip>
+                ))}
+              </Group>
+            </Chip.Group>
+          </Flex>
         </Flex>
-      ) : (
-        <Group position="apart">
-          <Chip.Group multiple>
-            <Group>
-              {platformDropdownList.map((item) => (
-                <Chip value={`${item.id}`}>{item.name}</Chip>
-              ))}
-            </Group>
-            <Group>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  // card should change to display platforms
-                  // TODO: remove state of chips
-                  setShowPlatformCard(false);
-                  //onAddToPlatformList(namePlatform);
-                }}
-              >
-                Back
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  // card should change to display platforms
-                  setShowPlatformCard(false);
-                  // TODO: trigger adding to list
-                  //onAddToPlatformList(namePlatform);
-                }}
-              >
-                Add
-              </Button>
-            </Group>
-          </Chip.Group>
-        </Group>
-      )}
-
+        <Box sx={(theme) => ({ paddingTop: theme.spacing.xl })}>
+          <Button
+            variant="outline"
+            onClick={() => {
+              onAddToPlatformList(userPlatformList);
+            }}
+          >
+            Add Platforms
+          </Button>
+        </Box>
+      </Group>
       {error?.platformName ||
       (actionData?.errors?.platformName && error?.platformIdNameReleaseDate) ? (
         <ErrorCard

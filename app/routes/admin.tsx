@@ -1,5 +1,13 @@
 import { Outlet, useLoaderData } from "@remix-run/react";
-import { Title, Text, Header, Group, Container, AppShell } from "@mantine/core";
+import {
+  Title,
+  Text,
+  Header,
+  Group,
+  Container,
+  AppShell,
+  useMantineTheme,
+} from "@mantine/core";
 import { json } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import type { ActionArgs } from "@remix-run/node";
@@ -30,6 +38,9 @@ export const loader = async ({ request }: ActionArgs) => {
 };
 
 const Admin: React.FC = () => {
+  const theme = useMantineTheme();
+  // TODO: I can convert this into a button too for user to change theme
+  theme.colorScheme = "dark";
   const loaderData = useLoaderData<{ user: UserPropsForClient }>();
   const typeCheckUser = UserPropsForClientZod.safeParse(loaderData.user);
 
@@ -48,14 +59,7 @@ const Admin: React.FC = () => {
           padding="md"
           navbar={<AdminNavigation {...loaderData.user!} />}
           header={
-            <Header
-              sx={(theme) => ({
-                backgroundColor: theme.colors.dark[5],
-                borderBottom: `1px solid ${theme.colors.dark[2]}`,
-              })}
-              pl="xl"
-              height={70}
-            >
+            <Header pl="xl" height={70}>
               <Title py="lg" color="dimmed" order={2}>
                 Admin Dashboard
               </Title>
@@ -63,11 +67,10 @@ const Admin: React.FC = () => {
           }
           styles={(theme) => ({
             main: {
-              backgroundColor: theme.colors.dark[8],
-              // backgroundColor:
-              //   theme.colorScheme === "dark"
-              //     ? theme.colors.dark[8]
-              //     : theme.colors.gray[0],
+              backgroundColor:
+                theme.colorScheme === "dark"
+                  ? theme.colors.dark[8]
+                  : theme.colors.gray[0],
             },
           })}
         >

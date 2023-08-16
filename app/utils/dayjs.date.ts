@@ -9,6 +9,10 @@ export const getNewDateAddMonth = (monthToAdd: number) => {
   return b;
 };
 
-export const getEndOfMonth = () => {
+export const getEndOfCurrentMonth = () => {
   return dayjs().endOf("month");
+};
+
+export const getStartOfCurrentMonth = () => {
+  return dayjs().startOf("month");
 };

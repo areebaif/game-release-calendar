@@ -3,7 +3,11 @@ import { UserType } from "@prisma/client";
 import { db } from "./db.server";
 import { DbAddGame, DbReadGameMetaData, DbEditGame } from "./types";
 import { saltRounds } from "./session.server";
-import { getEndOfMonth, s3Client } from "~/utils";
+import {
+  getEndOfCurrentMonth,
+  getStartOfCurrentMonth,
+  s3Client,
+} from "~/utils";
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 
 export const dbCreateGame = async (data: DbAddGame) => {
@@ -110,14 +114,14 @@ export const dbGetAllGamesData = async () => {
 };
 
 export const dbGetCurrentMonthGames = async () => {
-  const currentDate = new Date();
-  const endOfMonth = getEndOfMonth();
+  const startOfMonth = getStartOfCurrentMonth();
+  const endOfMonth = getEndOfCurrentMonth();
   const gameMetaData = await db.gameMetaData.findMany({
     where: {
       AND: [
         {
           releaseDate: {
-            gte: currentDate.toISOString(),
+            gte: startOfMonth.toISOString(),
           },
         },
         { releaseDate: { lte: endOfMonth.toISOString() } },

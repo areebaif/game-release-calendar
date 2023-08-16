@@ -1,5 +1,10 @@
 import { db } from "./db.server";
-import { formatDate, getNewDateAddMonth, getEndOfMonth } from "./dayjs.date";
+import {
+  formatDate,
+  getNewDateAddMonth,
+  getEndOfCurrentMonth,
+  getStartOfCurrentMonth,
+} from "./dayjs.date";
 import { s3Client } from "./awsS3Client.server";
 import { getSignedUrl } from "./image.upload";
 import { validFileType } from "./image.validFileType";
@@ -76,5 +81,6 @@ export {
   ErrorRegisterUserFormFieldsZod,
   dbGetCurrentMonthGames,
   getNewDateAddMonth,
-  getEndOfMonth,
+  getEndOfCurrentMonth,
+  getStartOfCurrentMonth,
 };

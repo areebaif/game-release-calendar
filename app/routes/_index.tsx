@@ -6,6 +6,7 @@ import { Title } from "@mantine/core";
 import { UserPropsForClientZod, authenticatedUser } from "~/utils";
 import { UserPropsForClient } from "~/utils/types";
 import { ErrorCard } from "~/components";
+import { Text } from "@mantine/core";
 
 // export const meta: V2_MetaFunction = () => {
 //   return [
@@ -48,6 +49,13 @@ export default function Index() {
         </li>
         <li>
           <Link to="/game/current-month">current month games</Link>
+        </li>
+        <li>
+          <Text>
+            Note: The link below takes year as query parameter in the format
+            yyyy. Right now the link is hardcoded to 2023
+          </Text>
+          <Link to="/game/year/2023">get game by year</Link>
         </li>
         {!loaderData.user?.id ? (
           <li>

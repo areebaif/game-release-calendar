@@ -6,7 +6,6 @@ import { validFileType } from "./image.validFileType";
 import {
   GamePlatformZod,
   formPlatformFieldsZod,
-  PlatformDropDwonListZod,
   ErrorAddGameFormFieldsZod,
 } from "./zod.Game";
 
@@ -50,7 +49,6 @@ export {
   validFileType,
   GamePlatformZod,
   formPlatformFieldsZod,
-  PlatformDropDwonListZod,
   UserPropsForClientZod,
   ImageUploadApiZod,
   ErrorAddGameFormFieldsZod,

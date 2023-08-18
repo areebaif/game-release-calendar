@@ -1,3 +1,4 @@
+import * as React from "react";
 import { Outlet, useLoaderData } from "@remix-run/react";
 import {
   Title,
@@ -7,19 +8,16 @@ import {
   Container,
   AppShell,
   useMantineTheme,
+  Switch,
 } from "@mantine/core";
 import { json } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
+import { IconSun, IconMoonStars } from "@tabler/icons-react";
 import type { ActionArgs } from "@remix-run/node";
 import { requireAdminUser } from "~/utils";
 import { UserPropsForClient } from "~/utils/types";
 import { UserPropsForClientZod } from "~/utils";
-import {
-  PlatformInput,
-  ErrorCard,
-  FormFieldsAddGame,
-  AdminNavigation,
-} from "~/components";
+import { ErrorCard, AdminNavigation } from "~/components";
 
 export const loader = async ({ request }: ActionArgs) => {
   // only admin can access this route, if the user is not admin or a user is not signedIn, requireAdminUser redirects the user to homepage
@@ -39,8 +37,9 @@ export const loader = async ({ request }: ActionArgs) => {
 
 const Admin: React.FC = () => {
   const theme = useMantineTheme();
-  // TODO: I can convert this into a button too for user to change theme
-  theme.colorScheme = "dark";
+  const [adminTheme, setAdminTheme] = React.useState<"dark" | "light">("dark");
+  const ThemeContext = React.createContext(adminTheme);
+  theme.colorScheme = adminTheme;
   const loaderData = useLoaderData<{ user: UserPropsForClient }>();
   const typeCheckUser = UserPropsForClientZod.safeParse(loaderData.user);
 
@@ -55,29 +54,55 @@ const Admin: React.FC = () => {
   return (
     <>
       <main>
-        <AppShell
-          padding="md"
-          navbar={<AdminNavigation {...loaderData.user!} />}
-          header={
-            <Header pl="xl" height={70}>
-              <Title py="lg" color="dimmed" order={2}>
-                Admin Dashboard
-              </Title>
-            </Header>
-          }
-          styles={(theme) => ({
-            main: {
-              backgroundColor:
-                theme.colorScheme === "dark"
-                  ? theme.colors.dark[8]
-                  : theme.colors.gray[0],
-            },
-          })}
-        >
-          <Container fluid>
-            <Outlet />
-          </Container>
-        </AppShell>
+        <ThemeContext.Provider value={adminTheme}>
+          <AppShell
+            padding="md"
+            navbar={<AdminNavigation {...loaderData.user!} />}
+            header={
+              <Header pl="xl" height={70}>
+                <Group>
+                  <Title py="lg" color="dimmed" order={2}>
+                    Admin Dashboard
+                  </Title>
+                  <Switch
+                    onLabel={
+                      <IconSun
+                        size="1rem"
+                        stroke={2.5}
+                        color={theme.colors.green[4]}
+                      />
+                    }
+                    offLabel={
+                      <IconMoonStars
+                        size="1rem"
+                        stroke={2.5}
+                        color={theme.colors.blue[6]}
+                      />
+                    }
+                    onChange={() => {
+                      console.log(" I just ran");
+                      if (adminTheme === "dark") setAdminTheme("light");
+                      else setAdminTheme("dark");
+                    }}
+                    label="I agree to sell my privacy"
+                  />
+                </Group>
+              </Header>
+            }
+            styles={(theme) => ({
+              main: {
+                backgroundColor:
+                  theme.colorScheme === "dark"
+                    ? theme.colors.dark[8]
+                    : theme.colors.gray[0],
+              },
+            })}
+          >
+            <Container fluid>
+              <Outlet />
+            </Container>
+          </AppShell>
+        </ThemeContext.Provider>
       </main>
     </>
   );

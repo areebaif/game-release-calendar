@@ -26,7 +26,8 @@ import { ErrorCard, GameCard } from "~/components";
 import { UserPropsForClientZod, requireAdminUser } from "~/utils";
 
 export const action = async ({ request }: ActionArgs) => {
-  const user = await requireAdminUser({ request, redirectTo: "/" });
+  const user = await requireAdminUser({ request });
+  if (!user) redirect("/");
 
   const form = await request.formData();
   const id = form.get(`${DeleteGameFormFields.GameId}`);

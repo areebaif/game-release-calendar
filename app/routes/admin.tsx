@@ -38,6 +38,7 @@ export const loader = async ({ request }: ActionArgs) => {
 const Admin: React.FC = () => {
   const theme = useMantineTheme();
   const [adminTheme, setAdminTheme] = React.useState<"dark" | "light">("dark");
+  const [checked, setChecked] = React.useState(false);
   const ThemeContext = React.createContext(adminTheme);
   theme.colorScheme = adminTheme;
   const loaderData = useLoaderData<{ user: UserPropsForClient }>();
@@ -59,32 +60,33 @@ const Admin: React.FC = () => {
             padding="md"
             navbar={<AdminNavigation {...loaderData.user!} />}
             header={
-              <Header pl="xl" height={70}>
-                <Group>
+              <Header height={70}>
+                <Group px="xl" position="apart">
                   <Title py="lg" color="dimmed" order={2}>
                     Admin Dashboard
                   </Title>
                   <Switch
+                    checked={checked}
                     onLabel={
+                      <IconMoonStars
+                        size="1rem"
+                        stroke={2.5}
+                        color={theme.colors.blue[4]}
+                      />
+                    }
+                    offLabel={
                       <IconSun
                         size="1rem"
                         stroke={2.5}
                         color={theme.colors.green[4]}
                       />
                     }
-                    offLabel={
-                      <IconMoonStars
-                        size="1rem"
-                        stroke={2.5}
-                        color={theme.colors.blue[6]}
-                      />
-                    }
-                    onChange={() => {
-                      console.log(" I just ran");
+                    onChange={(event) => {
+                      setChecked(event.currentTarget.checked);
                       if (adminTheme === "dark") setAdminTheme("light");
                       else setAdminTheme("dark");
                     }}
-                    label="I agree to sell my privacy"
+                    label="switch theme mode"
                   />
                 </Group>
               </Header>

@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { UserType } from "@prisma/client";
 import {
   GamePlatformZod,
   PlatformDropDwonListZod,
@@ -14,6 +13,7 @@ import { ErrorAddPlatformFieldsZod } from "./zod.addPlatform";
 import {
   DbAddGameZod,
   DbEditGameZod,
+  DbReadGameByYearZod,
   DbReadGameMetaDataZod,
 } from "./zod.db.crud";
 import {
@@ -44,6 +44,7 @@ export type DbEditGame = z.infer<typeof DbEditGameZod>;
 export type ErrorRegisterUserFormFields = z.infer<
   typeof ErrorRegisterUserFormFieldsZod
 >;
+export type DbReadGameByYear = z.infer<typeof DbReadGameByYearZod>;
 
 export enum AddGameFormFields {
   platformName = "platformName",
@@ -94,4 +95,19 @@ export enum RegisterUserFormFields {
 export enum UserTypeForm {
   ADMIN = "ADMIN",
   STANDARD = "STANDARD",
+}
+
+export enum MonthNames {
+  January = "January",
+  February = "February",
+  March = "March",
+  April = "April",
+  May = "May",
+  June = "June",
+  July = "July",
+  August = "August",
+  September = "September",
+  October = "October",
+  November = "November",
+  December = "December",
 }

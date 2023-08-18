@@ -4,6 +4,9 @@ import {
   getNewDateAddMonth,
   getEndOfCurrentMonth,
   getStartOfCurrentMonth,
+  getEndOfYear,
+  getStartOfYear,
+  getMonthNumber,
 } from "./dayjs.date";
 import { s3Client } from "./awsS3Client.server";
 import { getSignedUrl } from "./image.upload";
@@ -23,7 +26,7 @@ import {
   ErrorRegisterUserFormFieldsZod,
   UserZod,
 } from "./zod.userAuth";
-import { DbReadGameMetaDataZod } from "./zod.db.crud";
+import { DbReadGameMetaDataZod, DbReadGameByYearZod } from "./zod.db.crud";
 import { getUrlUploadImageToS3 } from "./image.upload";
 import {
   dbGetAllGamesData,
@@ -35,6 +38,7 @@ import {
   dbGetGameDataById,
   dbDeleteGameById,
   dbGetCurrentMonthGames,
+  dbGetGameByYear,
 } from "./db.server.crud";
 import {
   loginUser,
@@ -83,4 +87,9 @@ export {
   getNewDateAddMonth,
   getEndOfCurrentMonth,
   getStartOfCurrentMonth,
+  getEndOfYear,
+  getStartOfYear,
+  dbGetGameByYear,
+  DbReadGameByYearZod,
+  getMonthNumber,
 };

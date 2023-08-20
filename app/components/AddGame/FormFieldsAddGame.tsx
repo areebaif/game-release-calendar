@@ -20,7 +20,7 @@ type FormFieldsAddGame = {
   setGameDescription: (val: string) => void;
   image: File | null;
   setImage: (val: File) => void;
-
+  handleAddGame: () => void;
   actionData: { errors: ErrorAddGameFormFields } | undefined;
   error: ErrorAddGameFormFields;
 };
@@ -34,6 +34,7 @@ export const FormFieldsAddGame: React.FC<FormFieldsAddGame> = ({
   setImage,
   actionData,
   error,
+  handleAddGame,
 }) => {
   return (
     <Card
@@ -56,7 +57,7 @@ export const FormFieldsAddGame: React.FC<FormFieldsAddGame> = ({
         placeholder="type here"
         value={gameName}
         type="text"
-        name={AddGameFormFields.gameName}
+        //name={AddGameFormFields.gameName}
         onChange={(event) => setGameName(event.currentTarget.value)}
       ></TextInput>
       {actionData?.errors?.gameName || error?.gameName ? (
@@ -76,7 +77,7 @@ export const FormFieldsAddGame: React.FC<FormFieldsAddGame> = ({
         placeholder="type here"
         value={gameDescription}
         autosize
-        name={AddGameFormFields.gameDescription}
+        //name={AddGameFormFields.gameDescription}
         onChange={(event) => setGameDescription(event.currentTarget.value)}
       ></Textarea>
       {actionData?.errors?.gameDescription || error?.gameDescription ? (
@@ -103,8 +104,6 @@ export const FormFieldsAddGame: React.FC<FormFieldsAddGame> = ({
         </label>
       </Group>
       <FileInput
-        // we will not submit this field to the backend, we will submit the fileURL we get from s3 to backend: we will append that field to the form data
-        // we need the field to display errror to the user/client.
         label="upload image"
         placeholder="upload image"
         icon={<IconUpload size="16px" />}
@@ -118,8 +117,13 @@ export const FormFieldsAddGame: React.FC<FormFieldsAddGame> = ({
         <></>
       )}
       <Group mt="sm" position="right">
-        <Button variant="outline" type="submit">
-          Add
+        <Button
+          onClick={() => {
+            handleAddGame();
+          }}
+          variant="outline"
+        >
+          Add Game
         </Button>
       </Group>
     </Card>

@@ -52,6 +52,7 @@ export enum AddGameFormFields {
   gameDescription = "gameDescription",
   gamePicBlob = "gamePicBlob",
   imageUrl = "imageUrl",
+  platformArray = "platformArray",
 }
 
 export enum EditGameFormFields {

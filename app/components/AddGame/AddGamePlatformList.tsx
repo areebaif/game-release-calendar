@@ -41,7 +41,7 @@ export const AddGamePlatformList: React.FC<AddGamePlatformListProps> = ({
                 variant="unstyled"
                 value={`${formValues.platformId}$${formValues.platformName}$${formValues.releaseDate}`}
                 type="hidden"
-                name={`${AddGameFormFields.platformIdNameReleaseDate}`}
+                //name={`${AddGameFormFields.platformIdNameReleaseDate}`}
                 readOnly
               ></Input>
 

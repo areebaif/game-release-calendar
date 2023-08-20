@@ -166,7 +166,7 @@ const EditGame: React.FC = () => {
     value: `${item.id}`,
     label: item.name,
   }));
-  const [formPlatformFields, setFormPlatformFields] = React.useState<
+  const [gamePlatformList, setGamePlatformList] = React.useState<
     FormPlatformFields[]
   >(loaderData.gameItem.platform);
   const [gameName, setGameName] = React.useState(
@@ -199,7 +199,7 @@ const EditGame: React.FC = () => {
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(undefined);
-    if (!formPlatformFields.length) {
+    if (!gamePlatformList.length) {
       setError({
         [EditGameFormFields.platformName]:
           "platform name and release date cannot be empty",
@@ -222,13 +222,13 @@ const EditGame: React.FC = () => {
   };
 
   const platformListProps = {
-    formPlatformFields,
-    setFormPlatformFields,
+    gamePlatformList,
+    setGamePlatformList,
   };
   const platformInputProps = {
     platforms: loaderData.platforms,
-    formPlatformFields,
-    setFormPlatformFields,
+    gamePlatformList,
+    setGamePlatformList,
     error,
     actionData,
     setError,

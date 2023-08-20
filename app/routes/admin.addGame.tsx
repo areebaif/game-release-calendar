@@ -342,7 +342,7 @@ const AddGame: React.FC = () => {
         }}
       >
         <Card.Section inheritPadding py="sm" withBorder>
-          <Title order={4}>Add Platform</Title>
+          <Title order={4}>Add game specific platforms</Title>
         </Card.Section>
         <Card.Section inheritPadding py="md">
           <PlatformInput {...platformInputProps} />

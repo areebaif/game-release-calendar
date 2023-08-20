@@ -53,7 +53,7 @@ export const AddGameUserInput: React.FC<AddGameUserInputProps> = ({
       }}
     >
       <Card.Section inheritPadding py="sm" withBorder>
-        <Title order={4}>Add Game</Title>
+        <Title order={4}>Add game attributes</Title>
       </Card.Section>
       <TextInput
         pt="xs"

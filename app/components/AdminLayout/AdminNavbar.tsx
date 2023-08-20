@@ -2,7 +2,14 @@ import { requireAdminUser } from "~/utils";
 import { UserPropsForClient } from "~/utils/types";
 import { useNavigate } from "@remix-run/react";
 import { User } from "./User";
-import { Navbar, ThemeIcon, UnstyledButton, Group, Text } from "@mantine/core";
+import {
+  Navbar,
+  ThemeIcon,
+  UnstyledButton,
+  Group,
+  Text,
+  useMantineTheme,
+} from "@mantine/core";
 import {
   IconMessages,
   IconDatabase,
@@ -17,11 +24,27 @@ export const AdminNavigation: React.FC<UserPropsForClient> = (props) => {
   return (
     <Navbar p="xs" width={{ base: 275 }}>
       <Navbar.Section grow mt="md">
-        <Text size="sm" sx={(theme) => ({ color: theme.colors.dark[2] })}>
+        <Text
+          size="sm"
+          sx={(theme) => ({
+            color:
+              theme.colorScheme === "dark"
+                ? theme.colors.dark[2]
+                : theme.colors.dark,
+          })}
+        >
           GAME
         </Text>
         <GameMainLinks />
-        <Text size="sm" sx={(theme) => ({ color: theme.colors.dark[2] })}>
+        <Text
+          size="sm"
+          sx={(theme) => ({
+            color:
+              theme.colorScheme === "dark"
+                ? theme.colors.dark[2]
+                : theme.colors.dark,
+          })}
+        >
           USER
         </Text>
         <UserMainLinks />
@@ -42,6 +65,7 @@ interface MainLinkProps {
 
 function MainLink({ icon, color, label, link }: MainLinkProps) {
   const navigate = useNavigate();
+  const theme = useMantineTheme();
   return (
     <UnstyledButton
       sx={(theme) => ({
@@ -64,7 +88,10 @@ function MainLink({ icon, color, label, link }: MainLinkProps) {
       }}
     >
       <Group>
-        <ThemeIcon color={color} variant="dark">
+        <ThemeIcon
+          color={color}
+          variant={theme.colorScheme === "dark" ? "dark" : "light"}
+        >
           {icon}
         </ThemeIcon>
         <Text size="sm">{label}</Text>

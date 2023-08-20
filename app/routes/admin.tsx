@@ -62,7 +62,15 @@ const Admin: React.FC = () => {
             header={
               <Header height={70}>
                 <Group px="xl" position="apart">
-                  <Title py="lg" color="dimmed" order={2}>
+                  <Title
+                    py="lg"
+                    color={
+                      theme.colorScheme === "dark"
+                        ? theme.colors.dark[0]
+                        : theme.black
+                    }
+                    order={2}
+                  >
                     Admin Dashboard
                   </Title>
                   <Switch

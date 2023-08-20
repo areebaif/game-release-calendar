@@ -46,7 +46,15 @@ export const User: React.FC<UserPropsForClient> = (props) => {
             <IconUser color="gray" size={20} />
           </ThemeIcon>
           <Box sx={{ flex: 1 }}>
-            <Text color={`gray`} size="sm" weight={500}>
+            <Text
+              color={
+                theme.colorScheme === "dark"
+                  ? theme.colors.dark[0]
+                  : theme.black
+              }
+              size="sm"
+              weight={500}
+            >
               {user.userName}
             </Text>
             <Text size="xs">{user.email}</Text>

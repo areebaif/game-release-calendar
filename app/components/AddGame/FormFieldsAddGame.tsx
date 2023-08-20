@@ -7,25 +7,28 @@ import {
   Card,
   Title,
   Group,
+  Image,
 } from "@mantine/core";
 import { IconUpload } from "@tabler/icons-react";
 import { ErrorCard } from "~/components";
 // type imports
 import { ErrorAddGameFormFields, AddGameFormFields } from "~/utils/types";
 
-type FormFieldsAddGame = {
+type AddGameUserInputProps = {
   gameName: string;
   setGameName: (val: string) => void;
   gameDescription: string;
   setGameDescription: (val: string) => void;
   image: File | null;
   setImage: (val: File) => void;
+  imageUrl: string;
+  setImageUrl: (val: string) => void;
   handleAddGame: () => void;
   actionData: { errors: ErrorAddGameFormFields } | undefined;
   error: ErrorAddGameFormFields;
 };
 
-export const FormFieldsAddGame: React.FC<FormFieldsAddGame> = ({
+export const AddGameUserInput: React.FC<AddGameUserInputProps> = ({
   gameName,
   setGameName,
   gameDescription,
@@ -35,6 +38,8 @@ export const FormFieldsAddGame: React.FC<FormFieldsAddGame> = ({
   actionData,
   error,
   handleAddGame,
+  imageUrl,
+  setImageUrl,
 }) => {
   return (
     <Card
@@ -77,7 +82,6 @@ export const FormFieldsAddGame: React.FC<FormFieldsAddGame> = ({
         placeholder="type here"
         value={gameDescription}
         autosize
-        //name={AddGameFormFields.gameDescription}
         onChange={(event) => setGameDescription(event.currentTarget.value)}
       ></Textarea>
       {actionData?.errors?.gameDescription || error?.gameDescription ? (
@@ -103,13 +107,26 @@ export const FormFieldsAddGame: React.FC<FormFieldsAddGame> = ({
           character count: {gameDescription.length}/1000
         </label>
       </Group>
+      {image ? (
+        <Image
+          mt="md"
+          maw={240}
+          withPlaceholder
+          radius="md"
+          src={imageUrl}
+          alt="game image"
+        />
+      ) : undefined}
       <FileInput
         label="upload image"
         placeholder="upload image"
         icon={<IconUpload size="16px" />}
         accept="image/*"
         value={image}
-        onChange={setImage}
+        onChange={(e) => {
+          setImage(e!);
+          setImageUrl(URL.createObjectURL(e!));
+        }}
       />
       {error?.gamePicBlob ? (
         <ErrorCard errorMessage={"please upload image type jpeg or png"} />

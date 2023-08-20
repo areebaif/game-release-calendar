@@ -12,8 +12,8 @@ import { ErrorCard } from "../ErrorComponent";
 
 type PlatformInputProps = {
   platforms: GamePlatform[];
-  formPlatformFields: FormPlatformFields[];
-  setFormPlatformFields: (val: FormPlatformFields[]) => void;
+  gamePlatformList: FormPlatformFields[];
+  setGamePlatformList: (val: FormPlatformFields[]) => void;
   error: ErrorAddGameFormFields;
   setError: (val: ErrorAddGameFormFields) => void;
   actionData: { errors: ErrorAddGameFormFields } | undefined;
@@ -21,8 +21,8 @@ type PlatformInputProps = {
 
 export const PlatformInput: React.FC<PlatformInputProps> = ({
   platforms,
-  formPlatformFields,
-  setFormPlatformFields,
+  gamePlatformList,
+  setGamePlatformList,
   error,
   setError,
   actionData,
@@ -68,7 +68,7 @@ export const PlatformInput: React.FC<PlatformInputProps> = ({
       });
       return;
     }
-    setFormPlatformFields([...formPlatformFields, ...platformsFiltered]);
+    setGamePlatformList([...gamePlatformList, ...platformsFiltered]);
     setUserPlatformList([]);
     setReleaseDate(null);
   };

@@ -3,23 +3,22 @@ import { Grid, Title, Button, Input, Divider } from "@mantine/core";
 import { FormPlatformFields, AddGameFormFields } from "~/utils/types";
 import { formatDate } from "~/utils";
 
-export type AddGamePlatformListProps = {
-  formPlatformFields: FormPlatformFields[];
-  setFormPlatformFields: (data: FormPlatformFields[]) => void;
+export type GameSpecificPlatformListProps = {
+  gamePlatformList: FormPlatformFields[];
+  setGamePlatformList: (data: FormPlatformFields[]) => void;
 };
 
-export const AddGamePlatformList: React.FC<AddGamePlatformListProps> = ({
-  formPlatformFields,
-  setFormPlatformFields,
-}) => {
+export const GameSpecificPlatformList: React.FC<
+  GameSpecificPlatformListProps
+> = ({ gamePlatformList, setGamePlatformList }) => {
   const onRemoveField = (id: string) => {
-    setFormPlatformFields(
-      formPlatformFields.filter((fields) => fields.platformId !== id)
+    setGamePlatformList(
+      gamePlatformList.filter((fields) => fields.platformId !== id)
     );
   };
   return (
     <>
-      {formPlatformFields.length ? (
+      {gamePlatformList.length ? (
         <>
           <Grid>
             <Grid.Col span={"auto"}>
@@ -35,7 +34,7 @@ export const AddGamePlatformList: React.FC<AddGamePlatformListProps> = ({
             </Grid.Col>
           </Grid>
           <Divider my="sm" />
-          {formPlatformFields.map((formValues, index) => (
+          {gamePlatformList.map((formValues, index) => (
             <React.Fragment key={formValues.platformId}>
               <Input
                 variant="unstyled"

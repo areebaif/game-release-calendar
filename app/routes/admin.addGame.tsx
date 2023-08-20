@@ -28,11 +28,12 @@ import { useDisclosure } from "@mantine/hooks";
 // type imports
 import type { ActionArgs, TypedResponse } from "@remix-run/node";
 // local imports
+import { AddGameFormObjClient, AddGameFormDataDisplayCard } from "~/components";
 import {
   PlatformInput,
   ErrorCard,
-  FormFieldsAddGame,
-  AddGamePlatformList,
+  AddGameUserInput,
+  GameSpecificPlatformList,
 } from "~/components";
 import {
   db,
@@ -184,60 +185,37 @@ export const action = async ({
   }
 };
 
-export type formObject = {
-  constructedUrl: string;
-  //[AddGameFormFields.imageUrl]: string;
-  [AddGameFormFields.gameName]: string;
-  [AddGameFormFields.gameDescription]: string;
-  [AddGameFormFields.gamePicBlob]: File | null;
-  [AddGameFormFields.platformArray]: platformMergedFields["mergedField"][];
-};
-
-type platformMergedFields = {
-  mergedField: FormPlatformFields & {
-    [AddGameFormFields.platformIdNameReleaseDate]: string;
-  };
-};
-
 const AddGame: React.FC = () => {
   // hooks
   const platforms = useLoaderData<GamePlatform[]>();
   const actionData = useActionData<{ errors: ErrorAddGameFormFields }>();
   const navigation = useNavigation();
   const submit = useSubmit();
-  const [formPlatformFields, setFormPlatformFields] = React.useState<
+  //props
+  const [gamePlatformList, setGamePlatformList] = React.useState<
     FormPlatformFields[]
   >([]);
-  //props
   const [gameName, setGameName] = React.useState("");
   const [gameDescription, setGameDescription] = React.useState("");
   const [image, setImage] = React.useState<File | null>(null);
-  const [allImages, setAllImages] = React.useState<File[]>([]);
+  // we need the imageUrl to display a thumbnail of image
   const [imageUrl, setImageUrl] = React.useState<string>("");
+  const [allImages, setAllImages] = React.useState<File[]>([]);
+  const [formInput, setFormInput] = React.useState<AddGameFormObjClient[]>([]);
   const [error, setError] = React.useState<ErrorAddGameFormFields>();
-  const [isS3UploadComplete, setIsS3UploadComplete] = React.useState(false);
-  const [opened, { open, close }] = useDisclosure(false);
-  const [formInput, setFormInput] = React.useState<formObject[]>([]);
+
   // Type checks: check if the server is sending correct values
   const parsePlatform = GamePlatformZod.safeParse(platforms[0]);
   const serverPostError = ErrorAddGameFormFieldsZod.safeParse(
     actionData?.errors
   );
-  // TODO: I might not need a useEffect just set the url when you set image
-  React.useEffect(() => {
-    if (image) {
-      setImageUrl(URL.createObjectURL(image));
-    }
-  }, [image]);
 
   if (!parsePlatform.success || !serverPostError.success) {
-    // log error in console
     !parsePlatform.success
       ? console.log(parsePlatform.error)
       : !serverPostError.success
       ? console.log(serverPostError.error)
       : undefined;
-    // return error to client
     return (
       <ErrorCard
         errorMessage={"something went wrong with the server please try again"}
@@ -249,104 +227,95 @@ const AddGame: React.FC = () => {
   }
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError(undefined);
-    // if (!formPlatformFields.length) {
-    //   setError({
-    //     [AddGameFormFields.platformName]:
-    //       "platform name and release date cannot be empty",
-    //   });
-    //   return;
-    // }
-    // if (!gameName.length) {
-    //   setError({
-    //     [AddGameFormFields.gameName]: "Game name cannot be empty",
-    //   });
-    //   return;
-    // }
-    // if (gameDescription.length > 1000) {
-    //   setError({
-    //     [AddGameFormFields.gameDescription]:
-    //       "Please add description of 1000 charcters or less",
-    //   });
-    //   return;
-    // }
-    // const type = image?.type!;
-    // // this functioon checks if the file submitted by the user is of valid type, it also returns the extension of the file
-    // const validPictureType = validFileType(type);
-    // if (!validPictureType.isValid) {
-    //   setError({
-    //     [AddGameFormFields.gamePicBlob]:
-    //       "please upload correct image type of jpeg or png",
-    //   });
-    //   return;
-    // }
-    // open();
-    // const $form = e.currentTarget;
-    // const s3Data = {
-    //   fileType: type,
-    //   image: image!,
-    // };
-    try {
-      //   const uploadImage = await getUrlUploadImageToS3(s3Data);
-      //   close();
-      //   const formData = new FormData($form);
-      //   formData.append(AddGameFormFields.imageUrl, `${uploadImage.fileName}`);
+    const $form = e.currentTarget;
+    const formData = new FormData($form);
+    // add images to the form
+    allImages.forEach((image, index) => {
+      formData.append(`${AddGameFormFields.gamePicBlob}$${index}`, image);
+    });
 
-      const $form = e.currentTarget;
-      const formData = new FormData($form);
-      // add images to the form
-      allImages.forEach((image, index) => {
-        formData.append(`${AddGameFormFields.gamePicBlob}$${index}`, image);
-      });
-
-      submit(formData, {
-        method: "post",
-        encType: "multipart/form-data",
-        action: "/admin/addGame",
-      });
-    } catch (err) {
-      console.log(error);
-      setIsS3UploadComplete(true);
-      throw new Response(null, {
-        status: 500,
-        statusText: "internal server error, failed to upload image",
-      });
-    }
+    submit(formData, {
+      method: "post",
+      encType: "multipart/form-data",
+      action: "/admin/addGame",
+    });
   };
   const handleAddGame = () => {
-    const mappedPlatormArray = formPlatformFields.map((platformData) => ({
+    // check user inputs
+    setError(undefined);
+    if (!gamePlatformList.length) {
+      setError({
+        [AddGameFormFields.platformName]:
+          "platform name and release date cannot be empty",
+      });
+      return;
+    }
+    if (!gameName.length) {
+      setError({
+        [AddGameFormFields.gameName]: "Game name cannot be empty",
+      });
+      return;
+    }
+    if (gameDescription.length > 1000) {
+      setError({
+        [AddGameFormFields.gameDescription]:
+          "Please add description of 1000 charcters or less",
+      });
+      return;
+    }
+    const type = image?.type!;
+    // this functioon checks if the file submitted by the user is of valid type
+    const validPictureType = validFileType(type);
+    if (!validPictureType.isValid) {
+      setError({
+        [AddGameFormFields.gamePicBlob]:
+          "please upload correct image type of jpeg or png",
+      });
+      return;
+    }
+    // add all the data to the form
+    const mappedPlatormArray = gamePlatformList.map((platformData) => ({
       ...platformData,
       [AddGameFormFields.platformIdNameReleaseDate]: `${platformData.platformId}$${platformData.platformName}$${platformData.releaseDate}`,
     }));
-    const formInputVal: formObject = {
+    const formInputVal: AddGameFormObjClient = {
       constructedUrl: imageUrl,
       [AddGameFormFields.gameName]: gameName,
       [AddGameFormFields.gameDescription]: gameDescription,
       [AddGameFormFields.gamePicBlob]: image,
       [AddGameFormFields.platformArray]: mappedPlatormArray,
     };
+    // setInput fields to default
     setAllImages((prev) => [...prev, image!]);
     setFormInput((prev) => [...prev, formInputVal]);
+    setGameName("");
+    setGameDescription("");
+    setImage(null);
+    setGamePlatformList([]);
   };
+
   const handleDeleteGame = (index: number) => {
+    // delet from images
     const filteredImages = allImages.filter((images, i) => i !== index);
+    // delete from form
     const filterFormInput = formInput.filter((item, i) => i !== index);
     setAllImages([...filteredImages]);
     setFormInput([...filterFormInput]);
   };
+  // props for components
   const platformInputProps = {
     platforms,
-    formPlatformFields,
-    setFormPlatformFields,
+    gamePlatformList,
+    setGamePlatformList,
     error,
     actionData,
     setError,
   };
-  const platformListProps = {
-    formPlatformFields,
-    setFormPlatformFields,
+  const gameSpecificPlatformList = {
+    gamePlatformList,
+    setGamePlatformList,
   };
-  const formFieldsAddGame = {
+  const addGameUserInput = {
     gameName,
     setGameName,
     gameDescription,
@@ -356,6 +325,8 @@ const AddGame: React.FC = () => {
     actionData,
     error,
     handleAddGame,
+    imageUrl,
+    setImageUrl,
   };
 
   return (
@@ -378,136 +349,34 @@ const AddGame: React.FC = () => {
         </Card.Section>
       </Card>
       <Form method="post" action="/admin/addGame" onSubmit={onSubmit}>
-        {formPlatformFields.length ? (
+        {gamePlatformList.length ? (
           <Card>
             <Card shadow="sm" radius="md" withBorder>
-              <AddGamePlatformList {...platformListProps} />
+              <GameSpecificPlatformList {...gameSpecificPlatformList} />
             </Card>
-            <FormFieldsAddGame {...formFieldsAddGame} />
+            <AddGameUserInput {...addGameUserInput} />
           </Card>
         ) : (
           <>
-            <FormFieldsAddGame {...formFieldsAddGame} />{" "}
+            <AddGameUserInput {...addGameUserInput} />{" "}
           </>
         )}
         {formInput.length ? (
-          formInput.map((item, index) => {
-            return (
-              <Card shadow="sm" radius="md" mt="sm" withBorder key={index}>
-                <Card.Section inheritPadding py="sm" withBorder>
-                  <Group position="apart">
-                    <Title order={4}>
-                      {index + 1} - {item.gameName}
-                    </Title>
-                    <IconTrash
-                      style={{ cursor: "grab" }}
-                      onClick={() => {
-                        handleDeleteGame(index);
-                      }}
-                    />
-                  </Group>
-                </Card.Section>
-                <Card shadow="sm" mt="sm" mx="xl" radius="md" withBorder>
-                  <Grid>
-                    <Grid.Col span={"auto"}>
-                      <Title order={5}>Platform Name</Title>
-                    </Grid.Col>
-                    <Grid.Col span={"auto"}>
-                      {" "}
-                      <Title order={5}>Release Date</Title>
-                    </Grid.Col>
-                  </Grid>
-                  {item.platformArray.map((formValues, i) => (
-                    <React.Fragment key={formValues.platformId}>
-                      <Divider my="sm" />
-                      <input
-                        value={`${formValues.platformId}$${formValues.platformName}$${formValues.releaseDate}$${index}`}
-                        type="hidden"
-                        name={`${AddGameFormFields.platformIdNameReleaseDate}$${index}`}
-                        readOnly
-                      ></input>
-                      <Grid>
-                        <Grid.Col span={"auto"}>
-                          <Input
-                            variant="unstyled"
-                            value={formValues.platformName}
-                            readOnly
-                          ></Input>
-                        </Grid.Col>
-                        <Grid.Col span={"auto"}>
-                          <Input
-                            variant="unstyled"
-                            value={formatDate(formValues.releaseDate)}
-                            readOnly
-                          ></Input>
-                        </Grid.Col>
-                      </Grid>
-                    </React.Fragment>
-                  ))}
-                </Card>
-                <Text pt="xs">
-                  <Text span weight={"bold"}>
-                    name:{" "}
-                  </Text>
-                  {item.gameName}
-                </Text>
-                <Text pt="xs">
-                  <Text span weight={"bold"}>
-                    description:{" "}
-                  </Text>
-                  {item.gameDescription}
-                </Text>
-                <Image
-                  mt="md"
-                  maw={240}
-                  withPlaceholder
-                  radius="md"
-                  src={item.constructedUrl}
-                  alt="game image"
-                />
-                <FileInput
-                  mt="xs"
-                  style={{ width: "40%" }}
-                  accept="image/*"
-                  disabled
-                  value={item.gamePicBlob}
-                />
-                <input
-                  hidden={true}
-                  value={item.gameName}
-                  readOnly
-                  name={`${AddGameFormFields.gameName}$${index}`}
-                ></input>
-                <input
-                  hidden={true}
-                  readOnly
-                  value={item.gameDescription}
-                  name={`${AddGameFormFields.gameDescription}$${index}`}
-                ></input>
-              </Card>
-            );
-          })
-        ) : (
-          <></>
-        )}
-        {formInput.length ? (
-          <Group mt="sm" position="center">
-            <Button size="lg" type="submit">
-              Submit
-            </Button>
-          </Group>
+          <>
+            <AddGameFormDataDisplayCard
+              handleDeleteGame={handleDeleteGame}
+              formInput={formInput}
+            />
+            <Group mt="sm" position="center">
+              <Button size="lg" type="submit">
+                Submit
+              </Button>
+            </Group>
+          </>
         ) : (
           <></>
         )}
       </Form>
-      <Modal
-        opened={opened}
-        onClose={close}
-        title="Submitting Image to S3 for upload"
-        centered
-      >
-        <Loader></Loader>
-      </Modal>
     </>
   );
 };

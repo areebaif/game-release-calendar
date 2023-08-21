@@ -2,7 +2,7 @@ import * as React from "react";
 import { z } from "zod";
 import { json, redirect } from "@remix-run/node";
 import type { ActionArgs } from "@remix-run/node";
-import { UserType } from "@prisma/client";
+import { UserType, Prisma } from "@prisma/client";
 import {
   Form,
   useActionData,
@@ -107,6 +107,16 @@ export const action = async ({ request }: ActionArgs) => {
     };
   } catch (err) {
     console.log(err);
+    if (err instanceof Prisma.PrismaClientKnownRequestError) {
+      if (err.code === "P2002") {
+        errors.userName =
+          "There is a unique constraint violation, a username cannot be created with this username or email";
+        return json({ errors: errors });
+      }
+      errors.userName =
+        "something went wrong with the database, please try again later.";
+      return json({ errors: errors });
+    }
     throw new Response(null, {
       status: 500,
       statusText: "internal server error, failed to create create",

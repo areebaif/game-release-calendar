@@ -128,8 +128,14 @@ export const AddGameUserInput: React.FC<AddGameUserInputProps> = ({
           setImageUrl(URL.createObjectURL(e!));
         }}
       />
-      {error?.gamePicBlob ? (
-        <ErrorCard errorMessage={"please upload image type jpeg or png"} />
+      {actionData?.errors?.gamePicBlob || error?.gamePicBlob ? (
+        <ErrorCard
+          errorMessage={
+            actionData?.errors?.gamePicBlob
+              ? actionData?.errors?.gamePicBlob
+              : error?.gamePicBlob
+          }
+        />
       ) : (
         <></>
       )}

@@ -29,6 +29,36 @@ export const dbCreateGame = async (data: DbAddGame) => {
   });
 };
 
+export const dbCreateMultipleGames = async (games: {
+  [key: string]: DbAddGame;
+}) => {
+  const gamePromises = [];
+  for (const property in games) {
+    const { title, description, platform, imageUrl } = games[property];
+    const parsedPlatforms = platform.map((platform) => {
+      return {
+        gamePlatformId: platform.platformId,
+        releaseDate: platform.releaseDate,
+      };
+    });
+
+    const game = db.game.create({
+      data: {
+        title: title,
+        description: description,
+        imageUrl: imageUrl,
+        gameMetaData: {
+          createMany: {
+            data: parsedPlatforms,
+          },
+        },
+      },
+    });
+    gamePromises.push(game);
+  }
+  await db.$transaction([...gamePromises]);
+};
+
 export const dbEditGame = async (data: DbEditGame) => {
   const { title, description, platform, gameId } = data;
   const parsedPlatforms = platform.map((platform) => {

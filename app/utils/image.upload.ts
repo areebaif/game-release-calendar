@@ -1,67 +1,46 @@
-import { validFileType, ImageUploadApiZod } from ".";
-import { ImageUploadApi, s3FormFields } from "./types";
+import { DbAddGame } from "./types";
+import { s3Client } from ".";
+import { PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { v4 as uuidv4 } from "uuid";
 
-export const getSignedUrl = async (fileType: string) => {
-  const testFileType = validFileType(fileType);
-  if (!testFileType.isValid) {
-    throw new Response(null, {
-      status: 400,
-      statusText: "invalid file type provided",
-    });
-  }
-  const s3FormData = new FormData();
-  s3FormData.append(s3FormFields.fileType, fileType);
-  const response = await fetch(`/admin/s3url`, {
-    method: "POST",
-    body: s3FormData,
-  });
+export const uploadImagesToS3 = (games: { [key: string]: DbAddGame }) => {
+  const imagePromises = [];
+  for (const property in games) {
+    const image = games[property].imageBlob;
+    const stringArray = games[property].imageType.split("/");
+    const parsedFileExt = stringArray[1];
+    const imageKey =
+      process.env.NODE_ENV === "production"
+        ? `game/${uuidv4()}.${parsedFileExt}`
+        : `dev/${uuidv4()}.${parsedFileExt}`;
 
-  if (!response.ok) {
-    throw new Response(null, {
-      status: 500,
-      statusText: "internal server error, failed to upload image",
-    });
+    games[property].imageUrl = imageKey;
+    imagePromises.push(uploadToS3(image, imageKey, games[property].imageType));
   }
-  const res: ImageUploadApi = await response.json();
-  const parseResponse = ImageUploadApiZod.safeParse(res);
-  if (!parseResponse.success) {
-    console.log(parseResponse.error);
-    throw new Response(null, {
-      status: 500,
-      statusText: "internal server error, type incompatibility",
-    });
-  }
-  return res;
+  return imagePromises;
 };
 
-export const uploadToS3 = async (
-  pictureBlob: File,
-  fileType: string,
-  preSignedURL: string
-) => {
-  const response = await fetch(preSignedURL, {
-    method: "PUT",
-    headers: { contentType: fileType },
-    body: pictureBlob,
-  });
+const uploadToS3 = (image: Buffer, imageKey: string, imageType: string) => {
+  const s3Params = {
+    Bucket: process.env.BUCKET_NAME,
+    Body: image,
+    Key: imageKey,
+    ContentType: imageType,
+  };
 
-  if (!response.ok)
-    throw new Response(null, {
-      status: 500,
-      statusText: " internal server error, failed to upload image",
-    });
-  return response.ok;
+  const command = new PutObjectCommand(s3Params);
+  return s3Client.send(command);
 };
 
-type getUrlUploadImage = {
-  fileType: string;
-  image: File;
-};
-
-export const getUrlUploadImageToS3 = async (data: getUrlUploadImage) => {
-  const { fileType, image } = data;
-  const signedUrl = await getSignedUrl(fileType);
-
-  const uploadS3 = await uploadToS3(image, fileType, signedUrl.signedUrl);
-  return { fileName: signedUrl.fileName };
+export const deleteImagesFromS3 = (games: { [key: string]: DbAddGame }) => {
+  const deleteFromS3 = [];
+  for (const property in games) {
+    const s3Params = {
+      Bucket: process.env.BUCKET_NAME,
+      Key: games[property].imageUrl,
+    };
+    const command = new DeleteObjectCommand(s3Params);
+    deleteFromS3.push(s3Client.send(command));
+  }
+  return deleteFromS3;
 };

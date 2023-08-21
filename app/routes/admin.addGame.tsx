@@ -6,44 +6,29 @@ import {
   useSubmit,
   useActionData,
 } from "@remix-run/react";
-import { IconTrash, IconUpload } from "@tabler/icons-react";
 import { redirect, json, Response } from "@remix-run/node";
-import { DeleteObjectCommand } from "@aws-sdk/client-s3";
-import { formatDate } from "~/utils";
-import {
-  Button,
-  Card,
-  Loader,
-  Modal,
-  Title,
-  Group,
-  FileInput,
-  Text,
-  Image,
-  Grid,
-  Divider,
-  Input,
-} from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
+import { Prisma } from "@prisma/client";
+import { deleteImagesFromS3, uploadImagesToS3 } from "~/utils";
+import { Button, Card, Loader, Title, Group } from "@mantine/core";
 // type imports
 import type { ActionArgs, TypedResponse } from "@remix-run/node";
 // local imports
-import { AddGameFormObjClient, AddGameFormDataDisplayCard } from "~/components";
 import {
   PlatformInput,
   ErrorCard,
   AddGameUserInput,
   GameSpecificPlatformList,
+  AddGameFormObjClient,
+  AddGameFormDataDisplayCard,
 } from "~/components";
 import {
   db,
-  dbCreateGame,
-  validFileType,
-  getUrlUploadImageToS3,
-  s3Client,
   GamePlatformZod,
   ErrorAddGameFormFieldsZod,
   requireAdminUser,
+  validImageSizeZod,
+  validImageTypeZod,
+  dbCreateMultipleGames,
 } from "~/utils";
 // type imports
 import {
@@ -52,7 +37,6 @@ import {
   ErrorAddGameFormFields,
   DbAddGame,
   AddGameFormFields,
-  AddPlatformFormFields,
 } from "~/utils/types";
 
 export const loader = async ({ request }: ActionArgs) => {
@@ -77,110 +61,170 @@ export const action = async ({
 }: ActionArgs): Promise<ErrorAddGameFormFields | TypedResponse> => {
   const user = await requireAdminUser({ request });
   if (!user) return redirect("/");
+
   const form = await request.formData();
-  const addToDb: DbAddGame = {
-    platform: [],
-    title: "",
-    description: "",
-    imageUrl: "",
-  };
+  const games: { [key: string]: DbAddGame } = {};
   const errors: ErrorAddGameFormFields = {};
-  console.log(form);
+
   try {
     for (const pair of form.entries()) {
-      console.log(pair, " Hi this is a test");
+      switch (true) {
+        case pair[0].includes(AddGameFormFields.platformIdNameReleaseDate):
+          const splitField = pair[0].split("$");
+          const [field, gameIndex] = splitField;
+          const value = pair[1];
+          if (typeof value !== "string")
+            errors.platformName = "type mismatch please enter value as string";
+          // this is value split
+          const parseFormValue = value as string;
+          const splitFormValue = parseFormValue.split("$");
+          const [platformId, platformName, releaseDate] = splitFormValue;
+
+          if (!platformName.length)
+            errors.platformName = "please provide a value for platform name";
+
+          if (!releaseDate.length)
+            errors.releaseDate =
+              "please provide value for platform release date";
+          const platform = {
+            platformId,
+            platformName,
+            releaseDate,
+          };
+          if (!games[gameIndex]) {
+            games[gameIndex] = {
+              platform: [platform],
+              title: "",
+              description: "",
+              imageUrl: "",
+              imageBlob: undefined,
+              imageType: "",
+            };
+          } else {
+            games[gameIndex].platform.push(platform);
+          }
+          break;
+        case pair[0].includes(AddGameFormFields.gameName):
+          const splitNameField = pair[0].split("$");
+          const [nameField, index] = splitNameField;
+          // type checking
+          const gameNameVal = pair[1];
+          if (typeof gameNameVal !== "string" || gameNameVal.length === 0)
+            errors.gameName =
+              "please submit game name as string and this fields cannot be empty";
+          const gameName = gameNameVal as string;
+          const nameExists = await db.game.findUnique({
+            where: { title: gameName },
+          });
+          if (nameExists?.id) {
+            errors.gameName =
+              "This is a unqiue contraint violation. The game name already exists in the system. ou cannot use this name again.";
+          }
+          if (!games[index]) {
+            games[index] = {
+              platform: [],
+              title: gameName,
+              description: "",
+              imageUrl: "",
+              imageBlob: undefined,
+              imageType: "",
+            };
+          } else {
+            games[index].title = gameName;
+          }
+          break;
+        case pair[0].includes(AddGameFormFields.gameDescription):
+          const splitDescField = pair[0].split("$");
+          const [descriptionField, gIndex] = splitDescField;
+          const descriptionVal = pair[1];
+          if (
+            typeof descriptionVal !== "string" ||
+            descriptionVal.length > 1000
+          )
+            errors.gameDescription =
+              "please submit description as string and character length cannot exceed 1000";
+          if (!games[gIndex]) {
+            games[gIndex] = {
+              platform: [],
+              title: "",
+              description: descriptionVal as string,
+              imageUrl: "",
+              imageBlob: undefined,
+              imageType: "",
+            };
+          } else {
+            games[gIndex].description = descriptionVal as string;
+          }
+          break;
+        case pair[0].includes(AddGameFormFields.gamePicBlob):
+          const splitImageField = pair[0].split("$");
+          const [imageField, gamIndex] = splitImageField;
+          const imageBlob = pair[1] as Blob;
+          const validImageType = validImageTypeZod.safeParse(
+            imageBlob.type
+          ).success;
+          const validImageSize = validImageSizeZod.safeParse(
+            imageBlob.size
+          ).success;
+          if (!validImageType || !validImageSize) {
+            errors.gamePicBlob =
+              " please upload image of type image/png, image/jpeg and image size can not exceed 3mb ";
+          }
+          // There is a check after all switch statements to show errors for all fields, but we are making an exception here since
+          // connverting file to buffer is relatively an expensive operation and we want to return early if there is an error with image type and size before we do any conversions.
+          if (errors.gamePicBlob) {
+            return json({ errors: errors });
+          }
+          const bytesArray = await imageBlob.arrayBuffer();
+          const imageBuffer = Buffer.from(bytesArray);
+          if (!games[gamIndex]) {
+            games[gamIndex] = {
+              platform: [],
+              title: "",
+              description: "",
+              imageUrl: "",
+              imageBlob: imageBuffer,
+              imageType: imageBlob.type,
+            };
+          } else {
+            games[gamIndex].imageBlob = imageBuffer;
+            games[gamIndex].imageType = imageBlob.type;
+          }
+          break;
+        default:
+          errors.generalError =
+            "you have submitted a form field that backedn does not recognize";
+      }
     }
-    // for (const pair of form.entries()) {
-    //   switch (true) {
-    //     case pair[0] === AddGameFormFields.platformIdNameReleaseDate:
-    //       const value = pair[1];
-    //       if (typeof value !== "string")
-    //         errors.platformName = "type mismatch please enter value as string";
-
-    //       const parseFormValue = value as string;
-
-    //       const splitFormValue = parseFormValue.split("$");
-
-    //       const [platformId, platformName, releaseDate] = splitFormValue;
-
-    //       if (!platformName.length)
-    //         errors.platformName = "please provide a value for platform name";
-
-    //       if (!releaseDate.length)
-    //         errors.releaseDate =
-    //           "please provide value for platform release date";
-
-    //       const platform = {
-    //         platformId,
-    //         platformName,
-    //         releaseDate,
-    //       };
-    //       addToDb.platform.push(platform);
-    //       break;
-    //     case pair[0] === AddGameFormFields.gameName:
-    //       // type checking
-    //       const gameNameVal = pair[1];
-
-    //       if (typeof gameNameVal !== "string" || gameNameVal.length === 0)
-    //         errors.gameName =
-    //           "please submit game name as string and this fields cannot be empty";
-
-    //       const gameName = gameNameVal as string;
-
-    //       addToDb.title = gameName;
-    //       break;
-    //     case pair[0] === AddGameFormFields.gameDescription:
-    //       // type checking
-
-    //       const descriptionVal = pair[1];
-    //       if (
-    //         typeof descriptionVal !== "string" ||
-    //         descriptionVal.length > 1000
-    //       )
-    //         errors.gameDescription =
-    //           "please submit description as string and character length cannot exceed 1000";
-    //       addToDb.description = descriptionVal as string;
-    //       break;
-    //     case pair[0] === AddGameFormFields.imageUrl:
-    //       const imageUrlVal = pair[1] as string;
-    //       addToDb.imageUrl = imageUrlVal;
-    //       break;
-    //     default:
-    //       throw new Response(null, {
-    //         status: 400,
-    //         statusText:
-    //           "You have submitted a form field that is not supported by the backend",
-    //       });
-    //   }
-    // }
-    // const hasError = Object.values(errors).some((errorMessage) =>
-    //   errorMessage?.length ? true : false
-    // );
-    // if (hasError) return json({ errors: errors });
-    // // start adding values to the db
-    // await dbCreateGame(addToDb);
-    // return redirect(`/admin`);
+    const hasError = Object.values(errors).some((errorMessage) =>
+      errorMessage?.length ? true : false
+    );
+    if (hasError) return json({ errors: errors });
+    // this uploadImage function also sets the url of the images to be added to database
+    const imagePromises = uploadImagesToS3(games);
+    await Promise.all(imagePromises);
+    // the games are uploaded in a transaction lock, hence either entire operation will succeed or fail.
+    // We are doing these in a lock because if any game upload to db fails then we have to roll back image upload to s3 aswell
+    await dbCreateMultipleGames(games);
+    return redirect(`/admin`);
   } catch (err) {
     console.log(err);
-    // delete aws image if for any reason this code fails, otherwise you will have an image stored in s3 without corresponding database image url
-    const s3Params = {
-      Bucket: process.env.BUCKET_NAME,
-      Key: addToDb.imageUrl,
-    };
-    const command = new DeleteObjectCommand(s3Params);
-    try {
-      const response = await s3Client.send(command);
-      throw new Response(null, {
-        status: 500,
-        statusText: "Internal Server Error, Please try again",
-      });
-    } catch (err) {
-      // This error happens while deleteing s3 object
-      console.log(err);
-      throw new Response(null, {
-        status: 500,
-        statusText: "Internal Server Error, Please try again",
-      });
+    if (err instanceof Prisma.PrismaClientKnownRequestError) {
+      // for any reason prisma operation fails I have to roll back s3 image uploads
+      try {
+        const deleteImagesPromises = deleteImagesFromS3(games);
+        await Promise.all(deleteImagesPromises);
+        // TODO: again needs to be a general error
+        errors.gameName =
+          "something went wrong with the database, please try again later.";
+        return json({ errors: errors });
+      } catch (err) {
+        // This error happens while deleteing s3 object
+        console.log(err);
+        errors.gamePicBlob =
+          "something went wrong with the database, please try again later.";
+        return json({ errors: errors });
+      }
     }
   }
 };
@@ -201,7 +245,9 @@ const AddGame: React.FC = () => {
   // we need the imageUrl to display a thumbnail of image
   const [imageUrl, setImageUrl] = React.useState<string>("");
   const [allImages, setAllImages] = React.useState<File[]>([]);
-  const [formInput, setFormInput] = React.useState<AddGameFormObjClient[]>([]);
+  const [allFormFields, setAllFormFields] = React.useState<
+    AddGameFormObjClient[]
+  >([]);
   const [error, setError] = React.useState<ErrorAddGameFormFields>();
 
   // Type checks: check if the server is sending correct values
@@ -210,15 +256,24 @@ const AddGame: React.FC = () => {
     actionData?.errors
   );
 
-  if (!parsePlatform.success || !serverPostError.success) {
+  if (
+    !parsePlatform.success ||
+    !serverPostError.success ||
+    actionData?.errors?.generalError
+  ) {
+    const generalError = actionData?.errors?.generalError;
     !parsePlatform.success
       ? console.log(parsePlatform.error)
       : !serverPostError.success
       ? console.log(serverPostError.error)
-      : undefined;
+      : console.log(generalError);
     return (
       <ErrorCard
-        errorMessage={"something went wrong with the server please try again"}
+        errorMessage={
+          generalError
+            ? generalError
+            : "something went wrong with the server please try again"
+        }
       />
     );
   }
@@ -229,11 +284,9 @@ const AddGame: React.FC = () => {
     e.preventDefault();
     const $form = e.currentTarget;
     const formData = new FormData($form);
-    // add images to the form
     allImages.forEach((image, index) => {
       formData.append(`${AddGameFormFields.gamePicBlob}$${index}`, image);
     });
-
     submit(formData, {
       method: "post",
       encType: "multipart/form-data",
@@ -263,10 +316,9 @@ const AddGame: React.FC = () => {
       });
       return;
     }
-    const type = image?.type!;
-    // this functioon checks if the file submitted by the user is of valid type
-    const validPictureType = validFileType(type);
-    if (!validPictureType.isValid) {
+    const validImageType = validImageTypeZod.safeParse(image?.type).success;
+    const validImageSize = validImageSizeZod.safeParse(image?.size).success;
+    if (!validImageType || !validImageSize) {
       setError({
         [AddGameFormFields.gamePicBlob]:
           "please upload correct image type of jpeg or png",
@@ -287,7 +339,7 @@ const AddGame: React.FC = () => {
     };
     // setInput fields to default
     setAllImages((prev) => [...prev, image!]);
-    setFormInput((prev) => [...prev, formInputVal]);
+    setAllFormFields((prev) => [...prev, formInputVal]);
     setGameName("");
     setGameDescription("");
     setImage(null);
@@ -298,9 +350,9 @@ const AddGame: React.FC = () => {
     // delet from images
     const filteredImages = allImages.filter((images, i) => i !== index);
     // delete from form
-    const filterFormInput = formInput.filter((item, i) => i !== index);
+    const filterFormInput = allFormFields.filter((item, i) => i !== index);
     setAllImages([...filteredImages]);
-    setFormInput([...filterFormInput]);
+    setAllFormFields([...filterFormInput]);
   };
   // props for components
   const platformInputProps = {
@@ -361,11 +413,11 @@ const AddGame: React.FC = () => {
             <AddGameUserInput {...addGameUserInput} />{" "}
           </>
         )}
-        {formInput.length ? (
+        {allFormFields.length ? (
           <>
             <AddGameFormDataDisplayCard
               handleDeleteGame={handleDeleteGame}
-              formInput={formInput}
+              formInput={allFormFields}
             />
             <Group mt="sm" position="center">
               <Button size="lg" type="submit">

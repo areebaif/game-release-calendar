@@ -1,12 +1,15 @@
 import * as React from "react";
 import { json } from "@remix-run/node";
-import { getCurrentMonthGame } from "~/utils";
+import { dbGetCurrentMonthGames, DbReadGameMetaDataZod } from "~/utils";
+import { List } from "@mantine/core";
+import { Link } from "@remix-run/react";
+import { ErrorCard, GameCard } from "~/components";
+import { DbReadGameMetaData } from "~/utils/types";
 import { useLoaderData } from "@remix-run/react";
 
 export const loader = async () => {
   try {
-    console.log(" I ma here s");
-    const allGamesMetaData = await getCurrentMonthGame();
+    const allGamesMetaData = await dbGetCurrentMonthGames();
     return json(allGamesMetaData);
   } catch (err) {
     console.log(err);
@@ -18,9 +21,32 @@ export const loader = async () => {
 };
 
 const CurrentMonth: React.FC = () => {
-  const currentMonthGame = useLoaderData();
-  console.log(currentMonthGame, "slslslsl");
-  return <div>I navigated</div>;
+  const currentMonthGame = useLoaderData<DbReadGameMetaData[]>();
+  if (!currentMonthGame.length) {
+    return <div>no data to display</div>;
+  }
+  const zodParseGameMetaData = DbReadGameMetaDataZod.safeParse(
+    currentMonthGame[0]
+  );
+  if (!zodParseGameMetaData.success) {
+    console.log(zodParseGameMetaData.error);
+    return (
+      <ErrorCard errorMessage="something went wrong with the server please try again" />
+    );
+  }
+  return (
+    <List icon={" "}>
+      {currentMonthGame?.map((gameItem) => {
+        return (
+          <List.Item key={gameItem.game.gameId}>
+            <Link to={`/game/${gameItem.game.gameId}`}>
+              <GameCard gameItem={gameItem} />
+            </Link>
+          </List.Item>
+        );
+      })}
+    </List>
+  );
 };
 
 export default CurrentMonth;

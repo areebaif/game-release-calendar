@@ -33,7 +33,7 @@ export const GameIndexRoute: React.FC = () => {
       <ErrorCard errorMessage="something went wrong with the server please try again" />
     );
   }
-  // TODO: add link to open a game separately
+
   return (
     <List icon={" "}>
       {loaderdata?.map((gameItem) => {

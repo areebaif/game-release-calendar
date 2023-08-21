@@ -1,5 +1,5 @@
 import { db } from "./db.server";
-import { formatDate } from "./dayjs.date";
+import { formatDate, getNewDateAddMonth, getEndOfMonth } from "./dayjs.date";
 import { s3Client } from "./awsS3Client.server";
 
 import {
@@ -30,7 +30,7 @@ import {
   dbCreateGame,
   dbGetGameDataById,
   dbDeleteGameById,
-  getCurrentMonthGame,
+  dbGetCurrentMonthGames,
   dbCreateMultipleGames,
 } from "./db.server.crud";
 import {
@@ -72,10 +72,12 @@ export {
   sendCredentialsEmail,
   ErrorRegisterUserFormFieldsZod,
   CredentialEmailZod,
-  getCurrentMonthGame,
   uploadImagesToS3,
   deleteImagesFromS3,
   validImageSizeZod,
   validImageTypeZod,
   dbCreateMultipleGames,
+  dbGetCurrentMonthGames,
+  getNewDateAddMonth,
+  getEndOfMonth,
 };

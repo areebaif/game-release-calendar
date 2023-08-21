@@ -3,7 +3,7 @@ import { UserType } from "@prisma/client";
 import { db } from "./db.server";
 import { DbAddGame, DbReadGameMetaData, DbEditGame } from "./types";
 import { saltRounds } from "./session.server";
-import { s3Client } from "~/utils";
+import { getEndOfMonth, s3Client } from "~/utils";
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 
 export const dbCreateGame = async (data: DbAddGame) => {
@@ -190,7 +190,76 @@ export const dbGetAllGamesData = async () => {
     }
     return result.push({ game, platform: [platform] });
   });
-  return result;
+  const gamesSortedByDate = [...result];
+  gamesSortedByDate.sort((a, b) => {
+    const date1: any = new Date(a.platform[0].releaseDate);
+    const date2: any = new Date(b.platform[0].releaseDate);
+
+    return date1 - date2;
+  });
+
+  return gamesSortedByDate;
+};
+
+export const dbGetCurrentMonthGames = async () => {
+  const currentDate = new Date();
+  const endOfMonth = getEndOfMonth();
+  const gameMetaData = await db.gameMetaData.findMany({
+    where: {
+      AND: [
+        {
+          releaseDate: {
+            gte: currentDate.toISOString(),
+          },
+        },
+        { releaseDate: { lte: endOfMonth.toISOString() } },
+      ],
+    },
+    orderBy: {
+      gameId: "asc",
+    },
+    include: {
+      game: {
+        select: {
+          title: true,
+          imageUrl: true,
+          description: true,
+        },
+      },
+      GamePlatform: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+  });
+  const result: DbReadGameMetaData[] = [];
+  gameMetaData.forEach((gameItem, index) => {
+    const game: DbReadGameMetaData["game"] = {
+      ...gameItem.game,
+      gameId: gameItem.gameId,
+    };
+    const platform: DbReadGameMetaData["platform"][0] = {
+      platformId: gameItem.GamePlatform.id,
+      platformName: gameItem.GamePlatform.name,
+      releaseDate: new Date(`${gameItem.releaseDate}`).toISOString(),
+    };
+    if (index !== 0 && gameItem.gameId === gameMetaData[index - 1].gameId) {
+      result[result.length - 1].platform.push(platform);
+      return;
+    }
+    return result.push({ game, platform: [platform] });
+  });
+  const gamesSortedByDate = [...result];
+  gamesSortedByDate.sort((a, b) => {
+    const date1: any = new Date(a.platform[0].releaseDate);
+    const date2: any = new Date(b.platform[0].releaseDate);
+
+    return date1 - date2;
+  });
+
+  return gamesSortedByDate;
 };
 
 export const dbGetGameDataById = async (gameId: string) => {

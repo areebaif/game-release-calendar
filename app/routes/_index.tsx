@@ -47,7 +47,7 @@ export default function Index() {
           <Link to="/game">View all games</Link>
         </li>
         <li>
-          <Link to="/game/current-month">current month games</Link>
+          <Link to="/game/current-month">view current month games</Link>
         </li>
         {!loaderData.user?.id ? (
           <li>
@@ -55,7 +55,7 @@ export default function Index() {
           </li>
         ) : (
           <li>
-            <Link to="/logout">logout</Link>
+            <Link to="/admin/logout">logout</Link>
           </li>
         )}
       </ul>

@@ -11,6 +11,8 @@ export const DbAddGameZod = z.object({
       releaseDate: z.string(),
     })
     .array(),
+  imageBlob: z.any(),
+  imageType: z.string(),
 });
 
 export const DbEditGameZod = z.object({

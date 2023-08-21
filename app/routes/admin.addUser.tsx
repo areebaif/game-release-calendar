@@ -1,7 +1,8 @@
 import * as React from "react";
+import { z } from "zod";
 import { json, redirect } from "@remix-run/node";
 import type { ActionArgs } from "@remix-run/node";
-import { UserType } from "@prisma/client";
+import { UserType, Prisma } from "@prisma/client";
 import {
   Form,
   useActionData,
@@ -10,9 +11,19 @@ import {
 } from "@remix-run/react";
 import { v4 as uuidv4 } from "uuid";
 import { useDisclosure } from "@mantine/hooks";
-import { Card, Button, Loader, Modal, Text } from "@mantine/core";
+import {
+  Card,
+  Button,
+  Loader,
+  Modal,
+  Text,
+  Title,
+  Group,
+  Grid,
+  Textarea,
+} from "@mantine/core";
 // local imports
-import { AddAdminUser, ErrorCard } from "~/components";
+import { AddUser, ErrorCard } from "~/components";
 import {
   dbCreateUser,
   dbGetUserByEmail,
@@ -21,6 +32,7 @@ import {
   ErrorRegisterUserFormFieldsZod,
   UserZod,
   sendCredentialsEmail,
+  CredentialEmailZod,
 } from "~/utils";
 import {
   ErrorRegisterUserFormFields,
@@ -83,7 +95,6 @@ export const action = async ({ request }: ActionArgs) => {
       userName: AddToDb.userName,
     };
     const emailSent = await sendCredentialsEmail(emailData);
-    console.log(emailSent, "hshshsh", password);
     return {
       user: {
         id: createUser.id,
@@ -96,6 +107,16 @@ export const action = async ({ request }: ActionArgs) => {
     };
   } catch (err) {
     console.log(err);
+    if (err instanceof Prisma.PrismaClientKnownRequestError) {
+      if (err.code === "P2002") {
+        errors.userName =
+          "There is a unique constraint violation, a username cannot be created with this username or email";
+        return json({ errors: errors });
+      }
+      errors.userName =
+        "something went wrong with the database, please try again later.";
+      return json({ errors: errors });
+    }
     throw new Response(null, {
       status: 500,
       statusText: "internal server error, failed to create create",
@@ -136,8 +157,15 @@ const RegisterAdminUser: React.FC = () => {
       setEmail("");
       formRef?.current?.reset();
       const typeCheckUser = UserZod.safeParse(actionData.user);
-      if (!typeCheckUser.success) {
-        console.log(typeCheckUser.error.issues);
+      const typeCheckEmail = CredentialEmailZod.safeParse(actionData.emailSent);
+      if (!typeCheckUser || !typeCheckEmail) {
+        console.log(
+          !typeCheckUser.success
+            ? typeCheckUser.error.issues
+            : !typeCheckEmail.success
+            ? typeCheckEmail.error.issues
+            : null
+        );
         setServerTypeCheckError(true);
       } else {
         // open the model with info of the user created
@@ -201,29 +229,69 @@ const RegisterAdminUser: React.FC = () => {
     actionData,
   };
   return (
-    <Card
-      shadow="sm"
-      p="lg"
-      radius="md"
-      withBorder
-      style={{
-        overflow: "inherit",
-        margin: "15px 0 0 0",
-      }}
-    >
-      <Card.Section inheritPadding py="md">
-        <Form ref={formRef} onSubmit={onSubmit}>
-          <AddAdminUser {...signupProps} />
-          <Button type="submit">Submit</Button>
-        </Form>
-      </Card.Section>
-      <Modal opened={isModalOpen} onClose={close} title="User Credentials">
-        <Text>{actionData?.emailSent.message}</Text>
-        <Text>userName: {actionData?.user.userName}</Text>
-        <Text>userType: {actionData?.user.userType}</Text>
-        <Text>userPassword: {actionData?.user.userPassword}</Text>
+    <>
+      <Card shadow="sm" p="xl" radius="md" withBorder>
+        <Card.Section withBorder inheritPadding py="xs">
+          {" "}
+          <Title order={3}>Add User</Title>
+        </Card.Section>
+        <Card.Section inheritPadding py="xs">
+          <Grid align={"stretch"}>
+            <Grid.Col span={2}>
+              <Textarea
+                defaultValue={
+                  " An email containing credentials will be sent to the user created."
+                }
+                readOnly
+                disabled
+                autosize
+                minRows={3}
+                mt="xl"
+              ></Textarea>
+            </Grid.Col>
+            <Grid.Col span={"auto"}>
+              {" "}
+              <Form ref={formRef} onSubmit={onSubmit}>
+                <AddUser {...signupProps} />
+                <Group position="center" mt="sm">
+                  <Button size="sm" type="submit">
+                    Submit
+                  </Button>
+                </Group>
+              </Form>
+            </Grid.Col>
+          </Grid>
+        </Card.Section>
+      </Card>
+      <Modal
+        centered
+        opened={isModalOpen}
+        withCloseButton={false}
+        onClose={close}
+      >
+        <Group position="center">
+          <Title order={4}>User Creation Status</Title>
+        </Group>
+        <Text>
+          <Text weight={"bold"}>Email status:</Text>{" "}
+          <Text>{actionData?.emailSent?.message}</Text>
+        </Text>
+        <Text>
+          <Text weight={"bold"}>User name:</Text>{" "}
+          <Text>{actionData?.user?.userName}</Text>
+        </Text>
+        <Text>
+          {" "}
+          <Text weight={"bold"}>User type:</Text>{" "}
+          <Text>{actionData?.user?.userType}</Text>
+        </Text>
+        <Text>
+          {" "}
+          <Text weight={"bold"}>User password:</Text>{" "}
+          <Text>{actionData?.user?.userPassword}</Text>
+        </Text>
       </Modal>
-    </Card>
+    </>
   );
 };
 

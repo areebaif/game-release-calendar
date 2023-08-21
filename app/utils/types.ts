@@ -1,15 +1,14 @@
 import { z } from "zod";
-import { UserType } from "@prisma/client";
+
 import {
   GamePlatformZod,
-  PlatformDropDwonListZod,
   formPlatformFieldsZod,
   ErrorAddGameFormFieldsZod,
   ErrorEditGameFormFieldsZod,
   ErrorDeleteGameFormFieldsZod,
 } from "./zod.Game";
 
-import { ImageUploadApiZod } from "./zod.imageUploadApi";
+
 import { ErrorAddPlatformFieldsZod } from "./zod.addPlatform";
 import {
   DbAddGameZod,
@@ -26,8 +25,6 @@ import {
 
 export type GamePlatform = z.infer<typeof GamePlatformZod>;
 export type FormPlatformFields = z.infer<typeof formPlatformFieldsZod>;
-export type PlatformDropDwonList = z.infer<typeof PlatformDropDwonListZod>;
-export type ImageUploadApi = z.infer<typeof ImageUploadApiZod>;
 export type ErrorAddGameFormFields = z.infer<typeof ErrorAddGameFormFieldsZod>;
 export type ErrorAddPlatformFields = z.infer<typeof ErrorAddPlatformFieldsZod>;
 export type DbAddGame = z.infer<typeof DbAddGameZod>;
@@ -54,6 +51,7 @@ export enum AddGameFormFields {
   gameDescription = "gameDescription",
   gamePicBlob = "gamePicBlob",
   imageUrl = "imageUrl",
+  platformArray = "platformArray",
 }
 
 export enum EditGameFormFields {
@@ -74,9 +72,7 @@ export enum AddPlatformFormFields {
   name = "name",
 }
 
-export enum s3FormFields {
-  fileType = "fileType",
-}
+
 
 export enum LoginFormFields {
   emailUserName = "emailUserName",

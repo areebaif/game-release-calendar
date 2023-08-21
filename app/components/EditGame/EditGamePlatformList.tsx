@@ -4,22 +4,22 @@ import { FormPlatformFields, EditGameFormFields } from "~/utils/types";
 import { formatDate } from "~/utils";
 
 export type EditGamePlatformListProps = {
-  formPlatformFields: FormPlatformFields[];
-  setFormPlatformFields: (data: FormPlatformFields[]) => void;
+  gamePlatformList: FormPlatformFields[];
+  setGamePlatformList: (data: FormPlatformFields[]) => void;
 };
 
 export const EditGamePlatformList: React.FC<EditGamePlatformListProps> = ({
-  formPlatformFields,
-  setFormPlatformFields,
+  gamePlatformList,
+  setGamePlatformList,
 }) => {
   const onRemoveField = (id: string) => {
-    setFormPlatformFields(
-      formPlatformFields.filter((fields) => fields.platformId !== id)
+    setGamePlatformList(
+      gamePlatformList.filter((fields) => fields.platformId !== id)
     );
   };
   return (
     <>
-      {formPlatformFields.length ? (
+      {gamePlatformList.length ? (
         <>
           <Divider my="sm" />
           <Grid>
@@ -35,7 +35,7 @@ export const EditGamePlatformList: React.FC<EditGamePlatformListProps> = ({
               <Title order={5}>Delete</Title>
             </Grid.Col>
           </Grid>
-          {formPlatformFields.map((formValues, index) => (
+          {gamePlatformList.map((formValues, index) => (
             <React.Fragment key={index}>
               <Input
                 variant="unstyled"

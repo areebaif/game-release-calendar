@@ -14,15 +14,6 @@ export const formPlatformFieldsZod = z.object({
   releaseDate: z.string(),
 });
 
-export const PlatformDropDwonListZod = z.object({
-  value: z.string(),
-  label: z.string(),
-  id: z.string().uuid(),
-  name: z.string(),
-  createdAt: z.string().optional(),
-  updatedAt: z.string().optional(),
-});
-
 export const ErrorAddGameFormFieldsZod = z
   .object({
     [AddGameFormFields.platformName]: z.string().optional(),
@@ -33,6 +24,7 @@ export const ErrorAddGameFormFieldsZod = z
     [AddGameFormFields.imageUrl]: z.string().optional(),
     [AddGameFormFields.gamePicBlob]: z.string().optional(),
     [AddGameFormFields.platformIdNameReleaseDate]: z.string().optional(),
+    generalError: z.string().optional(),
   })
   .optional();
 
@@ -54,3 +46,13 @@ export const ErrorDeleteGameFormFieldsZod = z
   })
   .optional();
 
+export const validImageTypeZod = z
+  .string()
+  .refine(
+    (imageType) => ["image/jpeg", "image/jpg", "image/png"].includes(imageType),
+    {
+      message: "String can't be more than 255 characters",
+    }
+  );
+
+export const validImageSizeZod = z.number().lte(3000000);

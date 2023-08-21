@@ -7,6 +7,7 @@ import {
 } from "@remix-run/react";
 import { redirect, json } from "@remix-run/node";
 import { Card, Title, TextInput, Button, Loader, Group } from "@mantine/core";
+import { Prisma } from "@prisma/client";
 // type import
 import type { ActionArgs, TypedResponse } from "@remix-run/node";
 // local imports
@@ -42,6 +43,16 @@ export const action = async ({
     return redirect(`/admin`);
   } catch (err) {
     console.log(err);
+    if (err instanceof Prisma.PrismaClientKnownRequestError) {
+      if (err.code === "P2002") {
+        errors.name =
+          "There is a unique constraint violation, a new platform cannot be created with this plaform name";
+        return json({ errors: errors });
+      }
+      errors.name =
+        "something went wrong with the database, please try again later.";
+      return json({ errors: errors });
+    }
     throw new Response(null, {
       status: 500,
       statusText: "internal server error, failed to create platform",

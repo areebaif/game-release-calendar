@@ -29,6 +29,36 @@ export const dbCreateGame = async (data: DbAddGame) => {
   });
 };
 
+export const dbCreateMultipleGames = async (games: {
+  [key: string]: DbAddGame;
+}) => {
+  const gamePromises = [];
+  for (const property in games) {
+    const { title, description, platform, imageUrl } = games[property];
+    const parsedPlatforms = platform.map((platform) => {
+      return {
+        gamePlatformId: platform.platformId,
+        releaseDate: platform.releaseDate,
+      };
+    });
+
+    const game = db.game.create({
+      data: {
+        title: title,
+        description: description,
+        imageUrl: imageUrl,
+        gameMetaData: {
+          createMany: {
+            data: parsedPlatforms,
+          },
+        },
+      },
+    });
+    gamePromises.push(game);
+  }
+  await db.$transaction([...gamePromises]);
+};
+
 export const dbEditGame = async (data: DbEditGame) => {
   const { title, description, platform, gameId } = data;
   const parsedPlatforms = platform.map((platform) => {
@@ -58,6 +88,68 @@ export const dbEditGame = async (data: DbEditGame) => {
     },
   });
   await db.$transaction([deleteMetaData, game]);
+};
+
+export const getCurrentMonthGame = async () => {
+  const currentDate = new Date();
+  const newDate = new Date(currentDate.setMonth(currentDate.getMonth() + 1));
+  console.log(
+    newDate,
+    currentDate,
+    "sjsksksksk!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  );
+  const gameMetaData = await db.gameMetaData.findMany({
+    orderBy: {
+      gameId: "asc",
+    },
+    where: {
+      //AND: [
+      // {
+      releaseDate: {
+        gte: currentDate,
+      },
+      //   },
+      //   {
+      //     releaseDate: {
+      //       lte: newDate,
+      //     },
+      //   },
+      // ],
+    },
+    include: {
+      game: {
+        select: {
+          title: true,
+          imageUrl: true,
+          description: true,
+        },
+      },
+      GamePlatform: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+  });
+  const result: DbReadGameMetaData[] = [];
+  gameMetaData.forEach((gameItem, index) => {
+    const game: DbReadGameMetaData["game"] = {
+      ...gameItem.game,
+      gameId: gameItem.gameId,
+    };
+    const platform: DbReadGameMetaData["platform"][0] = {
+      platformId: gameItem.GamePlatform.id,
+      platformName: gameItem.GamePlatform.name,
+      releaseDate: new Date(`${gameItem.releaseDate}`).toISOString(),
+    };
+    if (index !== 0 && gameItem.gameId === gameMetaData[index - 1].gameId) {
+      result[result.length - 1].platform.push(platform);
+      return;
+    }
+    return result.push({ game, platform: [platform] });
+  });
+  return result;
 };
 
 export const dbGetAllGamesData = async () => {

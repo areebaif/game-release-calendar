@@ -8,7 +8,12 @@ type ErrorCardProps = {
 
 export const ErrorCard: React.FC<ErrorCardProps> = ({ errorMessage }) => {
   return (
-    <Alert icon={<IconAlertCircle size="1rem" />} color="red">
+    <Alert
+      mt="xs"
+      icon={<IconAlertCircle size="1rem" />}
+      color="red"
+      variant="outline"
+    >
       {errorMessage}
     </Alert>
   );

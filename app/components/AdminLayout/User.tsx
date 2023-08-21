@@ -42,16 +42,22 @@ export const User: React.FC<UserPropsForClient> = (props) => {
         }}
       >
         <Group>
-          <ThemeIcon color={"grape"} variant="light">
-            <IconUser size={20} />
+          <ThemeIcon variant="dark">
+            <IconUser color="gray" size={20} />
           </ThemeIcon>
           <Box sx={{ flex: 1 }}>
-            <Text size="sm" weight={500}>
+            <Text
+              color={
+                theme.colorScheme === "dark"
+                  ? theme.colors.dark[0]
+                  : theme.black
+              }
+              size="sm"
+              weight={500}
+            >
               {user.userName}
             </Text>
-            <Text color="dimmed" size="xs">
-              {user.email}
-            </Text>
+            <Text size="xs">{user.email}</Text>
           </Box>
         </Group>
       </UnstyledButton>

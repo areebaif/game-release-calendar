@@ -1,10 +1,11 @@
 import * as React from "react";
 import { json } from "@remix-run/node";
-import { useLoaderData, Link } from "@remix-run/react";
-import { List } from "@mantine/core";
 import { dbGetCurrentMonthGames, DbReadGameMetaDataZod } from "~/utils";
+import { List } from "@mantine/core";
+import { Link } from "@remix-run/react";
 import { ErrorCard, GameCard } from "~/components";
 import { DbReadGameMetaData } from "~/utils/types";
+import { useLoaderData } from "@remix-run/react";
 
 export const loader = async () => {
   try {

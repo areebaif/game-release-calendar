@@ -1,25 +1,26 @@
 import { db } from "./db.server";
 import { formatDate, getNewDateAddMonth, getEndOfMonth } from "./dayjs.date";
 import { s3Client } from "./awsS3Client.server";
-import { getSignedUrl } from "./image.upload";
-import { validFileType } from "./image.validFileType";
+
 import {
   GamePlatformZod,
   formPlatformFieldsZod,
-  PlatformDropDwonListZod,
   ErrorAddGameFormFieldsZod,
+  validImageSizeZod,
+  validImageTypeZod,
 } from "./zod.Game";
 
 import { ErrorAddPlatformFieldsZod } from "./zod.addPlatform";
-import { ImageUploadApiZod } from "./zod.imageUploadApi";
+
 import {
   UserPropsForClientZod,
   ErrorLoginFormFieldsZod,
   ErrorRegisterUserFormFieldsZod,
   UserZod,
+  CredentialEmailZod,
 } from "./zod.userAuth";
 import { DbReadGameMetaDataZod } from "./zod.db.crud";
-import { getUrlUploadImageToS3 } from "./image.upload";
+import { uploadImagesToS3, deleteImagesFromS3 } from "./image.upload";
 import {
   dbGetAllGamesData,
   dbCreateUser,
@@ -30,6 +31,7 @@ import {
   dbGetGameDataById,
   dbDeleteGameById,
   dbGetCurrentMonthGames,
+  dbCreateMultipleGames,
 } from "./db.server.crud";
 import {
   loginUser,
@@ -45,17 +47,12 @@ export {
   db,
   formatDate,
   s3Client,
-  getSignedUrl,
-  validFileType,
   GamePlatformZod,
   formPlatformFieldsZod,
-  PlatformDropDwonListZod,
   UserPropsForClientZod,
-  ImageUploadApiZod,
   ErrorAddGameFormFieldsZod,
   ErrorAddPlatformFieldsZod,
   dbCreateGame,
-  getUrlUploadImageToS3,
   dbGetAllGamesData,
   DbReadGameMetaDataZod,
   dbCreateUser,
@@ -74,6 +71,12 @@ export {
   UserZod,
   sendCredentialsEmail,
   ErrorRegisterUserFormFieldsZod,
+  CredentialEmailZod,
+  uploadImagesToS3,
+  deleteImagesFromS3,
+  validImageSizeZod,
+  validImageTypeZod,
+  dbCreateMultipleGames,
   dbGetCurrentMonthGames,
   getNewDateAddMonth,
   getEndOfMonth,

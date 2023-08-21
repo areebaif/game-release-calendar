@@ -29,6 +29,7 @@ import {
   EditGameFormFields,
 } from "~/utils/types";
 import { dbEditGame } from "~/utils/db.server.crud";
+import GameItem from "./game.$gameId";
 
 export const loader = async ({ request, params }: ActionArgs) => {
   const user = await requireAdminUser({ request });
@@ -165,7 +166,7 @@ const EditGame: React.FC = () => {
     value: `${item.id}`,
     label: item.name,
   }));
-  const [formPlatformFields, setFormPlatformFields] = React.useState<
+  const [gamePlatformList, setGamePlatformList] = React.useState<
     FormPlatformFields[]
   >(loaderData.gameItem.platform);
   const [gameName, setGameName] = React.useState(
@@ -198,7 +199,7 @@ const EditGame: React.FC = () => {
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(undefined);
-    if (!formPlatformFields.length) {
+    if (!gamePlatformList.length) {
       setError({
         [EditGameFormFields.platformName]:
           "platform name and release date cannot be empty",
@@ -221,13 +222,13 @@ const EditGame: React.FC = () => {
   };
 
   const platformListProps = {
-    formPlatformFields,
-    setFormPlatformFields,
+    gamePlatformList,
+    setGamePlatformList,
   };
   const platformInputProps = {
-    platformDropdownList: dropdownList,
-    formPlatformFields,
-    setFormPlatformFields,
+    platforms: loaderData.platforms,
+    gamePlatformList,
+    setGamePlatformList,
     error,
     actionData,
     setError,

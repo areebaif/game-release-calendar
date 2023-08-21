@@ -44,3 +44,8 @@ export const UserPropsForClientZod = z
 export const JwtPayloadZod = z.object({
   id: z.string(),
 });
+
+export const CredentialEmailZod = z.object({
+  message: z.string(),
+  success: z.boolean(),
+});

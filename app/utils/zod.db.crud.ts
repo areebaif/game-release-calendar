@@ -1,4 +1,5 @@
 import z from "zod";
+import { MonthNames } from "./types";
 
 export const DbAddGameZod = z.object({
   title: z.string(),
@@ -42,4 +43,20 @@ export const DbReadGameMetaDataZod = z.object({
       releaseDate: z.string(),
     })
     .array(),
+});
+
+export const DbReadGameByYearZod = z.object({
+  year: z.number(),
+  [MonthNames.January]: DbReadGameMetaDataZod.optional().array(),
+  [MonthNames.February]: DbReadGameMetaDataZod.optional().array(),
+  [MonthNames.March]: DbReadGameMetaDataZod.optional().array(),
+  [MonthNames.April]: DbReadGameMetaDataZod.optional().array(),
+  [MonthNames.May]: DbReadGameMetaDataZod.optional().array(),
+  [MonthNames.June]: DbReadGameMetaDataZod.optional().array(),
+  [MonthNames.July]: DbReadGameMetaDataZod.optional().array(),
+  [MonthNames.August]: DbReadGameMetaDataZod.optional().array(),
+  [MonthNames.September]: DbReadGameMetaDataZod.optional().array(),
+  [MonthNames.October]: DbReadGameMetaDataZod.optional().array(),
+  [MonthNames.November]: DbReadGameMetaDataZod.optional().array(),
+  [MonthNames.December]: DbReadGameMetaDataZod.optional().array(),
 });

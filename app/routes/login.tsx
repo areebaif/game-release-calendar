@@ -11,13 +11,7 @@ import {
 import { Card, Button, Loader } from "@mantine/core";
 // local imports
 import { Login } from "~/components";
-import {
-  dbCreateUser,
-  dbGetUserByEmail,
-  dbGetUserByUserName,
-  loginUser,
-  createUserSession,
-} from "~/utils";
+import { loginUser, createUserSession } from "~/utils";
 import {
   ErrorLoginFormFields,
   LoginFormFields,

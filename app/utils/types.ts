@@ -8,12 +8,12 @@ import {
   ErrorDeleteGameFormFieldsZod,
 } from "./zod.Game";
 
-
 import { ErrorAddPlatformFieldsZod } from "./zod.addPlatform";
 import {
   DbAddGameZod,
   DbEditGameZod,
   DbReadGameMetaDataZod,
+  DbReadGameByYearZod,
 } from "./zod.db.crud";
 import {
   ErrorLoginFormFieldsZod,
@@ -41,6 +41,7 @@ export type DbEditGame = z.infer<typeof DbEditGameZod>;
 export type ErrorRegisterUserFormFields = z.infer<
   typeof ErrorRegisterUserFormFieldsZod
 >;
+export type DbReadGameByYear = z.infer<typeof DbReadGameByYearZod>;
 
 export enum AddGameFormFields {
   platformName = "platformName",
@@ -72,8 +73,6 @@ export enum AddPlatformFormFields {
   name = "name",
 }
 
-
-
 export enum LoginFormFields {
   emailUserName = "emailUserName",
   password = "password",
@@ -90,4 +89,19 @@ export enum RegisterUserFormFields {
 export enum UserTypeForm {
   ADMIN = "ADMIN",
   STANDARD = "STANDARD",
+}
+
+export enum MonthNames {
+  January = "January",
+  February = "February",
+  March = "March",
+  April = "April",
+  May = "May",
+  June = "June",
+  July = "July",
+  August = "August",
+  September = "September",
+  October = "October",
+  November = "November",
+  December = "December",
 }

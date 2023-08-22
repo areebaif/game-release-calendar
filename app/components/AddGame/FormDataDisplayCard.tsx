@@ -1,5 +1,9 @@
 import * as React from "react";
-import { AddGameFormFields, FormPlatformFields } from "~/utils/types";
+import {
+  AddGameFormFields,
+  FormPlatformFields,
+  GameGenre,
+} from "~/utils/types";
 import {
   Card,
   Title,
@@ -10,6 +14,7 @@ import {
   Grid,
   Divider,
   Input,
+  Chip,
 } from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
 import { formatDate } from "~/utils";
@@ -20,6 +25,7 @@ export type AddGameFormObjClient = {
   [AddGameFormFields.gameDescription]: string;
   [AddGameFormFields.gamePicBlob]: File | null;
   [AddGameFormFields.platformArray]: platformMergedFields["mergedField"][];
+  [AddGameFormFields.gameGenre]: GameGenre[] | undefined;
 };
 
 type platformMergedFields = {
@@ -102,6 +108,22 @@ export const AddGameFormDataDisplayCard: React.FC<
           </Text>
           {item.gameDescription}
         </Text>
+        <Text mt="sm" weight={"bold"}>
+          game genre{" "}
+        </Text>
+        <Group mt="xs">
+          {item.gameGenre?.map((genre) => (
+            <div key={index}>
+              <input
+                name={`${AddGameFormFields.gameGenre}$${index}`}
+                value={genre.id}
+                readOnly
+                type="hidden"
+              ></input>
+              <Chip>{genre.name}</Chip>
+            </div>
+          ))}
+        </Group>
         <Image
           mt="md"
           maw={240}

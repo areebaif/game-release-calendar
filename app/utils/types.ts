@@ -6,6 +6,7 @@ import {
   ErrorAddGameFormFieldsZod,
   ErrorEditGameFormFieldsZod,
   ErrorDeleteGameFormFieldsZod,
+  GameGenreZod,
 } from "./zod.Game";
 
 import { ErrorAddPlatformFieldsZod } from "./zod.addPlatform";
@@ -22,6 +23,7 @@ import {
   UserPropsForClientZod,
   UserZod,
 } from "./zod.userAuth";
+import { ErrorAddGameGenreFormFieldsZod } from "./zod.addGameGenre";
 
 export type GamePlatform = z.infer<typeof GamePlatformZod>;
 export type FormPlatformFields = z.infer<typeof formPlatformFieldsZod>;
@@ -42,7 +44,10 @@ export type ErrorRegisterUserFormFields = z.infer<
   typeof ErrorRegisterUserFormFieldsZod
 >;
 export type DbReadGameByYear = z.infer<typeof DbReadGameByYearZod>;
-
+export type ErrorAddGameGenreFormFields = z.infer<
+  typeof ErrorAddGameGenreFormFieldsZod
+>;
+export type GameGenre = z.infer<typeof GameGenreZod>;
 export enum AddGameFormFields {
   platformName = "platformName",
   releaseDate = "releaseDate",
@@ -53,6 +58,7 @@ export enum AddGameFormFields {
   gamePicBlob = "gamePicBlob",
   imageUrl = "imageUrl",
   platformArray = "platformArray",
+  gameGenre = "gameGenre",
 }
 
 export enum EditGameFormFields {
@@ -70,6 +76,10 @@ export enum DeleteGameFormFields {
 }
 
 export enum AddPlatformFormFields {
+  name = "name",
+}
+
+export enum AddGameGenreFormFields {
   name = "name",
 }
 

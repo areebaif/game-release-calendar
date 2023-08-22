@@ -36,9 +36,9 @@ export const GameIndexRoute: React.FC = () => {
   // TODO: add link to open a game separately
   return (
     <List icon={" "}>
-      {loaderdata?.map((gameItem) => {
+      {loaderdata?.map((gameItem, index) => {
         return (
-          <List.Item key={gameItem.game.gameId}>
+          <List.Item key={index}>
             <Link to={`/game/${gameItem.game.gameId}`}>
               <GameCard gameItem={gameItem} />
             </Link>

@@ -105,7 +105,7 @@ const gameData = [
     icon: <IconDatabase size={16} />,
     color: "gray",
     label: "Add games",
-    link: "/admin/addGame",
+    link: "/admin/add-game",
   },
   {
     icon: <IconEditCircle size={16} />,
@@ -116,8 +116,14 @@ const gameData = [
   {
     icon: <IconMessages size={16} />,
     color: "gray",
-    label: "Add gaming platform",
-    link: "/admin/addPlatform",
+    label: "Add game genre",
+    link: "/admin/add-game-genre",
+  },
+  {
+    icon: <IconMessages size={16} />,
+    color: "gray",
+    label: "Add game platform",
+    link: "/admin/add-platform",
   },
 ];
 
@@ -126,7 +132,7 @@ const userData = [
     icon: <IconUser size={16} />,
     color: "gray",
     label: "Add user",
-    link: "/admin/addUser",
+    link: "/admin/add-user",
   },
 
   {

@@ -37,7 +37,9 @@ import {
   ErrorAddGameFormFields,
   DbAddGame,
   AddGameFormFields,
+  GameGenre,
 } from "~/utils/types";
+import { GameGenreZod } from "~/utils/zod.Game";
 
 export const loader = async ({ request }: ActionArgs) => {
   try {
@@ -46,7 +48,10 @@ export const loader = async ({ request }: ActionArgs) => {
     const platforms = await db.gamePlatform.findMany({
       select: { id: true, name: true },
     });
-    return platforms;
+    const genre = await db.gameGenre.findMany({
+      select: { id: true, name: true },
+    });
+    return json({ platforms, genre });
   } catch (err) {
     console.log(err);
     throw new Response(null, {
@@ -68,6 +73,11 @@ export const action = async ({
 
   try {
     for (const pair of form.entries()) {
+      console.log(
+        pair[0],
+        pair[1],
+        "slslslslslslslslslsl!!!!!!!!!!!!!!!!!!!!!!!"
+      );
       switch (true) {
         case pair[0].includes(AddGameFormFields.platformIdNameReleaseDate):
           const splitField = pair[0].split("$");
@@ -99,6 +109,7 @@ export const action = async ({
               imageUrl: "",
               imageBlob: undefined,
               imageType: "",
+              genre: [],
             };
           } else {
             games[gameIndex].platform.push(platform);
@@ -128,6 +139,7 @@ export const action = async ({
               imageUrl: "",
               imageBlob: undefined,
               imageType: "",
+              genre: [],
             };
           } else {
             games[index].title = gameName;
@@ -151,9 +163,32 @@ export const action = async ({
               imageUrl: "",
               imageBlob: undefined,
               imageType: "",
+              genre: [],
             };
           } else {
             games[gIndex].description = descriptionVal as string;
+          }
+          break;
+        case pair[0].includes(AddGameFormFields.gameGenre):
+          const splitGenreField = pair[0].split("$");
+          const [genreField, gaIndex] = splitGenreField;
+          const genreId = pair[1];
+          console.log(genreId, "lalalalalalalaalalal");
+          if (typeof genreId !== "string" || !genreId.length)
+            errors.gameGenre = "please submit correct values for game genre";
+          const genreString = genreId as string;
+          if (!games[gaIndex]) {
+            games[gaIndex] = {
+              platform: [],
+              title: "",
+              description: "",
+              imageUrl: "",
+              imageBlob: undefined,
+              imageType: "",
+              genre: [genreString],
+            };
+          } else {
+            games[gaIndex].genre.push(genreString);
           }
           break;
         case pair[0].includes(AddGameFormFields.gamePicBlob):
@@ -185,6 +220,7 @@ export const action = async ({
               imageUrl: "",
               imageBlob: imageBuffer,
               imageType: imageBlob.type,
+              genre: [],
             };
           } else {
             games[gamIndex].imageBlob = imageBuffer;
@@ -231,7 +267,10 @@ export const action = async ({
 
 const AddGame: React.FC = () => {
   // hooks
-  const platforms = useLoaderData<GamePlatform[]>();
+  const loaderData = useLoaderData<{
+    platforms: GamePlatform[];
+    genre: GameGenre[];
+  }>();
   const actionData = useActionData<{ errors: ErrorAddGameFormFields }>();
   const navigation = useNavigation();
   const submit = useSubmit();
@@ -245,20 +284,24 @@ const AddGame: React.FC = () => {
   // we need the imageUrl to display a thumbnail of image
   const [imageUrl, setImageUrl] = React.useState<string>("");
   const [allImages, setAllImages] = React.useState<File[]>([]);
+  const [selectedGameGenreList, setSelectedGameGenreList] =
+    React.useState<string[]>();
+
   const [allFormFields, setAllFormFields] = React.useState<
     AddGameFormObjClient[]
   >([]);
   const [error, setError] = React.useState<ErrorAddGameFormFields>();
 
   // Type checks: check if the server is sending correct values
-  const parsePlatform = GamePlatformZod.safeParse(platforms[0]);
+  const parsePlatform = GamePlatformZod.safeParse(loaderData.platforms[0]);
+  const parseGenre = GameGenreZod.safeParse(loaderData.genre[0]);
   const serverPostError = ErrorAddGameFormFieldsZod.safeParse(
     actionData?.errors
   );
-
   if (
     !parsePlatform.success ||
     !serverPostError.success ||
+    !parseGenre.success ||
     actionData?.errors?.generalError
   ) {
     const generalError = actionData?.errors?.generalError;
@@ -266,6 +309,8 @@ const AddGame: React.FC = () => {
       ? console.log(parsePlatform.error)
       : !serverPostError.success
       ? console.log(serverPostError.error)
+      : !parseGenre.success
+      ? console.log(parseGenre.error)
       : console.log(generalError);
     return (
       <ErrorCard
@@ -290,7 +335,7 @@ const AddGame: React.FC = () => {
     submit(formData, {
       method: "post",
       encType: "multipart/form-data",
-      action: "/admin/addGame",
+      action: "/admin/add-game",
     });
   };
   const handleAddGame = () => {
@@ -316,6 +361,12 @@ const AddGame: React.FC = () => {
       });
       return;
     }
+    if (!selectedGameGenreList?.length) {
+      setError({
+        [AddGameFormFields.gameGenre]: "Please select a game genre",
+      });
+      return;
+    }
     const validImageType = validImageTypeZod.safeParse(image?.type).success;
     const validImageSize = validImageSizeZod.safeParse(image?.size).success;
     if (!validImageType || !validImageSize) {
@@ -330,12 +381,22 @@ const AddGame: React.FC = () => {
       ...platformData,
       [AddGameFormFields.platformIdNameReleaseDate]: `${platformData.platformId}$${platformData.platformName}$${platformData.releaseDate}`,
     }));
+    const mappedGameGenre = selectedGameGenreList?.map((genreId) => {
+      const genreName = loaderData.genre.filter(
+        (item) => `${item.id}` === genreId
+      );
+      return {
+        id: genreId,
+        name: genreName[0].name,
+      };
+    });
     const formInputVal: AddGameFormObjClient = {
       constructedUrl: imageUrl,
       [AddGameFormFields.gameName]: gameName,
       [AddGameFormFields.gameDescription]: gameDescription,
       [AddGameFormFields.gamePicBlob]: image,
       [AddGameFormFields.platformArray]: mappedPlatormArray,
+      [AddGameFormFields.gameGenre]: mappedGameGenre,
     };
     // setInput fields to default
     setAllImages((prev) => [...prev, image!]);
@@ -344,6 +405,7 @@ const AddGame: React.FC = () => {
     setGameDescription("");
     setImage(null);
     setGamePlatformList([]);
+    setSelectedGameGenreList([]);
   };
 
   const handleDeleteGame = (index: number) => {
@@ -356,7 +418,7 @@ const AddGame: React.FC = () => {
   };
   // props for components
   const platformInputProps = {
-    platforms,
+    platforms: loaderData.platforms,
     gamePlatformList,
     setGamePlatformList,
     error,
@@ -379,6 +441,9 @@ const AddGame: React.FC = () => {
     handleAddGame,
     imageUrl,
     setImageUrl,
+    gameGenre: loaderData.genre,
+    selectedGameGenreList,
+    setSelectedGameGenreList,
   };
 
   return (
@@ -400,7 +465,7 @@ const AddGame: React.FC = () => {
           <PlatformInput {...platformInputProps} />
         </Card.Section>
       </Card>
-      <Form method="post" action="/admin/addGame" onSubmit={onSubmit}>
+      <Form onSubmit={onSubmit}>
         {gamePlatformList.length ? (
           <Card>
             <Card shadow="sm" radius="md" withBorder>

@@ -9,6 +9,7 @@ import {
 } from "~/utils/types";
 
 import { ErrorCard } from "../ErrorComponent";
+import { SelectBadges } from "../AddGameSelectBadge";
 
 type PlatformInputProps = {
   platforms: GamePlatform[];
@@ -86,7 +87,12 @@ export const PlatformInput: React.FC<PlatformInputProps> = ({
     setUserPlatformList([]);
     setReleaseDate(null);
   };
-
+  const selectBadgesProps = {
+    data: platforms,
+    selectedValues: userPlatformList,
+    onChangeSelectedValues: setUserPlatformList,
+    name: "Add Platform",
+  };
   return (
     <>
       <Grid>
@@ -118,31 +124,7 @@ export const PlatformInput: React.FC<PlatformInputProps> = ({
                 value={releaseDate}
                 onChange={setReleaseDate}
               />
-              <Flex direction={"column"} gap="xs" wrap="wrap">
-                <label
-                  style={{
-                    display: "inline-block",
-                    fontSize: "0.875rem",
-                    fontWeight: 500,
-                    wordBreak: "break-word",
-                  }}
-                >
-                  select platforms
-                </label>
-                <Chip.Group
-                  multiple
-                  value={userPlatformList}
-                  onChange={setUserPlatformList}
-                >
-                  <Group>
-                    {platforms.map((item) => (
-                      <Chip key={item.id} value={`${item.id}`}>
-                        {item.name}
-                      </Chip>
-                    ))}
-                  </Group>
-                </Chip.Group>
-              </Flex>
+              <SelectBadges {...selectBadgesProps} />
             </Flex>
             <Box sx={(theme) => ({ paddingTop: theme.spacing.xl })}>
               <Button

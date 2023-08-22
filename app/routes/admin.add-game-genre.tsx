@@ -13,17 +13,20 @@ import type { ActionArgs, TypedResponse } from "@remix-run/node";
 // local imports
 import { ErrorCard } from "~/components";
 import { db, ErrorAddPlatformFieldsZod, requireAdminUser } from "~/utils";
-import { ErrorAddPlatformFields, AddPlatformFormFields } from "~/utils/types";
+import {
+  ErrorAddGameGenreFormFields,
+  AddGameGenreFormFields,
+} from "~/utils/types";
 
 export const action = async ({
   request,
-}: ActionArgs): Promise<ErrorAddPlatformFields | TypedResponse> => {
+}: ActionArgs): Promise<ErrorAddGameGenreFormFields | TypedResponse> => {
   const user = await requireAdminUser({ request });
   if (!user) return redirect("/");
   const form = await request.formData();
 
-  const name = form.get(AddPlatformFormFields.name);
-  const errors: ErrorAddPlatformFields = {
+  const name = form.get(AddGameGenreFormFields.name);
+  const errors: ErrorAddGameGenreFormFields = {
     name: undefined,
   };
 
@@ -34,11 +37,11 @@ export const action = async ({
     errorMessage?.length ? true : false
   );
   if (hasError) return json({ errors: errors });
-  const platformName = name as string;
-  // TODO: uncomment this
+  const genre = name as string;
+
   try {
-    const platform = await db.gamePlatform.create({
-      data: { name: platformName },
+    const result = await db.gameGenre.create({
+      data: { name: genre },
     });
     return redirect(`/admin`);
   } catch (err) {
@@ -46,7 +49,7 @@ export const action = async ({
     if (err instanceof Prisma.PrismaClientKnownRequestError) {
       if (err.code === "P2002") {
         errors.name =
-          "There is a unique constraint violation, a new platform cannot be created with this plaform name";
+          "There is a unique constraint violation, a new game genrecannot be created with this genre name";
         return json({ errors: errors });
       }
       errors.name =
@@ -60,14 +63,14 @@ export const action = async ({
   }
 };
 
-const AddPlatform: React.FC = () => {
+const AddGameGenre: React.FC = () => {
   // hooks
   const navigation = useNavigation();
   const submit = useSubmit();
-  const actionData = useActionData<{ errors: ErrorAddPlatformFields }>();
+  const actionData = useActionData<{ errors: ErrorAddGameGenreFormFields }>();
   // props
   const [name, setName] = React.useState("");
-  const [error, setError] = React.useState<ErrorAddPlatformFields>();
+  const [error, setError] = React.useState<ErrorAddGameGenreFormFields>();
   // server result validation
   const result = ErrorAddPlatformFieldsZod.safeParse(actionData?.errors);
   if (!result.success) {
@@ -95,7 +98,7 @@ const AddPlatform: React.FC = () => {
     const $form = e.currentTarget;
     // get the formData from that form
     const formData = new FormData($form);
-    submit(formData, { method: "post", action: "/admin/addPlatform" });
+    submit(formData, { method: "post", action: "/admin/add-game-genre" });
   };
 
   return (
@@ -110,7 +113,7 @@ const AddPlatform: React.FC = () => {
       }}
     >
       <Card.Section withBorder inheritPadding py="xs">
-        <Title order={3}>Add Platform</Title>
+        <Title order={3}>Add Game Genre</Title>
       </Card.Section>
 
       <Form onSubmit={onSubmit}>
@@ -121,7 +124,7 @@ const AddPlatform: React.FC = () => {
           placeholder="type here"
           value={name}
           type="text"
-          name={AddPlatformFormFields.name}
+          name={AddGameGenreFormFields.name}
           onChange={(event) => setName(event.currentTarget.value)}
         ></TextInput>
         {error?.name || actionData?.errors?.name ? (
@@ -131,7 +134,6 @@ const AddPlatform: React.FC = () => {
         ) : (
           <></>
         )}
-
         <Group position="center" mt="sm">
           <Button size="sm" type="submit">
             Submit
@@ -142,4 +144,4 @@ const AddPlatform: React.FC = () => {
   );
 };
 
-export default AddPlatform;
+export default AddGameGenre;

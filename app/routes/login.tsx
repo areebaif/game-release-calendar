@@ -24,6 +24,8 @@ export const action = async ({ request }: ActionArgs) => {
   const password = form.get(LoginFormFields.password);
   const email = form.get(LoginFormFields.emailUserName);
 
+  console.log(email, password, "holalala");
+
   const errors: ErrorLoginFormFields = {};
   // form validation
   if (!email?.length)
@@ -42,7 +44,9 @@ export const action = async ({ request }: ActionArgs) => {
       password: password as string,
     };
     // login the user to get userId
+ 
     const user = await loginUser(DbValues.emailUserName, DbValues.password);
+    console.log(user, "slslsl");
     if (!user) {
       errors.emailUserName =
         "error logging in user, please check your credentials";

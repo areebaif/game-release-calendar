@@ -12,7 +12,12 @@ import {
 import { IconUpload } from "@tabler/icons-react";
 import { ErrorCard } from "~/components";
 // type imports
-import { ErrorAddGameFormFields, AddGameFormFields } from "~/utils/types";
+import {
+  ErrorAddGameFormFields,
+  AddGameFormFields,
+  GameGenre,
+} from "~/utils/types";
+import { SelectBadges } from "../AddGameSelectBadge";
 
 type AddGameUserInputProps = {
   gameName: string;
@@ -26,6 +31,9 @@ type AddGameUserInputProps = {
   handleAddGame: () => void;
   actionData: { errors: ErrorAddGameFormFields } | undefined;
   error: ErrorAddGameFormFields;
+  gameGenre: GameGenre[];
+  selectedGameGenreList: string[] | undefined;
+  setSelectedGameGenreList: (data: string[] | undefined) => void;
 };
 
 export const AddGameUserInput: React.FC<AddGameUserInputProps> = ({
@@ -40,7 +48,17 @@ export const AddGameUserInput: React.FC<AddGameUserInputProps> = ({
   handleAddGame,
   imageUrl,
   setImageUrl,
+  gameGenre,
+  selectedGameGenreList,
+  setSelectedGameGenreList,
 }) => {
+  const selectBadgesProps = {
+    data: gameGenre,
+    selectedValues: selectedGameGenreList,
+    onChangeSelectedValues: setSelectedGameGenreList,
+    name: "Add Genre",
+  };
+
   return (
     <Card
       shadow="sm"
@@ -107,6 +125,18 @@ export const AddGameUserInput: React.FC<AddGameUserInputProps> = ({
           character count: {gameDescription.length}/1000
         </label>
       </Group>
+      <SelectBadges {...selectBadgesProps} />
+      {actionData?.errors?.gameGenre || error?.gameGenre ? (
+        <ErrorCard
+          errorMessage={
+            actionData?.errors?.gameGenre
+              ? actionData?.errors?.gameGenre
+              : error?.gameGenre
+          }
+        />
+      ) : (
+        <></>
+      )}
       {image ? (
         <Image
           mt="md"
@@ -118,6 +148,7 @@ export const AddGameUserInput: React.FC<AddGameUserInputProps> = ({
         />
       ) : undefined}
       <FileInput
+        mt="md"
         label="upload image"
         placeholder="upload image"
         icon={<IconUpload size="16px" />}

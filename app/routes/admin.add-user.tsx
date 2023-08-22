@@ -41,8 +41,9 @@ import {
 } from "~/utils/types";
 
 export const action = async ({ request }: ActionArgs) => {
-  // const user = await requireAdminUser({ request });
-  // if (!user) return redirect("/");
+
+  const user = await requireAdminUser({ request });
+  if (!user) return redirect("/");
   const form = await request.formData();
   //const password = form.get(RegisterUserFormFields.password);
   const email = form.get(RegisterUserFormFields.email);

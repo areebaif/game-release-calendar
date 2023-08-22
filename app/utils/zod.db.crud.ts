@@ -14,6 +14,7 @@ export const DbAddGameZod = z.object({
     .array(),
   imageBlob: z.any(),
   imageType: z.string(),
+  genre: z.string().array(),
 });
 
 export const DbEditGameZod = z.object({

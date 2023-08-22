@@ -20,7 +20,8 @@ import { MonthNames } from "./types";
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 
 export const dbCreateGame = async (data: DbAddGame) => {
-  const { title, description, platform, imageUrl } = data;
+  const { title, description, platform, imageUrl, genre } = data;
+  const parseGenre = genre.map((id) => ({ genreId: id }));
   const parsedPlatforms = platform.map((platform) => {
     return {
       gamePlatformId: platform.platformId,
@@ -28,7 +29,7 @@ export const dbCreateGame = async (data: DbAddGame) => {
     };
   });
 
-  const game = await db.game.create({
+  return await db.game.create({
     data: {
       title: title,
       description: description,
@@ -47,7 +48,8 @@ export const dbCreateMultipleGames = async (games: {
 }) => {
   const gamePromises = [];
   for (const property in games) {
-    const { title, description, platform, imageUrl } = games[property];
+    const { title, description, platform, imageUrl, genre } = games[property];
+    const parseGenre = genre.map((id) => ({ genreId: id }));
     const parsedPlatforms = platform.map((platform) => {
       return {
         gamePlatformId: platform.platformId,
@@ -64,6 +66,9 @@ export const dbCreateMultipleGames = async (games: {
           createMany: {
             data: parsedPlatforms,
           },
+        },
+        GameGenreFlatTable: {
+          createMany: { data: parseGenre },
         },
       },
     });

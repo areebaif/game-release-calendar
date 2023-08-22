@@ -73,6 +73,11 @@ export const action = async ({
 
   try {
     for (const pair of form.entries()) {
+      console.log(
+        pair[0],
+        pair[1],
+        "slslslslslslslslslsl!!!!!!!!!!!!!!!!!!!!!!!"
+      );
       switch (true) {
         case pair[0].includes(AddGameFormFields.platformIdNameReleaseDate):
           const splitField = pair[0].split("$");
@@ -104,6 +109,7 @@ export const action = async ({
               imageUrl: "",
               imageBlob: undefined,
               imageType: "",
+              genre: [],
             };
           } else {
             games[gameIndex].platform.push(platform);
@@ -133,6 +139,7 @@ export const action = async ({
               imageUrl: "",
               imageBlob: undefined,
               imageType: "",
+              genre: [],
             };
           } else {
             games[index].title = gameName;
@@ -156,9 +163,32 @@ export const action = async ({
               imageUrl: "",
               imageBlob: undefined,
               imageType: "",
+              genre: [],
             };
           } else {
             games[gIndex].description = descriptionVal as string;
+          }
+          break;
+        case pair[0].includes(AddGameFormFields.gameGenre):
+          const splitGenreField = pair[0].split("$");
+          const [genreField, gaIndex] = splitGenreField;
+          const genreId = pair[1];
+          console.log(genreId, "lalalalalalalaalalal");
+          if (typeof genreId !== "string" || !genreId.length)
+            errors.gameGenre = "please submit correct values for game genre";
+          const genreString = genreId as string;
+          if (!games[gaIndex]) {
+            games[gaIndex] = {
+              platform: [],
+              title: "",
+              description: "",
+              imageUrl: "",
+              imageBlob: undefined,
+              imageType: "",
+              genre: [genreString],
+            };
+          } else {
+            games[gaIndex].genre.push(genreString);
           }
           break;
         case pair[0].includes(AddGameFormFields.gamePicBlob):
@@ -190,6 +220,7 @@ export const action = async ({
               imageUrl: "",
               imageBlob: imageBuffer,
               imageType: imageBlob.type,
+              genre: [],
             };
           } else {
             games[gamIndex].imageBlob = imageBuffer;
@@ -304,7 +335,7 @@ const AddGame: React.FC = () => {
     submit(formData, {
       method: "post",
       encType: "multipart/form-data",
-      action: "/admin-add-game",
+      action: "/admin/add-game",
     });
   };
   const handleAddGame = () => {

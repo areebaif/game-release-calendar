@@ -53,6 +53,7 @@ export const action = async ({
         "something went wrong with the database, please try again later.";
       return json({ errors: errors });
     }
+    // TODO: fix add a general error rather than throwing we want to return error to user not stop code execution here
     throw new Response(null, {
       status: 500,
       statusText: "internal server error, failed to create platform",

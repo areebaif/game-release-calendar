@@ -18,6 +18,7 @@ model Game {
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   gameMetaData GameMetaData[]
+  GameGenreFlatTable GameGenreFlatTable[]
 
 }
 
@@ -32,25 +33,34 @@ model GamePlatform {
 model GameGenre {
   id String @id @default(uuid())
   name String @unique
-  gameMetaData GameMetaData[]
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
+  GameGenreFlatTable GameGenreFlatTable[]
 }
+
+model GameGenreFlatTable {
+  id String @id @default(uuid())
+  gameId String
+  genreId String
+  game Game  @relation(fields: [gameId], references: [id])
+  gameGenre GameGenre @relation(fields: [genreId], references: [id])
+  @@index([gameId])
+  @@index([genreId])
+  @@unique([genreId, gameId], name: "gameGenreIdentifier")
+}
+
 
 model GameMetaData {
   id String @id @default(uuid())
   releaseDate  DateTime
   gameId String
   gamePlatformId String
-  gameGenreId String
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   game Game  @relation(fields: [gameId], references: [id])
   GamePlatform GamePlatform @relation(fields: [gamePlatformId], references: [id])
-  GameGenre GameGenre @relation(fields: [gameGenreId], references: [id])
   @@index([gameId])
   @@index([gamePlatformId])
- @@index([gameGenreId])
 }
 
 model User {

@@ -112,13 +112,16 @@ export const AddGameFormDataDisplayCard: React.FC<
           game genre{" "}
         </Text>
         <Group mt="xs">
-          {item.gameGenre?.map((genre, index) => (
-            <Chip
-              name={`${AddGameFormFields.gameGenre}$${index}`}
-              value={genre.id}
-            >
-              {genre.name}
-            </Chip>
+          {item.gameGenre?.map((genre) => (
+            <div key={index}>
+              <input
+                name={`${AddGameFormFields.gameGenre}$${index}`}
+                value={genre.id}
+                readOnly
+                type="hidden"
+              ></input>
+              <Chip>{genre.name}</Chip>
+            </div>
           ))}
         </Group>
         <Image

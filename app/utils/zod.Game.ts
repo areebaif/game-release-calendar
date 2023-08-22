@@ -8,12 +8,21 @@ export const GamePlatformZod = z.object({
   updatedAt: z.string().optional(),
 });
 
+export const GameGenreZod = z.object({
+  id: z.string().uuid(),
+  name: z.string(),
+  createdAt: z.string().optional(),
+  updatedAt: z.string().optional(),
+});
+
 export const formPlatformFieldsZod = z.object({
   platformId: z.string().uuid(),
   platformName: z.string(),
   releaseDate: z.string(),
 });
 
+
+const keys = Object.keys(AddGameFormFields);
 export const ErrorAddGameFormFieldsZod = z
   .object({
     [AddGameFormFields.platformName]: z.string().optional(),
@@ -24,6 +33,7 @@ export const ErrorAddGameFormFieldsZod = z
     [AddGameFormFields.imageUrl]: z.string().optional(),
     [AddGameFormFields.gamePicBlob]: z.string().optional(),
     [AddGameFormFields.platformIdNameReleaseDate]: z.string().optional(),
+    [AddGameFormFields.gameGenre]: z.string().optional(),
     generalError: z.string().optional(),
   })
   .optional();

@@ -41,8 +41,8 @@ import {
 } from "~/utils/types";
 
 export const action = async ({ request }: ActionArgs) => {
-  const user = await requireAdminUser({ request });
-  if (!user) return redirect("/");
+  // const user = await requireAdminUser({ request });
+  // if (!user) return redirect("/");
   const form = await request.formData();
   //const password = form.get(RegisterUserFormFields.password);
   const email = form.get(RegisterUserFormFields.email);
@@ -215,7 +215,7 @@ const RegisterAdminUser: React.FC = () => {
     const $form = e.currentTarget;
     // get the formData from that form
     const formData = new FormData($form);
-    submit(formData, { method: "post", action: "/admin/addUser" });
+    submit(formData, { method: "post", action: "/admin/add-user" });
   };
 
   const signupProps = {

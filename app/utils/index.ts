@@ -19,6 +19,7 @@ import {
 } from "./zod.Game";
 
 import { ErrorAddPlatformFieldsZod } from "./zod.addPlatform";
+import { ErrorAddGameGenreFormFieldsZod } from "./zod.addGameGenre";
 
 import {
   UserPropsForClientZod,
@@ -95,4 +96,5 @@ export {
   getMonthNumber,
   DbReadGameByYearZod,
   dbGetGameByYear,
+  ErrorAddGameGenreFormFieldsZod,
 };

@@ -1,5 +1,9 @@
 import { z } from "zod";
-import { LoginFormFields, RegisterUserFormFields } from "./types";
+import {
+  EditUserFormFields,
+  LoginFormFields,
+  RegisterUserFormFields,
+} from "./types";
 import { UserType } from "@prisma/client";
 
 export const ErrorLoginFormFieldsZod = z
@@ -9,6 +13,12 @@ export const ErrorLoginFormFieldsZod = z
     [LoginFormFields.userType]: z.string().optional(),
   })
   .optional();
+
+export const ErrorUserEditFormFieldsZod = z.object({
+  [EditUserFormFields.password]: z.string().optional(),
+  [EditUserFormFields.oldPassword]: z.string().optional(),
+  [EditUserFormFields.userId]: z.string().optional(),
+});
 
 export const ErrorRegisterUserFormFieldsZod = z
   .object({
@@ -38,6 +48,7 @@ export const UserPropsForClientZod = z
     userType: z.enum([`${UserType.ADMIN}`, `${UserType.STANDARD}`]),
     createdAt: z.string().optional(),
     updatedAt: z.string().optional(),
+    firstPassword: z.string().nullable(),
   })
   .nullable();
 

@@ -43,7 +43,6 @@ const Admin: React.FC = () => {
   theme.colorScheme = adminTheme;
   const loaderData = useLoaderData<{ user: UserPropsForClient }>();
   const typeCheckUser = UserPropsForClientZod.safeParse(loaderData.user);
-
   if (!typeCheckUser.success) {
     return (
       <ErrorCard

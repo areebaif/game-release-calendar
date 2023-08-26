@@ -42,6 +42,7 @@ import {
   dbGetCurrentMonthGames,
   dbCreateMultipleGames,
   dbGetGameByYear,
+  resetUserPassword,
 } from "./db.server.crud";
 import {
   loginUser,
@@ -97,4 +98,5 @@ export {
   DbReadGameByYearZod,
   dbGetGameByYear,
   ErrorAddGameGenreFormFieldsZod,
+  resetUserPassword,
 };

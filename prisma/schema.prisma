@@ -69,6 +69,7 @@ model User {
   updatedAt    DateTime @updatedAt
   email        String   @unique
   userName     String   @unique
+  firstPassword String?
   passwordHash String
   userType     UserType 
 }

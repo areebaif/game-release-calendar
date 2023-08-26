@@ -23,13 +23,14 @@ export const loginUser = async (
     userInputPassword,
     user?.passwordHash ? user?.passwordHash : userName?.passwordHash!
   );
-  console.log(" Ia m here!!!!!!!!!!!!!!!!!!!!!!!!!!, ", isPasswordCorrect);
+
   if (!isPasswordCorrect) return null;
   return {
     id: user?.id ? user.id : userName?.id,
     email: user?.email ? user.email : userName?.email,
     userName: user?.userName ? user.userName : userName?.userName,
     userType: user?.userType ? user.userType : userName?.userType,
+ 
   };
 };
 

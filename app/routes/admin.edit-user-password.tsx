@@ -139,6 +139,7 @@ const EditPassword: React.FC = () => {
         <Form onSubmit={onSubmit}>
           <TextInput
             mt="xs"
+            type={"password"}
             withAsterisk
             label="old password"
             placeholder="type here"
@@ -149,6 +150,7 @@ const EditPassword: React.FC = () => {
           <TextInput
             mt="xs"
             withAsterisk
+            type={"password"}
             label="password"
             placeholder="type here"
             value={password}
@@ -167,6 +169,7 @@ const EditPassword: React.FC = () => {
           <TextInput
             mt="xs"
             withAsterisk
+            type={"password"}
             label="confirm password"
             placeholder="type here"
             value={confirmPassword}

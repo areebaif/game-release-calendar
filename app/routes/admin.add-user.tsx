@@ -40,7 +40,6 @@ import {
 } from "~/utils/types";
 
 export const action = async ({ request }: ActionArgs) => {
-
   const user = await requireAdminUser({ request });
   if (!user) return redirect("/");
   const form = await request.formData();
@@ -100,7 +99,7 @@ export const action = async ({ request }: ActionArgs) => {
         id: createUser.id,
         email: createUser.email,
         userName: createUser.userName,
-        userPassword: password as string,
+        //userPassword: password as string,
         userType: createUser.userType,
       },
       emailSent,
@@ -285,11 +284,11 @@ const RegisterAdminUser: React.FC = () => {
           <Text weight={"bold"}>User type:</Text>{" "}
           <Text>{actionData?.user?.userType}</Text>
         </Text>
-        <Text>
+        {/*  <Text>
           {" "}
           <Text weight={"bold"}>User password:</Text>{" "}
           <Text>{actionData?.user?.userPassword}</Text>
-        </Text>
+        </Text> */}
       </Modal>
     </>
   );

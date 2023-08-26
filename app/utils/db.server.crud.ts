@@ -315,7 +315,13 @@ export const dbCreateUser = async (data: {
 
   //create new user
   const user = await db.user.create({
-    data: { email, passwordHash: hash, userType, userName: userName },
+    data: {
+      email,
+      passwordHash: hash,
+      userType,
+      userName: userName,
+      firstPassword: password,
+    },
   });
 
   return user;
@@ -356,6 +362,7 @@ export const resetUserPassword = async (data: {
     },
     data: {
       passwordHash: hash,
+      firstPassword: null,
     },
   });
   return { user, isPasswordCorrect };
@@ -403,6 +410,7 @@ export const dbGetUserById = async (id: any) => {
       email: true,
       userName: true,
       userType: true,
+      firstPassword: true,
     },
   });
   return user;

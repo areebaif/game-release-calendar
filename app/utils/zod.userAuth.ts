@@ -18,7 +18,6 @@ export const ErrorUserEditFormFieldsZod = z.object({
   [EditUserFormFields.password]: z.string().optional(),
   [EditUserFormFields.oldPassword]: z.string().optional(),
   [EditUserFormFields.userId]: z.string().optional(),
-
 });
 
 export const ErrorRegisterUserFormFieldsZod = z
@@ -49,6 +48,7 @@ export const UserPropsForClientZod = z
     userType: z.enum([`${UserType.ADMIN}`, `${UserType.STANDARD}`]),
     createdAt: z.string().optional(),
     updatedAt: z.string().optional(),
+    firstPassword: z.string().nullable(),
   })
   .nullable();
 

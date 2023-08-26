@@ -30,6 +30,7 @@ export const loginUser = async (
     email: user?.email ? user.email : userName?.email,
     userName: user?.userName ? user.userName : userName?.userName,
     userType: user?.userType ? user.userType : userName?.userType,
+ 
   };
 };
 

@@ -321,6 +321,46 @@ export const dbCreateUser = async (data: {
   return user;
 };
 
+export const resetUserPassword = async (data: {
+  newPassword: string;
+  oldPassword: string;
+  userId: string;
+}) => {
+  const { newPassword, oldPassword, userId } = data;
+  const user = await db.user.findUnique({
+    where: {
+      id: userId,
+    },
+    select: {
+      id: true,
+      email: true,
+      passwordHash: true,
+      userName: true,
+      userType: true,
+    },
+  });
+
+  if (!user) {
+    return { user: null };
+  }
+  const isPasswordCorrect = await bcrypt.compare(
+    oldPassword,
+    user?.passwordHash!
+  );
+  if (!isPasswordCorrect) return { isPasswordCorrect };
+
+  const hash = await bcrypt.hash(newPassword, saltRounds);
+  const updateUser = await db.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      passwordHash: hash,
+    },
+  });
+  return { user, isPasswordCorrect };
+};
+
 export const dbGetUserByEmail = async (email: string) => {
   const user = await db.user.findUnique({
     where: {

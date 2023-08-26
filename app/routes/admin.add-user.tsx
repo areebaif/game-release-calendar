@@ -1,5 +1,4 @@
 import * as React from "react";
-import { z } from "zod";
 import { json, redirect } from "@remix-run/node";
 import type { ActionArgs } from "@remix-run/node";
 import { UserType, Prisma } from "@prisma/client";

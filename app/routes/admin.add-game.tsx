@@ -73,11 +73,6 @@ export const action = async ({
 
   try {
     for (const pair of form.entries()) {
-      console.log(
-        pair[0],
-        pair[1],
-        "slslslslslslslslslsl!!!!!!!!!!!!!!!!!!!!!!!"
-      );
       switch (true) {
         case pair[0].includes(AddGameFormFields.platformIdNameReleaseDate):
           const splitField = pair[0].split("$");

@@ -21,7 +21,6 @@ export const formPlatformFieldsZod = z.object({
   releaseDate: z.string(),
 });
 
-
 const keys = Object.keys(AddGameFormFields);
 export const ErrorAddGameFormFieldsZod = z
   .object({

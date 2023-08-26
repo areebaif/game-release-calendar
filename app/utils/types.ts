@@ -19,6 +19,7 @@ import {
 import {
   ErrorLoginFormFieldsZod,
   ErrorRegisterUserFormFieldsZod,
+  ErrorUserEditFormFieldsZod,
   JwtPayloadZod,
   UserPropsForClientZod,
   UserZod,
@@ -47,6 +48,10 @@ export type DbReadGameByYear = z.infer<typeof DbReadGameByYearZod>;
 export type ErrorAddGameGenreFormFields = z.infer<
   typeof ErrorAddGameGenreFormFieldsZod
 >;
+export type ErrorUserEditFormFields = z.infer<
+  typeof ErrorUserEditFormFieldsZod
+>;
+
 export type GameGenre = z.infer<typeof GameGenreZod>;
 export enum AddGameFormFields {
   platformName = "platformName",
@@ -94,6 +99,12 @@ export enum RegisterUserFormFields {
   password = "password",
   userType = "userType",
   userName = "userName",
+}
+
+export enum EditUserFormFields {
+  password = "password",
+  oldPassword = "oldPassword",
+  userId = "userId",
 }
 
 export enum UserTypeForm {

@@ -17,6 +17,10 @@ import {
   IconAlertCircle,
   IconUser,
   IconEditCircle,
+  IconUserPlus,
+  IconDeviceGamepad,
+  IconIdBadge2,
+  IconTemplate,
 } from "@tabler/icons-react";
 
 export const AdminNavigation: React.FC<UserPropsForClient> = (props) => {
@@ -108,19 +112,19 @@ const gameData = [
     link: "/admin/add-game",
   },
   {
-    icon: <IconEditCircle size={16} />,
+    icon: <IconDeviceGamepad size={16} />,
     color: "gray",
     label: "View /Edit games",
     link: "/admin",
   },
   {
-    icon: <IconMessages size={16} />,
+    icon: <IconIdBadge2 size={16} />,
     color: "gray",
     label: "Add game genre",
     link: "/admin/add-game-genre",
   },
   {
-    icon: <IconMessages size={16} />,
+    icon: <IconTemplate size={16} />,
     color: "gray",
     label: "Add game platform",
     link: "/admin/add-platform",
@@ -129,12 +133,17 @@ const gameData = [
 
 const userData = [
   {
-    icon: <IconUser size={16} />,
+    icon: <IconUserPlus size={16} />,
     color: "gray",
     label: "Add user",
     link: "/admin/add-user",
   },
-
+  {
+    icon: <IconUser size={16} />,
+    color: "gray",
+    label: "Profile",
+    link: "/admin/edit-user-password",
+  },
   {
     icon: <IconLogin size={16} />,
     color: "gray",

@@ -14,14 +14,16 @@ export const uploadImagesToS3 = (games: { [key: string]: DbAddGame }) => {
         ? `game/${uuidv4()}.${parsedFileExt}`
         : `dev/${uuidv4()}.${parsedFileExt}`;
 
+    // store the uuid in the imageUrl property so that the database can save the image url
     games[property].imageUrl = imageKey;
+    // send the uuid as image url to S3 
     imagePromises.push(uploadToS3(image, imageKey, games[property].imageType));
   }
   return imagePromises;
 };
 
 const uploadToS3 = (image: Buffer, imageKey: string, imageType: string) => {
-  const s3Params = {
+    const s3Params = {
     Bucket: process.env.BUCKET_NAME,
     Body: image,
     Key: imageKey,

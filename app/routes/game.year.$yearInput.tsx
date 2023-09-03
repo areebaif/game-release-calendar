@@ -26,7 +26,6 @@ export const loader = async ({ request, params }: ActionArgs) => {
 const GameByYear: React.FC = () => {
   const yearInput = useParams();
   const gamesByYear = useLoaderData();
-  console.log(gamesByYear, "!!!!!!!!!!!!!!!");
   const typeCheckGamesByyear = DbReadGameByYearZod.safeParse(gamesByYear);
   if (!typeCheckGamesByyear.success) {
     return (

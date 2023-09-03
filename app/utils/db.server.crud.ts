@@ -15,6 +15,7 @@ import {
   getEndOfYear,
   s3Client,
   getMonthNumber,
+  parseImageUrl,
 } from "~/utils";
 import { MonthNames } from "./types";
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
@@ -136,13 +137,6 @@ export const dbGetAllGamesData = async () => {
     },
   });
   const mappedGames = mapGameMetadata(gameMetaData);
-  // const gamesSortedByDate = [...mappedGames];
-  // gamesSortedByDate.sort((a, b) => {
-  //   const date1: any = new Date(a.platform[0].releaseDate);
-  //   const date2: any = new Date(b.platform[0].releaseDate);
-
-  //   return date1 - date2;
-  // });
 
   return mappedGames;
 };
@@ -438,7 +432,9 @@ const mapGameMetadata = (val: mapGameMetaData[]) => {
   const result: DbReadGameMetaData[] = [];
   val.forEach((gameItem, index) => {
     const game: DbReadGameMetaData["game"] = {
-      ...gameItem.game,
+      title: gameItem.game.title,
+      description: gameItem.game.description,
+      imageUrl: parseImageUrl(gameItem.game.imageUrl!),
       gameId: gameItem.gameId,
     };
     const platform: DbReadGameMetaData["platform"][0] = {
@@ -533,7 +529,9 @@ const sortByMonth = (
   result: DbReadGameByYear
 ) => {
   const game: DbReadGameMetaData["game"] = {
-    ...gameItem.game,
+    title: gameItem.game.title,
+    description: gameItem.game.description,
+    imageUrl: parseImageUrl(gameItem.game.imageUrl!),
     gameId: gameItem.gameId,
   };
   const platform: DbReadGameMetaData["platform"][0] = {

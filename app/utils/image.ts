@@ -44,3 +44,9 @@ export const deleteImagesFromS3 = (games: { [key: string]: DbAddGame }) => {
   }
   return deleteFromS3;
 };
+
+export const parseImageUrl = (imageUrl: string) => {
+  return process.env.NODE_ENV === "development"
+    ? `${process.env.IMAGE_BASE_URL_DEVELOPMENT}/${imageUrl}`
+    : `${process.env.IMAGE_BASE_URL_PRODUCTION}/${imageUrl}`;
+};

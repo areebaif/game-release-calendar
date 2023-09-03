@@ -29,7 +29,7 @@ import {
   CredentialEmailZod,
 } from "./zod.userAuth";
 import { DbReadGameMetaDataZod, DbReadGameByYearZod } from "./zod.db.crud";
-import { uploadImagesToS3, deleteImagesFromS3 } from "./image.upload";
+import { uploadImagesToS3, deleteImagesFromS3, parseImageUrl } from "./image";
 import {
   dbGetAllGamesData,
   dbCreateUser,
@@ -99,4 +99,5 @@ export {
   dbGetGameByYear,
   ErrorAddGameGenreFormFieldsZod,
   resetUserPassword,
+  parseImageUrl,
 };

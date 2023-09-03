@@ -24,11 +24,7 @@ export const GameCard: React.FC<GameCardProps> = ({ gameItem }) => {
         <Image
           width={`100px`}
           radius="md"
-          src={
-            process.env.NODE_ENV === "development"
-              ? `https://game-calendar-development.s3.amazonaws.com/${gameItem.game.imageUrl}`
-              : `https://game-calendar.s3.amazonaws.com/${gameItem.game.imageUrl}`
-          }
+          src={gameItem.game.imageUrl}
           alt="Random image"
         />
       </Card.Section>

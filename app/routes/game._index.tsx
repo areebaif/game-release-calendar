@@ -1,10 +1,21 @@
 import * as React from "react";
 import { Link, useLoaderData } from "@remix-run/react";
 import { json } from "@remix-run/node";
-import { List } from "@mantine/core";
+import {
+  Box,
+  Card,
+  FileInput,
+  Flex,
+  Grid,
+  Image,
+  List,
+  Text,
+  createPolymorphicComponent,
+} from "@mantine/core";
 import { DbReadGameMetaData } from "~/utils/types";
 import { dbGetAllGamesData, DbReadGameMetaDataZod } from "~/utils";
 import { ErrorCard, GameCard } from "~/components";
+import { _FileInput } from "@mantine/core/lib/FileInput/FileInput";
 
 export const loader = async () => {
   try {
@@ -33,19 +44,13 @@ export const GameIndexRoute: React.FC = () => {
       <ErrorCard errorMessage="something went wrong with the server please try again" />
     );
   }
-
-  return (
-    <List icon={" "}>
-      {loaderdata?.map((gameItem, index) => {
-        return (
-          <List.Item key={index}>
-            <Link to={`/game/${gameItem.game.gameId}`}>
-              <GameCard gameItem={gameItem} />
-            </Link>
-          </List.Item>
-        );
-      })}
-    </List>
+  // <Link to={`/game/${gameItem.game.gameId}`}>
+  return loaderdata ? (
+    loaderdata.map((gameItem, index) => (
+      <GameCard key={index} gameItem={gameItem} />
+    ))
+  ) : (
+    <div>no data to display</div>
   );
 };
 

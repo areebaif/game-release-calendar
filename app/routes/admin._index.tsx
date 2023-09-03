@@ -1,7 +1,18 @@
 import * as React from "react";
 import { Link, useLoaderData } from "@remix-run/react";
 import { json, ActionArgs, redirect } from "@remix-run/node";
-import { Button, Group, List, Modal, Text, Textarea } from "@mantine/core";
+import {
+  Button,
+  Group,
+  List,
+  Modal,
+  Text,
+  Card,
+  Grid,
+  Image,
+  Flex,
+  FileInput,
+} from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { DbReadGameMetaData, UserPropsForClient } from "~/utils/types";
 import {
@@ -65,17 +76,10 @@ export const GameIndexRoute: React.FC = () => {
   // remove the user credentials se t back when admin creates a user
   return (
     <>
-      <List icon={" "}>
-        {loaderData.allGamesMetaData?.map((gameItem, index) => {
-          return (
-            <List.Item key={index}>
-              <Link to={`/game/${gameItem.game.gameId}`}>
-                <GameCard gameItem={gameItem} />
-              </Link>
-            </List.Item>
-          );
-        })}
-      </List>
+      {loaderData.allGamesMetaData?.map((gameItem, index) => (
+        <GameItemCard gameItem={gameItem} />
+      ))}
+
       <Modal centered opened={opened} onClose={close} title="Reset password">
         <Text size="md">
           It is highly recommended that you reset your password.
@@ -96,3 +100,26 @@ export const GameIndexRoute: React.FC = () => {
 };
 
 export default GameIndexRoute;
+
+type GameItemCardProps = {
+  gameItem: DbReadGameMetaData;
+};
+
+export const GameItemCard: React.FC<GameItemCardProps> = ({ gameItem }) => {
+  return (
+    <Card>
+      <Flex>
+        <label htmlFor={"file-input"}>
+          <Image
+            sx={(theme) => ({ "&:hover": { cursor: "pointer" } })}
+            src={gameItem.game.imageUrl}
+            width={"200"}
+            alt="No way!"
+          />
+        </label>
+        <input style={{ display: "none" }} id="file-input" type="file" />
+        <Text>{gameItem.game.title}</Text>
+      </Flex>
+    </Card>
+  );
+};

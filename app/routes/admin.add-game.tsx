@@ -232,9 +232,9 @@ export const action = async ({
     );
     if (hasError) return json({ errors: errors });
     // this uploadImage function also sets the url of the images to be added to database
-    const imagePromises = uploadImagesToS3(games);
+        const imagePromises = uploadImagesToS3(games);
     await Promise.all(imagePromises);
-    // the games are uploaded in a transaction lock, hence either entire operation will succeed or fail.
+        // the games are uploaded in a transaction lock, hence either entire operation will succeed or fail.
     // We are doing these in a lock because if any game upload to db fails then we have to roll back image upload to s3 aswell
     await dbCreateMultipleGames(games);
     return redirect(`/admin`);

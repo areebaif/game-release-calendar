@@ -14,7 +14,9 @@ export const uploadImagesToS3 = (games: { [key: string]: DbAddGame }) => {
         ? `game/${uuidv4()}.${parsedFileExt}`
         : `dev/${uuidv4()}.${parsedFileExt}`;
 
+    // store the uuid in the imageUrl property so that the database can save the image url
     games[property].imageUrl = imageKey;
+    // send the uuid as file/ image name to S3
     imagePromises.push(uploadToS3(image, imageKey, games[property].imageType));
   }
   return imagePromises;

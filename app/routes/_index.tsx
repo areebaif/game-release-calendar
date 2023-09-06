@@ -35,7 +35,7 @@ export default function Index() {
 
   return (
     <div>
-      <Title>Welcome to Remix</Title>
+      <Title>Welcome to Game Release Calendar</Title>
       <ul>
         {loaderData.user?.userType === "ADMIN" ? (
           <li>
@@ -50,13 +50,13 @@ export default function Index() {
         <li>
           <Link to="/game/current-month">current month games</Link>
         </li>
-        <li>
+        {/* <li>
           <Text>
             Note: The link below takes year as query parameter in the format
             yyyy. Right now the link is hardcoded to 2023
           </Text>
           <Link to="/game/year/2023">get game by year</Link>
-        </li>
+        </li> */}
         {!loaderData.user?.id ? (
           <li>
             <Link to="/login">login</Link>

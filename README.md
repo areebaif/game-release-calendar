@@ -34,27 +34,6 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 Note: You need to use posr 3000 for this applicaton to run, otherwise you will not be able to interact with aws services. The services in aws have been designed to accept traffic only from port 3000 in development mode.
 
-## Deployment
+### Branching Strategy
 
-First, build your app for production:
-
-```sh
-npm run build
-```
-
-Then run the app in production mode:
-
-```sh
-npm start
-```
-
-Now you'll need to pick a host to deploy it to.
-
-### DIY
-
-If you're familiar with deploying node applications, the built-in Remix app server is production-ready.
-
-Make sure to deploy the output of `remix build`
-
-- `build/`
-- `public/build/`
+Our base branch that everything comes from is called main. All branches originate from the main branch.
